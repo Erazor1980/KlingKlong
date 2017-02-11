@@ -22,9 +22,10 @@
 #include "Game.h"
 
 Game::Game( MainWindow& wnd )
-	:
-	wnd( wnd ),
-	gfx( wnd )
+    :
+    wnd( wnd ),
+    gfx( wnd ),
+    ball( Vec2( 300, 300 ), Vec2( 100, 0 ) )
 {
 }
 
@@ -38,8 +39,11 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
+    const float dt = ft.Mark();
+    ball.Update( dt );
 }
 
 void Game::ComposeFrame()
 {
+    ball.Draw( gfx );
 }
