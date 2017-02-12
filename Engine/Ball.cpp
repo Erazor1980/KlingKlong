@@ -15,7 +15,7 @@ void Ball::Draw( Graphics& gfx ) const
 
 void Ball::Update( float dt )
 {
-    pos += vel * dt;
+    pos += vel.GetNormalized() * dt * speed;
 }
 
 bool Ball::DoWallCollision( const RectF& walls )
