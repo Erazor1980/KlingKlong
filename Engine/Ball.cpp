@@ -85,14 +85,16 @@ void Ball::ReboundY( const eBouncePos bouncePos )
         vel = Vec2( -2, -1 ).GetNormalized();
         break;
     case CENTER:
-        if( vel.x < 0 )
+        vel.y = -vel.y;
+        vel.x *= 0.75f;
+        /*if( vel.x < 0 )
         {
             vel = Vec2( -1, -1 ).GetNormalized();
         }
         else
         {
             vel = Vec2( 1, -1 ).GetNormalized();
-        }
+        }*/
         break;
     case MID_RIGHT:
         vel = Vec2( 2, -1 ).GetNormalized();

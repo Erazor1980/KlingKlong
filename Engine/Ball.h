@@ -2,7 +2,7 @@
 #include "Vec2.h"
 #include "Graphics.h"
 
-#define EXTRA_DEBUG_STUFF 1
+#define EXTRA_DEBUG_STUFF 0
 
 /* position, where ball hit the paddle */
 enum eBouncePos

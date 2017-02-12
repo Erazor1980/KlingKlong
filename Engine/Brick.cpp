@@ -21,9 +21,9 @@ void Brick::Draw( Graphics& gfx ) const
         /* draw "damaged" brick */
         if( life < maxLife )
         {
-            for( int y = rect.top; y < rect.bottom; ++y )
+            for( int y = ( int )rect.top; y < ( int )rect.bottom; ++y )
             {
-                for( int x = rect.left; x < rect.right; ++x )
+                for( int x = ( int )rect.left; x < ( int )rect.right; ++x )
                 {
                     if( x % 2 == 1 && y % 2 == 1 )
                     {
