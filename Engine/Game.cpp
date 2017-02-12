@@ -29,10 +29,10 @@ Game::Game( MainWindow& wnd )
     walls( 0, float( gfx.ScreenWidth ), 0, float( gfx.ScreenHeight ) ),
     soundPad( L"Sounds\\arkpad.wav" ),
     soundBrick( L"Sounds\\arkbrick.wav" ),
-    pad( Vec2( 400, 500 ), 50, 15 )
+    pad( Vec2( 400, 500 ), 70, 15 )
 {
     const Color colors[ 4 ] = { Colors::Red, Colors::Green, Colors::Blue, Colors::Cyan };
-    const Vec2 topLeft( 0, 0 );
+    const Vec2 topLeft( 40, 40 );
 
     for( int y = 0; y < nBricksDown; ++y )
     {
