@@ -69,7 +69,7 @@ void Game::ResetBall()
 
 void Game::ResetPaddle()
 {
-    pad = Paddle( Vec2( gfx.ScreenWidth / 2, gfx.ScreenHeight - BOARD_PADDING - 80 ), 70, 15 );
+    pad = Paddle( Vec2( gfx.ScreenWidth / 2, gfx.ScreenHeight - BOARD_PADDING - 50 ), 70, 15 );
 }
 
 void Game::Go()

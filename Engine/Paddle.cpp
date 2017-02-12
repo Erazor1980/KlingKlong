@@ -24,14 +24,13 @@ void Paddle::Draw( Graphics& gfx ) const
     rect.right = GetRect().right - 2 * wingWidth;
     gfx.DrawRect( rect, wingColor );
 
-    //TODO test, später weg!
-#if 0
-    if( bounce < INVALID )
+#if EXTRA_DEBUG_STUFF
+    if( bounce < DEFAULT )
     {
         switch( bounce )
         {
         case LEFT:
-            gfx.DrawCircle( ( GetRect().left + 5, GetRect().top - 5, 3, Colors::Blue );
+            gfx.DrawCircle( GetRect().left + 5, GetRect().top - 5, 3, Colors::Blue );
             break;
         case MID_LEFT:
             gfx.DrawCircle( GetRect().left + 5 + wingWidth, GetRect().top - 5, 3, Colors::Blue );

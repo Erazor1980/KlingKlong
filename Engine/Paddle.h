@@ -27,6 +27,6 @@ private:
     Vec2 pos;
     bool isCooldwon = false;
 
-    //TODO remove later, test only!
-    eBouncePos bounce = INVALID;
+    // for debug infos
+    eBouncePos bounce = DEFAULT;
 };

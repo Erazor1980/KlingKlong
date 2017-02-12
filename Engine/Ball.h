@@ -2,6 +2,8 @@
 #include "Vec2.h"
 #include "Graphics.h"
 
+#define EXTRA_DEBUG_STUFF 1
+
 /* position, where ball hit the paddle */
 enum eBouncePos
 {
@@ -10,7 +12,7 @@ enum eBouncePos
     CENTER,
     MID_RIGHT,
     RIGHT,
-    INVALID
+    DEFAULT /* for bricks bouncing */
 };
 
 class Ball
@@ -22,7 +24,7 @@ public:
     void Update( float dt, const Vec2& paddleCenter );
     bool DoWallCollision( const RectF& walls );
     void ReboundX();
-    void ReboundY( const eBouncePos bouncePos = CENTER );
+    void ReboundY( const eBouncePos bouncePos = DEFAULT );
     RectF GetRect() const;
     Vec2 GetVelocity() const;
     Vec2 GetPosition() const;
