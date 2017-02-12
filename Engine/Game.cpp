@@ -25,13 +25,20 @@ Game::Game( MainWindow& wnd )
     :
     wnd( wnd ),
     gfx( wnd ),
-    ball( Vec2( 300 + 24, 300 ), Vec2( -300, -300 ) ),
-    walls( 0, float( gfx.ScreenWidth ), 0, float( gfx.ScreenHeight ) ),
     soundPad( L"Sounds\\arkpad.wav" ),
     soundBrick( L"Sounds\\arkbrick.wav" ),
     pad( Vec2( 400, 500 ), 70, 15 )
 {
-    const Color colors[ 4 ] = { Colors::Red, Colors::Green, Colors::Blue, Colors::Cyan };
+    ResetGame();
+}
+
+void Game::ResetGame()
+{
+    ball = Ball( Vec2( 300 + 24, 300 ), Vec2( -300, -300 ) );
+
+    walls = RectF( 0, float( gfx.ScreenWidth ), 0, float( gfx.ScreenHeight ) );
+
+    const Color colors[ 4 ] ={ Colors::Red, Colors::Green, Colors::Blue, Colors::Cyan };
     const Vec2 topLeft( 40, 40 );
 
     for( int y = 0; y < nBricksDown; ++y )
@@ -42,63 +49,94 @@ Game::Game( MainWindow& wnd )
             bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c );
         }
     }
+
+    lifes = MAX_LIFES;
 }
 
 void Game::Go()
 {
-	gfx.BeginFrame();	
-	UpdateModel();
+    gfx.BeginFrame();
+    float elapsedTime = ft.Mark();
+    while( elapsedTime > 0.0f )
+    {
+        const float dt = std::min( 0.0025f, elapsedTime );
+        UpdateModel( dt );
+        elapsedTime -= dt;
+    }
 	ComposeFrame();
 	gfx.EndFrame();
 }
 
-void Game::UpdateModel()
+void Game::UpdateModel( float dt )
 {
-    const float dt = ft.Mark();
-    pad.Update( wnd.kbd, dt );
-    pad.DoWallCollision( walls );
-    ball.Update( dt );
-    ball.DoWallCollision( walls );
-
-    bool collisionHappened = false;
-    float curColDistSq;
-    int curColIdx;
-
-    for( int i = 0; i < nBricks; ++i )
+    if( wnd.kbd.KeyIsPressed( VK_RETURN ) )
     {
-        if( bricks[ i ].CheckBallCollision( ball ) )
+        ResetGame();
+    }
+
+    if( lifes > 0 )
+    {
+        pad.Update( wnd.kbd, dt );
+        pad.DoWallCollision( walls );
+        ball.Update( dt );
+
+        bool collisionHappened = false;
+        float curColDistSq;
+        int curColIdx;
+
+        for( int i = 0; i < nBricks; ++i )
         {
-            const float newColDistSq = ( ball.GetPosition() - bricks[ i ].GetCenter() ).GetLengthSq();
-            if( collisionHappened )
+            if( bricks[ i ].CheckBallCollision( ball ) )
             {
-                if( newColDistSq < curColDistSq )
+                const float newColDistSq = ( ball.GetPosition() - bricks[ i ].GetCenter() ).GetLengthSq();
+                if( collisionHappened )
+                {
+                    if( newColDistSq < curColDistSq )
+                    {
+                        curColDistSq = newColDistSq;
+                        curColIdx = i;
+                    }
+                }
+                else
                 {
                     curColDistSq = newColDistSq;
                     curColIdx = i;
+                    collisionHappened = true;
                 }
             }
-            else
-            {
-                curColDistSq = newColDistSq;
-                curColIdx = i;
-                collisionHappened = true;
-            }
+        }
+        if( collisionHappened )
+        {
+            pad.ResetCooldown();
+            bricks[ curColIdx ].ExecuteBallCollision( ball );
+            soundBrick.Play();
+        }
+
+        if( pad.DoBallCollision( ball ) )
+        {
+            soundPad.Play();
+        }
+
+        if( ball.DoWallCollision( walls ) )
+        {
+            pad.ResetCooldown();
         }
     }
-    if( collisionHappened )
-    {
-        bricks[ curColIdx ].ExecuteBallCollision( ball );
-        soundBrick.Play();
-    }
+}
 
-    if( pad.DoBallCollision( ball ) )
-    {
-        soundPad.Play();
-    }
+void Game::DrawGameOver()
+{
+    RectF rect( 20,  gfx.ScreenWidth - 20, 20, gfx.ScreenHeight - 20 );
+    gfx.DrawRect( rect, Colors::Red );
 }
 
 void Game::ComposeFrame()
 {
+    if( lifes == 0 )
+    {
+        DrawGameOver();
+    }
+
     ball.Draw( gfx );
     for( const Brick& b : bricks )
     {

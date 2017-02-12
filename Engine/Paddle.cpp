@@ -17,12 +17,30 @@ void Paddle::Draw( Graphics& gfx ) const
     gfx.DrawRect( rect, color );
 }
 
-bool Paddle::DoBallCollision( Ball& ball ) const
+bool Paddle::DoBallCollision( Ball& ball )
 {
-    if( ball.GetVelocity().y > 0 && GetRect().IsOverlappingWith( ball.GetRect() ) )
+    if( !isCooldwon )
     {
-        ball.ReboundY();
-        return true;
+        const RectF rect = GetRect();
+        if( rect.IsOverlappingWith( ball.GetRect() ) )
+        {
+            const Vec2 ballPos = ball.GetPosition();
+
+            if( std::signbit( ball.GetVelocity().x ) == std::signbit( ( ballPos - pos ).x ) )
+            {
+                ball.ReboundY();
+            }
+            else if( ballPos.x >= rect.left && ballPos.x <= rect.right )
+            {
+                ball.ReboundY();
+            }
+            else
+            {
+                ball.ReboundX();
+            }
+            isCooldwon = true;
+            return true;
+        }
     }
     return false;
 }
@@ -55,4 +73,9 @@ void Paddle::Update( Keyboard& kbd, float dt )
 RectF Paddle::GetRect() const
 {
     return RectF::FromCenter( pos, halfWidth, halfHeight );
+}
+
+void Paddle::ResetCooldown()
+{
+    isCooldwon = false;
 }

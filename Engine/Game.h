@@ -29,6 +29,8 @@
 #include "Brick.h"
 #include "Paddle.h"
 
+#define MAX_LIFES 5
+
 class Game
 {
 public:
@@ -36,11 +38,13 @@ public:
 	Game( const Game& ) = delete;
 	Game& operator=( const Game& ) = delete;
 	void Go();
+    void ResetGame();
 private:
 	void ComposeFrame();
-	void UpdateModel();
+	void UpdateModel( float dt );
 	/********************************/
 	/*  User Functions              */
+    void DrawGameOver();
 	/********************************/
 private:
 	MainWindow& wnd;
@@ -50,7 +54,7 @@ private:
     static constexpr float brickWidth = 40.0f;
     static constexpr float brickHeight = 24.0f;
     static constexpr int nBricksAcross = 18;
-    static constexpr int nBricksDown = 4;
+    static constexpr int nBricksDown = 5;
     static constexpr int nBricks = nBricksDown * nBricksAcross;
     FrameTimer ft;
     Ball ball;
@@ -59,5 +63,6 @@ private:
     Brick bricks[ nBricks ];
     Sound soundPad;
     Sound soundBrick;
+    int lifes = MAX_LIFES;
 	/********************************/
 };
