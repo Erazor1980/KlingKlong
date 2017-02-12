@@ -1,11 +1,13 @@
 #include "Brick.h"
 #include <assert.h>
 
-Brick::Brick( const RectF& rect_in, Color color_in, bool isUndestroyable )
+Brick::Brick( const RectF& rect_in, Color color_in, int lifeToDestroy, bool isUndestroyable )
     :
     rect( rect_in ),
     color( color_in ),
     destroyed( false ),
+    maxLife( lifeToDestroy ),
+    life( maxLife ),
     undestroyable( isUndestroyable )
 {
 }
@@ -15,6 +17,21 @@ void Brick::Draw( Graphics& gfx ) const
     if( !destroyed )
     {
         gfx.DrawRect( rect.GetExpanded( -padding ), color );
+
+        /* draw "damaged" brick */
+        if( life < maxLife )
+        {
+            for( int y = rect.top; y < rect.bottom; ++y )
+            {
+                for( int x = rect.left; x < rect.right; ++x )
+                {
+                    if( x % 2 == 1 && y % 2 == 1 )
+                    {
+                        gfx.PutPixel( x, y, Colors::Black );
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -45,7 +62,11 @@ bool Brick::ExecuteBallCollision( Ball& ball )
 
     if( !undestroyable )
     {
-        destroyed = true;
+        life--;
+        if( life <= 0 )
+        {
+            destroyed = true;
+        }
     }
 
     return destroyed;

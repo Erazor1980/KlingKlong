@@ -8,7 +8,7 @@ class Brick
 {
 public:
     Brick() = default;
-    Brick( const RectF& rect_in, Color color_in, bool isUndestroyable = false );
+    Brick( const RectF& rect_in, Color color_in, int lifeToDestroy = 1, bool isUndestroyable = false );
     void Draw( Graphics& gfx ) const;
     bool CheckBallCollision( const Ball& ball ) const;
     bool ExecuteBallCollision( Ball& ball );    /* returns true, if brick has been destroyed */
@@ -20,4 +20,6 @@ private:
     Color color;
     bool destroyed = true;
     bool undestroyable = false;
+    int maxLife = 1;    /* so many hits needed to get destroyed */
+    int life = 1;   
 };

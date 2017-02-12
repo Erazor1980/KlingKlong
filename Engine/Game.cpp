@@ -56,12 +56,12 @@ void Game::ResetGame()
             if( 0 == x || nBricksAcross - 1 == x )
             {
                 bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
-                                                                brickWidth, brickHeight ), Colors::LightGray, true );
+                                                                brickWidth, brickHeight ), Colors::LightGray, 1, true );
                 nBricksLeft--;
             }
             else
             {
-                bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c );
+                bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c, 2 );
             }
         }
     }
