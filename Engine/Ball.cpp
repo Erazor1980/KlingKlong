@@ -13,9 +13,16 @@ void Ball::Draw( Graphics& gfx ) const
     SpriteCodex::DrawBall( pos, gfx );
 }
 
-void Ball::Update( float dt )
+void Ball::Update( float dt, const Vec2& paddleCenter )
 {
-    pos += vel.GetNormalized() * dt * speed;
+    if( moving )
+    {
+        pos += vel.GetNormalized() * dt * speed;
+    }
+    else
+    {
+        pos.x = paddleCenter.x;
+    }
 }
 
 bool Ball::DoWallCollision( const RectF& walls )
@@ -73,4 +80,14 @@ Vec2 Ball::GetVelocity() const
 Vec2 Ball::GetPosition() const
 {
     return pos;
+}
+
+void Ball::Start()
+{
+    moving = true;
+}
+
+void Ball::Stop()
+{
+    moving = false;
 }

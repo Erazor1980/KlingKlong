@@ -30,6 +30,7 @@
 #include "Paddle.h"
 
 #define MAX_LIFES 5
+#define BOARD_PADDING 40 /* in pixel from screen border to game border */
 
 class Game
 {
@@ -38,13 +39,16 @@ public:
 	Game( const Game& ) = delete;
 	Game& operator=( const Game& ) = delete;
 	void Go();
-    void ResetGame();
 private:
 	void ComposeFrame();
 	void UpdateModel( float dt );
 	/********************************/
 	/*  User Functions              */
     void DrawGameOver();
+    void DrawLifesLeft();
+    void ResetGame();
+    void ResetBall();
+    void ResetPaddle();
 	/********************************/
 private:
 	MainWindow& wnd;
@@ -53,9 +57,10 @@ private:
 	/*  User Variables              */
     static constexpr float brickWidth = 40.0f;
     static constexpr float brickHeight = 24.0f;
-    static constexpr int nBricksAcross = 18;
-    static constexpr int nBricksDown = 5;
+    static constexpr int nBricksAcross = 1;
+    static constexpr int nBricksDown = 1;
     static constexpr int nBricks = nBricksDown * nBricksAcross;
+    int nBricksLeft = nBricks;
     FrameTimer ft;
     Ball ball;
     Paddle pad;
@@ -63,6 +68,9 @@ private:
     Brick bricks[ nBricks ];
     Sound soundPad;
     Sound soundBrick;
+    Sound soundGameOver;
+    Sound soundLifeLoss;
+    //Sound soundVictory;
     int lifes = MAX_LIFES;
 	/********************************/
 };

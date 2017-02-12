@@ -9,6 +9,7 @@
 class Paddle
 {
 public:
+    Paddle() = default;
     Paddle( const Vec2& pos_in, float halfWidth_in, float halfHeight_in );
     void Draw( Graphics& gfx ) const;
     bool DoBallCollision( Ball& ball );

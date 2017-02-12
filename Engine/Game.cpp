@@ -27,20 +27,25 @@ Game::Game( MainWindow& wnd )
     gfx( wnd ),
     soundPad( L"Sounds\\arkpad.wav" ),
     soundBrick( L"Sounds\\arkbrick.wav" ),
-    pad( Vec2( 400, 500 ), 70, 15 )
+    soundLifeLoss( L"Sounds\\fart1.wav" ),
+    soundGameOver( L"Sounds\\gameover.wav" )
+    //soundVictory( L"Sounds\\victory.wav" )
 {
+    walls = RectF( Vec2( BOARD_PADDING, BOARD_PADDING ), Vec2( gfx.ScreenWidth - BOARD_PADDING, gfx.ScreenHeight - BOARD_PADDING ) );
     ResetGame();
 }
 
 void Game::ResetGame()
 {
-    ball = Ball( Vec2( 300 + 24, 300 ), Vec2( -3, -3 ) );
+    // reset paddle
+    ResetPaddle();
 
-    ;
-    walls = RectF( Vec2( 40, 40 ), Vec2( gfx.ScreenWidth - 40, gfx.ScreenHeight - 40 ) );
-
+    // reset ball
+    ResetBall();
+    
+    // reset bricks
     const Color colors[ 4 ] ={ Colors::Red, Colors::Green, Colors::Blue, Colors::Cyan };
-    const Vec2 topLeft( 40, 40 );
+    const Vec2 topLeft( 90, 90 );
 
     for( int y = 0; y < nBricksDown; ++y )
     {
@@ -51,7 +56,19 @@ void Game::ResetGame()
         }
     }
 
+    // reset life
     lifes = MAX_LIFES;
+}
+
+void Game::ResetBall()
+{
+    ball = Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ) , Vec2( -3, -3 ) );
+    ball.Stop();
+}
+
+void Game::ResetPaddle()
+{
+    pad = Paddle( Vec2( gfx.ScreenWidth / 2, gfx.ScreenHeight - BOARD_PADDING - 80 ), 70, 15 );
 }
 
 void Game::Go()
@@ -70,16 +87,21 @@ void Game::Go()
 
 void Game::UpdateModel( float dt )
 {
-    if( wnd.kbd.KeyIsPressed( VK_RETURN ) )
+    if( wnd.kbd.KeyIsPressed( VK_SPACE ) )
     {
-        ResetGame();
+        ball.Start();
+    }
+    
+    if( 0 == nBricksLeft )
+    {
+        //soundVictory.Play();
     }
 
     if( lifes > 0 )
     {
         pad.Update( wnd.kbd, dt );
         pad.DoWallCollision( walls );
-        ball.Update( dt );
+        ball.Update( dt, pad.GetRect().GetCenter() );
 
         bool collisionHappened = false;
         float curColDistSq;
@@ -111,6 +133,7 @@ void Game::UpdateModel( float dt )
             pad.ResetCooldown();
             bricks[ curColIdx ].ExecuteBallCollision( ball );
             soundBrick.Play();
+            nBricksLeft--;
         }
 
         if( pad.DoBallCollision( ball ) )
@@ -121,6 +144,28 @@ void Game::UpdateModel( float dt )
         if( ball.DoWallCollision( walls ) )
         {
             pad.ResetCooldown();
+        }
+
+        if( ball.GetPosition().y >= walls.bottom - 10 )
+        {
+            lifes--;
+            if( 0 == lifes )
+            {
+                soundGameOver.Play();
+            }
+            else
+            {
+                ResetPaddle();
+                ResetBall();
+                soundLifeLoss.Play();
+            }
+        }
+    }
+    else
+    {
+        if( wnd.kbd.KeyIsPressed( VK_RETURN ) )
+        {
+            ResetGame();
         }
     }
 }
@@ -139,6 +184,15 @@ void Game::DrawGameOver()
     }
 }
 
+void Game::DrawLifesLeft()
+{
+    const int radius = BOARD_PADDING / 4;
+    for( int i = 1; i <= lifes; ++i )
+    {
+        gfx.DrawCircle( i * radius * 3 + 40, BOARD_PADDING / 2, radius, Colors::Red );
+    }
+}
+
 void Game::ComposeFrame()
 {
     ball.Draw( gfx );
@@ -148,7 +202,9 @@ void Game::ComposeFrame()
     }
     pad.Draw( gfx );
 
-    gfx.DrawRectBorder( RectF( Vec2( 40, 40 ), Vec2( gfx.ScreenWidth - 40, gfx.ScreenHeight - 40 ) ), 4, Colors::Red );
+    gfx.DrawRectBorder( walls, 3, Colors::LightGray );
+
+    DrawLifesLeft();
 
     if( lifes == 0 )
     {
