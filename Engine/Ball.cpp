@@ -10,6 +10,18 @@ Ball::Ball( const Vec2& pos_in, const Vec2& vel_in )
 
 void Ball::Draw( Graphics& gfx ) const
 {
+    // draw ball direction line when stopped
+    if( !moving )
+    {
+        Vec2 dir = pos + vel.GetNormalized();
+        for( int i = 1; i <= 10; ++i )
+        {
+            gfx.PutPixel( dir.x, dir.y, Colors::Gray );
+            dir += vel.GetNormalized() * 7;
+        }
+    }
+
+    // draw ball
     SpriteCodex::DrawBall( pos, gfx );
 }
 

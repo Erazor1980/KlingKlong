@@ -29,7 +29,7 @@
 #include "Brick.h"
 #include "Paddle.h"
 
-#define MAX_LIFES 1
+#define MAX_LIFES 5
 #define BOARD_PADDING 40 /* in pixel from screen border to game border */
 
 class Game
@@ -58,8 +58,8 @@ private:
 	/*  User Variables              */
     static constexpr float brickWidth = 40.0f;
     static constexpr float brickHeight = 24.0f;
-    static constexpr int nBricksAcross = 1;
-    static constexpr int nBricksDown = 1;
+    static constexpr int nBricksAcross = 18;
+    static constexpr int nBricksDown = 4;
     static constexpr int nBricks = nBricksDown * nBricksAcross;
     int nBricksLeft = nBricks;
     FrameTimer ft;
