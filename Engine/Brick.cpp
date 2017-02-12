@@ -1,11 +1,12 @@
 #include "Brick.h"
 #include <assert.h>
 
-Brick::Brick( const RectF& rect_in, Color color_in )
+Brick::Brick( const RectF& rect_in, Color color_in, bool isUndestroyable )
     :
     rect( rect_in ),
     color( color_in ),
-    destroyed( false )
+    destroyed( false ),
+    undestroyable( isUndestroyable )
 {
 }
 
@@ -22,7 +23,7 @@ bool Brick::CheckBallCollision( const Ball & ball ) const
     return !destroyed && rect.IsOverlappingWith( ball.GetRect() );
 }
 
-void Brick::ExecuteBallCollision( Ball& ball )
+bool Brick::ExecuteBallCollision( Ball& ball )
 {
     assert( CheckBallCollision( ball ) );
 
@@ -41,7 +42,13 @@ void Brick::ExecuteBallCollision( Ball& ball )
     {
         ball.ReboundX();
     }
-    destroyed = true;
+
+    if( !undestroyable )
+    {
+        destroyed = true;
+    }
+
+    return destroyed;
 }
 
 bool Brick::IsDestroyed() const

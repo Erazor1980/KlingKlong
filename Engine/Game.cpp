@@ -47,15 +47,24 @@ void Game::ResetGame()
     const Color colors[ 4 ] ={ Colors::Red, Colors::Green, Colors::Blue, Colors::Cyan };
     const Vec2 topLeft( 90, 90 );
 
+    nBricksLeft = nBricks;
     for( int y = 0; y < nBricksDown; ++y )
     {
         const Color c = colors[ y ];
         for( int x = 0; x < nBricksAcross; ++x )
         {
-            bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c );
+            if( 0 == x || nBricksAcross - 1 == x )
+            {
+                bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
+                                                                brickWidth, brickHeight ), Colors::LightGray, true );
+                nBricksLeft--;
+            }
+            else
+            {
+                bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c );
+            }
         }
     }
-    nBricksLeft = nBricks;
 
     // reset life
     lifes = MAX_LIFES;
@@ -108,7 +117,6 @@ void Game::UpdateModel( float dt )
         bool collisionHappened = false;
         float curColDistSq;
         int curColIdx;
-
         for( int i = 0; i < nBricks; ++i )
         {
             if( bricks[ i ].CheckBallCollision( ball ) )
@@ -133,15 +141,15 @@ void Game::UpdateModel( float dt )
         if( collisionHappened )
         {
             pad.ResetCooldown();
-            bricks[ curColIdx ].ExecuteBallCollision( ball );
-            nBricksLeft--;
+            if( bricks[ curColIdx ].ExecuteBallCollision( ball ) )
+            {
+                nBricksLeft--;
+            }
+            
+            soundBrick.Play();
             if( 0 == nBricksLeft )
             {
                 soundVictory.Play();
-            }
-            else
-            {
-                soundBrick.Play();
             }
         }
 
