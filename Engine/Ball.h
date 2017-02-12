@@ -2,6 +2,17 @@
 #include "Vec2.h"
 #include "Graphics.h"
 
+/* position, where ball hit the paddle */
+enum eBouncePos
+{
+    LEFT = 0,
+    MID_LEFT,
+    CENTER,
+    MID_RIGHT,
+    RIGHT,
+    INVALID
+};
+
 class Ball
 {
 public:
@@ -11,7 +22,7 @@ public:
     void Update( float dt, const Vec2& paddleCenter );
     bool DoWallCollision( const RectF& walls );
     void ReboundX();
-    void ReboundY();
+    void ReboundY( const eBouncePos bouncePos = CENTER );
     RectF GetRect() const;
     Vec2 GetVelocity() const;
     Vec2 GetPosition() const;

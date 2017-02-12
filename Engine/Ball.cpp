@@ -16,7 +16,7 @@ void Ball::Draw( Graphics& gfx ) const
         Vec2 dir = pos + vel.GetNormalized();
         for( int i = 1; i <= 10; ++i )
         {
-            gfx.PutPixel( dir.x, dir.y, Colors::Gray );
+            gfx.PutPixel( ( int )dir.x, ( int )dir.y, Colors::Gray );
             dir += vel.GetNormalized() * 7;
         }
     }
@@ -74,9 +74,28 @@ void Ball::ReboundX()
     vel.x = -vel.x;
 }
 
-void Ball::ReboundY()
+void Ball::ReboundY( const eBouncePos bouncePos )
 {
-    vel.y = -vel.y;
+    switch( bouncePos )
+    {
+    case LEFT:
+        vel = Vec2( -2, -1 ).GetNormalized();
+        //moving = false;
+        break;
+    case MID_LEFT:
+        vel = Vec2( -1, -1 ).GetNormalized();
+        break;
+    case CENTER:
+        vel.y = -vel.y;
+        break;
+    case RIGHT:
+        vel = Vec2( 2, -1 ).GetNormalized();
+        //moving = false;
+        break;
+    case MID_RIGHT:
+        vel = Vec2( 1, -1 ).GetNormalized();
+        break;
+    }
 }
 
 RectF Ball::GetRect() const

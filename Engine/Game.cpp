@@ -63,7 +63,7 @@ void Game::ResetGame()
 
 void Game::ResetBall()
 {
-    ball = Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ) , Vec2( -3, -3 ) );
+    ball = Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ) , Vec2( 0.001, -3 ) );
     ball.Stop();
 }
 
@@ -91,6 +91,12 @@ void Game::UpdateModel( float dt )
     if( wnd.kbd.KeyIsPressed( VK_SPACE ) )
     {
         ball.Start();
+    }
+
+    //TODO remove later! for testing
+    if( wnd.kbd.KeyIsPressed( VK_RETURN ) )
+    {
+        ResetGame();
     }
     
     if( lifes > 0 && nBricksLeft > 0 )

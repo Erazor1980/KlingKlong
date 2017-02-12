@@ -26,4 +26,7 @@ private:
     float halfHeight;
     Vec2 pos;
     bool isCooldwon = false;
+
+    //TODO remove later, test only!
+    eBouncePos bounce = INVALID;
 };
