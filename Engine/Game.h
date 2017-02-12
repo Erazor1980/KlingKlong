@@ -29,7 +29,7 @@
 #include "Brick.h"
 #include "Paddle.h"
 
-#define MAX_LIFES 5
+#define MAX_LIFES 1
 #define BOARD_PADDING 40 /* in pixel from screen border to game border */
 
 class Game
@@ -45,6 +45,7 @@ private:
 	/********************************/
 	/*  User Functions              */
     void DrawGameOver();
+    void DrawVictory();
     void DrawLifesLeft();
     void ResetGame();
     void ResetBall();
@@ -70,7 +71,7 @@ private:
     Sound soundBrick;
     Sound soundGameOver;
     Sound soundLifeLoss;
-    //Sound soundVictory;
+    Sound soundVictory;
     int lifes = MAX_LIFES;
 	/********************************/
 };

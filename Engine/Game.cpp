@@ -28,8 +28,8 @@ Game::Game( MainWindow& wnd )
     soundPad( L"Sounds\\arkpad.wav" ),
     soundBrick( L"Sounds\\arkbrick.wav" ),
     soundLifeLoss( L"Sounds\\fart1.wav" ),
-    soundGameOver( L"Sounds\\gameover.wav" )
-    //soundVictory( L"Sounds\\victory.wav" )
+    soundGameOver( L"Sounds\\gameover.wav" ),
+    soundVictory( L"Sounds\\victory.wav" )
 {
     walls = RectF( Vec2( BOARD_PADDING, BOARD_PADDING ), Vec2( gfx.ScreenWidth - BOARD_PADDING, gfx.ScreenHeight - BOARD_PADDING ) );
     ResetGame();
@@ -55,6 +55,7 @@ void Game::ResetGame()
             bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c );
         }
     }
+    nBricksLeft = nBricks;
 
     // reset life
     lifes = MAX_LIFES;
@@ -92,12 +93,7 @@ void Game::UpdateModel( float dt )
         ball.Start();
     }
     
-    if( 0 == nBricksLeft )
-    {
-        //soundVictory.Play();
-    }
-
-    if( lifes > 0 )
+    if( lifes > 0 && nBricksLeft > 0 )
     {
         pad.Update( wnd.kbd, dt );
         pad.DoWallCollision( walls );
@@ -132,8 +128,15 @@ void Game::UpdateModel( float dt )
         {
             pad.ResetCooldown();
             bricks[ curColIdx ].ExecuteBallCollision( ball );
-            soundBrick.Play();
             nBricksLeft--;
+            if( 0 == nBricksLeft )
+            {
+                soundVictory.Play();
+            }
+            else
+            {
+                soundBrick.Play();
+            }
         }
 
         if( pad.DoBallCollision( ball ) )
@@ -172,13 +175,27 @@ void Game::UpdateModel( float dt )
 
 void Game::DrawGameOver()
 {
-    Vec2 topLeft( 20, 20 );
+    Vec2 topLeft( 80, 80 );
     float rectWidth = gfx.ScreenWidth - 2 * topLeft.x;
 
     while( rectWidth > 250 )
     {
         Vec2 bottomRight( gfx.ScreenWidth - topLeft.x, gfx.ScreenHeight - topLeft.y );
         gfx.DrawRectBorder( RectF( topLeft, bottomRight ), 4, Colors::Cyan ); //Colors::MakeRGB( rand() % 255, rand() % 255, rand() % 255 ) );
+        topLeft += Vec2( 60, 60 );
+        rectWidth = bottomRight.x - topLeft.x;
+    }
+}
+
+void Game::DrawVictory()
+{
+    Vec2 topLeft( 70, 70 );
+    float rectWidth = gfx.ScreenWidth - 2 * topLeft.x;
+
+    while( rectWidth > 250 )
+    {
+        Vec2 bottomRight( gfx.ScreenWidth - topLeft.x, gfx.ScreenHeight - topLeft.y );
+        gfx.DrawRectBorder( RectF( topLeft, bottomRight ), 4, Colors::MakeRGB( rand() % 255, rand() % 255, rand() % 255 ) );
         topLeft += Vec2( 30, 30 );
         rectWidth = bottomRight.x - topLeft.x;
     }
@@ -206,8 +223,12 @@ void Game::ComposeFrame()
 
     DrawLifesLeft();
 
-    if( lifes == 0 )
+    if( 0 == lifes )
     {
         DrawGameOver();
+    }
+    if( 0 == nBricksLeft )
+    {
+        DrawVictory();
     }
 }
