@@ -34,9 +34,10 @@ Game::Game( MainWindow& wnd )
 
 void Game::ResetGame()
 {
-    ball = Ball( Vec2( 300 + 24, 300 ), Vec2( -300, -300 ) );
+    ball = Ball( Vec2( 300 + 24, 300 ), Vec2( -3, -3 ) );
 
-    walls = RectF( 0, float( gfx.ScreenWidth ), 0, float( gfx.ScreenHeight ) );
+    ;
+    walls = RectF( Vec2( 40, 40 ), Vec2( gfx.ScreenWidth - 40, gfx.ScreenHeight - 40 ) );
 
     const Color colors[ 4 ] ={ Colors::Red, Colors::Green, Colors::Blue, Colors::Cyan };
     const Vec2 topLeft( 40, 40 );
@@ -126,21 +127,31 @@ void Game::UpdateModel( float dt )
 
 void Game::DrawGameOver()
 {
-    RectF rect( 20,  gfx.ScreenWidth - 20, 20, gfx.ScreenHeight - 20 );
-    gfx.DrawRect( rect, Colors::Red );
+    Vec2 topLeft( 20, 20 );
+    float rectWidth = gfx.ScreenWidth - 2 * topLeft.x;
+
+    while( rectWidth > 250 )
+    {
+        Vec2 bottomRight( gfx.ScreenWidth - topLeft.x, gfx.ScreenHeight - topLeft.y );
+        gfx.DrawRectBorder( RectF( topLeft, bottomRight ), 4, Colors::Cyan ); //Colors::MakeRGB( rand() % 255, rand() % 255, rand() % 255 ) );
+        topLeft += Vec2( 30, 30 );
+        rectWidth = bottomRight.x - topLeft.x;
+    }
 }
 
 void Game::ComposeFrame()
 {
-    if( lifes == 0 )
-    {
-        DrawGameOver();
-    }
-
     ball.Draw( gfx );
     for( const Brick& b : bricks )
     {
         b.Draw( gfx );
     }
     pad.Draw( gfx );
+
+    gfx.DrawRectBorder( RectF( Vec2( 40, 40 ), Vec2( gfx.ScreenWidth - 40, gfx.ScreenHeight - 40 ) ), 4, Colors::Red );
+
+    if( lifes == 0 )
+    {
+        DrawGameOver();
+    }
 }

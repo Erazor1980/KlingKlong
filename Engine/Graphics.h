@@ -62,7 +62,10 @@ public:
     {
         DrawRect( ( int )rect.left, ( int )rect.top, ( int )rect.right, ( int )rect.bottom, c );
     }
-
+    void DrawRect( const Vec2& topLeft, const Vec2& bottomRight, Color c )
+    {
+        DrawRect( ( int )topLeft.x, ( int )topLeft.y, ( int )bottomRight.x, ( int )bottomRight.y, c );
+    }
     void DrawRectBorder( const RectF& rect, const int border, Color c );
 	void DrawCircle( int x,int y,int radius,Color c );
 	~Graphics();
@@ -81,6 +84,6 @@ private:
 	D3D11_MAPPED_SUBRESOURCE							mappedSysBufferTexture;
 	Color*                                              pSysBuffer = nullptr;
 public:
-	static constexpr int ScreenWidth = 800;
-	static constexpr int ScreenHeight = 600;
+	static constexpr int ScreenWidth = 900;
+	static constexpr int ScreenHeight = 700;
 };
