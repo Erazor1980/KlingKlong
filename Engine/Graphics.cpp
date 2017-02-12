@@ -336,6 +336,21 @@ void Graphics::DrawRect( int x0,int y0,int x1,int y1,Color c )
 	}
 }
 
+void Graphics::DrawRectBorder( const RectF& rect, const int border, Color c )
+{
+    const Vec2 topLeft( rect.left, rect.top );
+    const Vec2 bottomRight( rect.right, rect.bottom );
+
+    // top line
+    DrawRect( ( int )topLeft.x, ( int )topLeft.y, ( int )bottomRight.x, ( int )topLeft.y + border, c );
+    // bottom line
+    DrawRect( ( int )topLeft.x, ( int )bottomRight.y - border, ( int )bottomRight.x, ( int )bottomRight.y, c );
+    // left line
+    DrawRect( ( int )topLeft.x, ( int )topLeft.y, ( int )topLeft.x + border, ( int )bottomRight.y, c );
+    // right line
+    DrawRect( ( int )bottomRight.x - border, ( int )topLeft.y, ( int )bottomRight.x, ( int )bottomRight.y, c );
+}
+
 void Graphics::DrawCircle( int x,int y,int radius,Color c )
 {
 	const int rad_sq = radius * radius;
