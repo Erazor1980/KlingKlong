@@ -78,9 +78,9 @@ void Game::ResetGame()
 
 void Game::ResetBall()
 {
-    ball = Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ) , Vec2( 0, -3 ) );
-    //ball.Stop();
-    ball.StickToPaddle( pad.GetRect().GetCenter().x );
+    ball = Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ) , Vec2( -0.2, -1 ) );
+    ball.Stop();
+    //ball.StickToPaddle( pad.GetRect().GetCenter().x );
 }
 
 void Game::ResetPaddle()
@@ -117,9 +117,12 @@ void Game::UpdateModel( float dt )
     
     if( lifes > 0 && nBricksLeft > 0 )
     {
-        pad.Update( wnd.kbd, dt );
+        if( ball.GetState() != WAITING )
+        {
+            pad.Update( wnd.kbd, dt );
+        }
         pad.DoWallCollision( walls.GetInnerBounds() );
-        ball.Update( dt, pad.GetRect().GetCenter().x );
+        ball.Update( dt, pad.GetRect().GetCenter().x, wnd.kbd );
 
         bool collisionHappened = false;
         float curColDistSq;

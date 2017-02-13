@@ -25,7 +25,7 @@ void Ball::Draw( Graphics& gfx ) const
     SpriteCodex::DrawBall( pos, gfx );
 }
 
-void Ball::Update( float dt, const float paddleCenterX )
+void Ball::Update( float dt, const float paddleCenterX, const Keyboard& kbd )
 {
     if( MOVING == ballState )
     {
@@ -33,7 +33,24 @@ void Ball::Update( float dt, const float paddleCenterX )
     }
     else if( WAITING == ballState )
     {
-        //TODO
+        //Vec2 dirNorm = dir.GetNormalized();
+        float angle = atan2( dir.y, dir.x );
+        
+        float angleChange = DEG2RAD( 0.3 );
+        if( kbd.KeyIsPressed( VK_LEFT ) && atan2( dir.y, dir.x ) > DEG2RAD( -150 ) )
+        {
+            float rotatedX = dir.x * cos( -angleChange ) - dir.y * sin( -angleChange );
+            float rotatedY = dir.x * sin( -angleChange ) + dir.y * cos( -angleChange );
+            SetDirection( Vec2( rotatedX, rotatedY ) );
+        }
+        else if( kbd.KeyIsPressed( VK_RIGHT ) && atan2( dir.y, dir.x ) < DEG2RAD( -30 )  )
+        {
+            float rotatedX = dir.x * cos( angleChange ) - dir.y * sin( angleChange );
+            float rotatedY = dir.x * sin( angleChange ) + dir.y * cos( angleChange );
+            SetDirection( Vec2( rotatedX, rotatedY ) );
+        }
+
+
     }
     else if( STICKING == ballState )
     {
@@ -96,6 +113,11 @@ Vec2 Ball::GetDirection() const
 Vec2 Ball::GetPosition() const
 {
     return pos;
+}
+
+eBallState Ball::GetState() const
+{
+    return ballState;
 }
 
 void Ball::SetDirection( const Vec2& dir_in )
