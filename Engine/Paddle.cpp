@@ -11,13 +11,30 @@ Paddle::Paddle( const Vec2 & pos_in, float halfWidth_in, float halfHeight_in )
 {
 }
 
-void Paddle::Draw( Graphics & gfx ) const
+void Paddle::Draw( Graphics& gfx ) const
 {
     RectF rect = GetRect();
     gfx.DrawRect( rect, wingColor );
     rect.left += wingWidth;
     rect.right -= wingWidth;
     gfx.DrawRect( rect, color );
+}
+
+void Paddle::DrawAsLifesRemaining( Graphics &gfx, const int lifesRemaining, const Vec2& pos, const float sizeRatio ) const
+{
+    /* calc size of life paddles to draw */
+    const float w = ( halfWidth * 2 ) * sizeRatio;
+    const float h = ( halfHeight * 2 ) * sizeRatio;
+    const float wingW = wingWidth * sizeRatio;
+
+    for( int i = 0; i < lifesRemaining; ++i )
+    {
+        RectF rect( pos + Vec2( i * 1.5f * w, 0 ), w, h );
+        gfx.DrawRect( rect, wingColor );
+        rect.left += wingW;
+        rect.right -= wingW;
+        gfx.DrawRect( rect, color );
+    }
 }
 
 bool Paddle::DoBallCollision( Ball & ball )

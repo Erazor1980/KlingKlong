@@ -29,9 +29,9 @@ Game::Game( MainWindow& wnd )
     soundBrick( L"Sounds\\arkbrick.wav" ),
     soundLifeLoss( L"Sounds\\fart1.wav" ),
     soundGameOver( L"Sounds\\gameover.wav" ),
-    soundVictory( L"Sounds\\victory.wav" )
+    soundVictory( L"Sounds\\victory.wav" ),
+    walls( RectF::FromCenter( Graphics::GetScreenRect().GetCenter(), fieldWidth / 2.0f, fieldHeight / 2.0f ), wallThickness, wallColor )
 {
-    walls = RectF( Vec2( BOARD_PADDING, BOARD_PADDING ), Vec2( gfx.ScreenWidth - BOARD_PADDING, gfx.ScreenHeight - BOARD_PADDING ) );
     ResetGame();
 }
 
@@ -44,13 +44,13 @@ void Game::ResetGame()
     ResetBall();
     
     // reset bricks
-    const Color colors[ 4 ] ={ Colors::Red, Colors::Green, Colors::Blue, Colors::Cyan };
-    const Vec2 topLeft( 90, 90 );
+    //const Color colors[ 4 ] ={ Colors::Red, Colors::Green, Colors::Blue, Colors::Cyan };
+    const Vec2 topLeft( walls.GetInnerBounds().left + distWallBricks, walls.GetInnerBounds().top + 50 );
 
     nBricksLeft = nBricks;
     for( int y = 0; y < nBricksDown; ++y )
     {
-        const Color c = colors[ y ];
+        const Color c = brickColors[ y ];
         for( int x = 0; x < nBricksAcross; ++x )
         {
             if( 0 == x || nBricksAcross - 1 == x )
@@ -86,7 +86,7 @@ void Game::ResetBall()
 
 void Game::ResetPaddle()
 {
-    pad = Paddle( Vec2( gfx.ScreenWidth / 2, gfx.ScreenHeight - BOARD_PADDING - 50 ), 70, 15 );
+    pad = Paddle( Vec2( gfx.ScreenWidth / 2, gfx.ScreenHeight - 80 ), 70, 15 );
 }
 
 void Game::Go()
@@ -119,7 +119,7 @@ void Game::UpdateModel( float dt )
     if( lifes > 0 && nBricksLeft > 0 )
     {
         pad.Update( wnd.kbd, dt );
-        pad.DoWallCollision( walls );
+        pad.DoWallCollision( walls.GetInnerBounds() );
         ball.Update( dt, pad.GetRect().GetCenter() );
 
         bool collisionHappened = false;
@@ -166,10 +166,15 @@ void Game::UpdateModel( float dt )
             soundPad.Play();
         }
 
-        const int collResult = ball.DoWallCollision( walls );
+        const int collResult = ball.DoWallCollision( walls.GetInnerBounds() );
         if( 1 == collResult )
         {
-            pad.ResetCooldown();
+            // only reset cooldown if not still coliding with ball
+            // (helps prevent weird shit when ball is trapped against wall)
+            if( !pad.GetRect().IsOverlappingWith( ball.GetRect() ) )
+            {
+                pad.ResetCooldown();
+            }
         }
         else if( 2 == collResult )
         {
@@ -223,14 +228,14 @@ void Game::DrawVictory()
     }
 }
 
-void Game::DrawLifesLeft()
-{
-    const int radius = BOARD_PADDING / 4;
-    for( int i = 1; i <= lifes; ++i )
-    {
-        gfx.DrawCircle( i * radius * 3 + 40, BOARD_PADDING / 2, radius, Colors::Red );
-    }
-}
+//void Game::DrawLifesLeft()
+//{
+//    const int radius = 10;
+//    for( int i = 1; i <= lifes; ++i )
+//    {
+//        gfx.DrawCircle( i * radius * 3 + 40, 20, radius, Colors::Red );
+//    }
+//}
 
 void Game::ComposeFrame()
 {
@@ -241,9 +246,10 @@ void Game::ComposeFrame()
     }
     pad.Draw( gfx );
 
-    gfx.DrawRectBorder( walls, 3, Colors::LightGray );
+    //gfx.DrawRectBorder( walls, 3, Colors::LightGray );
+    walls.Draw( gfx );
 
-    DrawLifesLeft();
+    pad.DrawAsLifesRemaining( gfx, lifes, Vec2( walls.GetInnerBounds().left, 15 ), 0.3f );
 
     if( 0 == lifes )
     {

@@ -4,7 +4,7 @@
 Brick::Brick( const RectF& rect_in, Color color_in, int lifeToDestroy, bool isUndestroyable )
     :
     rect( rect_in ),
-    color( color_in ),
+    bev( color_in ),
     destroyed( false ),
     maxLife( lifeToDestroy ),
     life( maxLife ),
@@ -16,8 +16,8 @@ void Brick::Draw( Graphics& gfx ) const
 {
     if( !destroyed )
     {
-        gfx.DrawRect( rect.GetExpanded( -padding ), color );
-
+        //gfx.DrawRect( rect.GetExpanded( -padding ), color );
+        bev.DrawBeveledBrick( rect.GetExpanded( -padding ), bevelSize, gfx );
         /* draw "damaged" brick */
         if( life < maxLife )
         {

@@ -3,6 +3,7 @@
 #include "Colors.h"
 #include "Graphics.h"
 #include "Ball.h"
+#include "Beveler.h"
 
 class Brick
 {
@@ -16,8 +17,10 @@ public:
     Vec2 GetCenter() const;
 private:
     static constexpr float padding = 1.0f;
+    static constexpr int bevelSize = 3;
+    Beveler bev;
     RectF rect;
-    Color color;
+    //Color color;
     bool destroyed = true;
     bool undestroyable = false;
     int maxLife = 1;    /* so many hits needed to get destroyed */

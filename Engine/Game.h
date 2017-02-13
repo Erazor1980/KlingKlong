@@ -28,9 +28,10 @@
 #include "Sound.h"
 #include "Brick.h"
 #include "Paddle.h"
+#include "Walls.h"
 
 #define MAX_LIFES 5
-#define BOARD_PADDING 40 /* in pixel from screen border to game border */
+//#define BOARD_PADDING 40 /* in pixel from screen border to game border */
 
 class Game
 {
@@ -46,7 +47,7 @@ private:
 	/*  User Functions              */
     void DrawGameOver();
     void DrawVictory();
-    void DrawLifesLeft();
+    //void DrawLifesLeft();
     void ResetGame();
     void ResetBall();
     void ResetPaddle();
@@ -56,16 +57,24 @@ private:
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
-    static constexpr float brickWidth = 40.0f;
-    static constexpr float brickHeight = 24.0f;
+    static constexpr float brickWidth = 38.0f;
+    static constexpr float brickHeight = 22.0f;
     static constexpr int nBricksAcross = 18;
     static constexpr int nBricksDown = 4;
     static constexpr int nBricks = nBricksDown * nBricksAcross;
     int nBricksLeft = nBricks;  /* only destructible bricks! */
+
+    static constexpr float wallThickness = 12.0f;
+    static constexpr float fieldWidth = float( nBricksAcross ) * brickWidth + 100;
+    static constexpr float fieldHeight = float( Graphics::ScreenHeight ) - 100;
+    static constexpr float distWallBricks = ( fieldWidth - brickWidth * nBricksAcross ) / 2.0f;
+    static constexpr Color wallColor = { 20, 60, 200 };
+    static constexpr Color brickColors[ 4 ] = { { 230, 0, 0 }, { 0, 230, 0 }, { 0, 0, 230 }, { 0, 230 ,230 } };
+
     FrameTimer ft;
     Ball ball;
     Paddle pad;
-    RectF walls;
+    Walls walls;
     Brick bricks[ nBricks ];
     Sound soundPad;
     Sound soundBrick;

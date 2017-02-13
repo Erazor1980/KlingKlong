@@ -13,6 +13,7 @@ public:
     Paddle() = default;
     Paddle( const Vec2& pos_in, float halfWidth_in, float halfHeight_in );
     void Draw( Graphics& gfx ) const;
+    void DrawAsLifesRemaining( Graphics& gfx, const int lifesRemaining, const Vec2& pos, const float sizeRatio = 0.5f ) const;
     bool DoBallCollision( Ball& ball );
     void DoWallCollision( const RectF& walls );
     void Update( const Keyboard& kbd, float dt );
