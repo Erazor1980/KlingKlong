@@ -47,7 +47,7 @@ bool Brick::ExecuteBallCollision( Ball& ball )
     const Vec2 ballPos = ball.GetPosition();
 
     /* test for "inside" bouncer... */
-    if( std::signbit( ball.GetVelocity().x ) == std::signbit( ( ballPos - GetCenter() ).x ) )
+    if( std::signbit( ball.GetDirection().x ) == std::signbit( ( ballPos - GetCenter() ).x ) )
     {
         ball.ReboundY();
     }

@@ -2,32 +2,21 @@
 #include "Vec2.h"
 #include "Graphics.h"
 
-#define EXTRA_DEBUG_STUFF 0
-
-/* position, where ball hit the paddle */
-enum eBouncePos
-{
-    LEFT = 0,
-    MID_LEFT,
-    CENTER,
-    MID_RIGHT,
-    RIGHT,
-    DEFAULT /* for bricks bouncing */
-};
-
 class Ball
 {
 public:
     Ball() = default;
-    Ball( const Vec2& pos_in, const Vec2& vel_in );
+    Ball( const Vec2& pos_in, const Vec2& dir_in );
     void Draw( Graphics& gfx ) const;
     void Update( float dt, const Vec2& paddleCenter );
-    bool DoWallCollision( const RectF& walls );
+    /* return 0 = nothing, 1 = hit wall, 2 = hit bottom */
+    int DoWallCollision( const RectF& walls );
     void ReboundX();
-    void ReboundY( const eBouncePos bouncePos = DEFAULT );
+    void ReboundY();
     RectF GetRect() const;
-    Vec2 GetVelocity() const;
+    Vec2 GetDirection() const;
     Vec2 GetPosition() const;
+    void SetDirection( const Vec2& dir_in );
     void Start();
     void Stop();
 private:
@@ -35,5 +24,5 @@ private:
     float speed = 500;
     bool moving = false;    /* for starting game, or resetting ball after loosing a life */
     Vec2 pos;
-    Vec2 vel;
+    Vec2 dir;
 };

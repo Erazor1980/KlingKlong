@@ -1,11 +1,11 @@
 #include "Ball.h"
 #include "SpriteCodex.h"
 
-Ball::Ball( const Vec2& pos_in, const Vec2& vel_in )
+Ball::Ball( const Vec2& pos_in, const Vec2& dir_in )
     :
-    pos( pos_in ),
-    vel( vel_in )
+    pos( pos_in )
 {
+    SetDirection( dir_in );
 }
 
 void Ball::Draw( Graphics& gfx ) const
@@ -13,11 +13,11 @@ void Ball::Draw( Graphics& gfx ) const
     // draw ball direction line when stopped
     if( !moving )
     {
-        Vec2 dir = pos + vel.GetNormalized();
+        Vec2 dirLine = pos + dir.GetNormalized();
         for( int i = 1; i <= 10; ++i )
         {
-            gfx.PutPixel( ( int )dir.x, ( int )dir.y, Colors::Gray );
-            dir += vel.GetNormalized() * 7;
+            gfx.PutPixel( ( int )dirLine.x, ( int )dirLine.y, Colors::Gray );
+            dirLine += dir.GetNormalized() * 7;
         }
     }
 
@@ -29,7 +29,7 @@ void Ball::Update( float dt, const Vec2& paddleCenter )
 {
     if( moving )
     {
-        pos += vel.GetNormalized() * dt * speed;
+        pos += dir.GetNormalized() * dt * speed;
     }
     else
     {
@@ -37,74 +37,46 @@ void Ball::Update( float dt, const Vec2& paddleCenter )
     }
 }
 
-bool Ball::DoWallCollision( const RectF& walls )
+int Ball::DoWallCollision( const RectF& walls )
 {
-    bool collided = false;
+    int collisionResult = 0;
     const RectF rect = GetRect();
     if( rect.left < walls.left )
     {
         pos.x += walls.left - rect.left;
         ReboundX();
-        collided = true;
+        collisionResult = 1;
     }
     else if( rect.right > walls.right )
     {
         pos.x -= rect.right - walls.right;
         ReboundX();
-        collided = true;
+        collisionResult = 1;
     }
     if( rect.top < walls.top )
     {
         pos.y += walls.top - rect.top;
         ReboundY();
-        collided = true;
+        collisionResult = 1;
     }
     else if( rect.bottom > walls.bottom )
     {
         pos.y -=  rect.bottom - walls.bottom;
         ReboundY();
-        collided = true;
+        collisionResult = 2;
     }    
 
-    return collided;
+    return collisionResult;
 }
 
 void Ball::ReboundX()
 {
-    vel.x = -vel.x;
+    dir.x = -dir.x;
 }
 
-void Ball::ReboundY( const eBouncePos bouncePos )
+void Ball::ReboundY()
 {
-    switch( bouncePos )
-    {
-    case LEFT:
-        vel = Vec2( -3, -1 ).GetNormalized();
-        break;
-    case MID_LEFT:
-        vel = Vec2( -2, -1 ).GetNormalized();
-        break;
-    case CENTER:
-        vel.y = -vel.y;
-        vel.x *= 0.75f;
-        /*if( vel.x < 0 )
-        {
-            vel = Vec2( -1, -1 ).GetNormalized();
-        }
-        else
-        {
-            vel = Vec2( 1, -1 ).GetNormalized();
-        }*/
-        break;
-    case MID_RIGHT:
-        vel = Vec2( 2, -1 ).GetNormalized();
-        break;
-    case RIGHT:
-        vel = Vec2( 3, -1 ).GetNormalized();
-        break;
-    default:
-        vel.y = -vel.y;
-    }
+    dir.y = -dir.y;
 }
 
 RectF Ball::GetRect() const
@@ -112,14 +84,19 @@ RectF Ball::GetRect() const
     return RectF::FromCenter( pos, radius, radius );
 }
 
-Vec2 Ball::GetVelocity() const
+Vec2 Ball::GetDirection() const
 {
-    return vel;
+    return dir;
 }
 
 Vec2 Ball::GetPosition() const
 {
     return pos;
+}
+
+void Ball::SetDirection( const Vec2& dir_in )
+{
+    dir = dir_in;
 }
 
 void Ball::Start()

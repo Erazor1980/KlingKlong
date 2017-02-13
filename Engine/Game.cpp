@@ -80,7 +80,7 @@ void Game::ResetGame()
 
 void Game::ResetBall()
 {
-    ball = Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ) , Vec2( 0.001, -3 ) );
+    ball = Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ) , Vec2( -3, -3 ) );
     ball.Stop();
 }
 
@@ -166,12 +166,12 @@ void Game::UpdateModel( float dt )
             soundPad.Play();
         }
 
-        if( ball.DoWallCollision( walls ) )
+        const int collResult = ball.DoWallCollision( walls );
+        if( 1 == collResult )
         {
             pad.ResetCooldown();
         }
-
-        if( ball.GetPosition().y >= walls.bottom - 10 )
+        else if( 2 == collResult )
         {
             lifes--;
             if( 0 == lifes )
