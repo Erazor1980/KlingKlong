@@ -1,125 +1,80 @@
 #include "Paddle.h"
 
-Paddle::Paddle( const Vec2& pos_in, float halfWidth_in, float halfHeight_in )
+Paddle::Paddle( const Vec2 & pos_in, float halfWidth_in, float halfHeight_in )
     :
     pos( pos_in ),
     halfWidth( halfWidth_in ),
-    halfHeight( halfHeight_in )
+    halfHeight( halfHeight_in ),
+    exitXFactor( maximumExitRatio / halfWidth ),
+    fixedZoneHalfWidth( halfWidth * fixedZoneWidthRatio ),
+    fixedZoneExitX( fixedZoneHalfWidth * exitXFactor )
 {
 }
 
-void Paddle::Draw( Graphics& gfx ) const
+void Paddle::Draw( Graphics & gfx ) const
 {
     RectF rect = GetRect();
     gfx.DrawRect( rect, wingColor );
     rect.left += wingWidth;
     rect.right -= wingWidth;
     gfx.DrawRect( rect, color );
-
-    // draw 2 lines for "mid_right/left"
-    rect.left = GetRect().left + 2 * wingWidth;
-    rect.right = GetRect().left + 2 * wingWidth + 1;
-    gfx.DrawRect( rect, wingColor );
-    rect.left = GetRect().right - 2 * wingWidth - 1;
-    rect.right = GetRect().right - 2 * wingWidth;
-    gfx.DrawRect( rect, wingColor );
-
-#if EXTRA_DEBUG_STUFF
-    if( bounce < DEFAULT )
-    {
-        switch( bounce )
-        {
-        case LEFT:
-            gfx.DrawCircle( GetRect().left + 5, GetRect().top - 5, 3, Colors::Blue );
-            break;
-        case MID_LEFT:
-            gfx.DrawCircle( GetRect().left + 5 + wingWidth, GetRect().top - 5, 3, Colors::Blue );
-            break;
-        case CENTER:
-            gfx.DrawCircle( pos.x, GetRect().top - 5, 3, Colors::Blue );
-            break;
-        case RIGHT:
-            gfx.DrawCircle( GetRect().right - 5, GetRect().top - 5, 3, Colors::Blue );
-            break;
-        case MID_RIGHT:
-            gfx.DrawCircle( GetRect().right - 5 - wingWidth, GetRect().top - 5, 3, Colors::Blue );
-            break;
-        }
-    }
-#endif
 }
 
-bool Paddle::DoBallCollision( Ball& ball )
+bool Paddle::DoBallCollision( Ball & ball )
 {
-    if( !isCooldwon )
+    if( !isCooldown )
     {
         const RectF rect = GetRect();
         if( rect.IsOverlappingWith( ball.GetRect() ) )
         {
             const Vec2 ballPos = ball.GetPosition();
-
-            if( ( std::signbit( ball.GetDirection().x ) == std::signbit( ( ballPos - pos ).x ) )
+            if( std::signbit( ball.GetDirection().x ) == std::signbit( ( ballPos - pos ).x )
                 || ( ballPos.x >= rect.left && ballPos.x <= rect.right ) )
             {
-                const float xDiff = ballPos.x - pos.x;
-                const Vec2 dir( xDiff * exitXFactor, -1.0f );
+                Vec2 dir;
+                const float xDifference = ballPos.x - pos.x;
+                if( std::abs( xDifference ) < fixedZoneHalfWidth )
+                {
+                    if( xDifference < 0.0f )
+                    {
+                        dir = Vec2( -fixedZoneExitX, -1.0f );
+                    }
+                    else
+                    {
+                        dir = Vec2( fixedZoneExitX, -1.0f );
+                    }
+                }
+                else
+                {
+                    dir = Vec2( xDifference * exitXFactor, -1.0f );
+                }
                 ball.SetDirection( dir );
-                //ball.setdi
             }
             else
             {
                 ball.ReboundX();
             }
-            isCooldwon = true;
+            isCooldown = true;
             return true;
         }
     }
     return false;
 }
 
-#if 0 // old
-bool Paddle::DoBallCollision( Ball& ball )
+void Paddle::DoWallCollision( const RectF & walls )
 {
-    if( !isCooldwon )
-    {
-        const RectF rect = GetRect();
-        if( rect.IsOverlappingWith( ball.GetRect() ) )
-        {
-            const Vec2 ballPos = ball.GetPosition();
-
-            if( std::signbit( ball.GetVelocity().x ) == std::signbit( ( ballPos - pos ).x ) )
-            {
-                ball.ReboundY();
-            }
-            else if( ballPos.x >= rect.left && ballPos.x <= rect.right )
-            {
-                ball.ReboundY();
-            }
-            else
-            {
-                ball.ReboundX();
-            }
-            isCooldwon = true;
-            return true;
-        }
-    }
-    return false;
-}
-#endif
-void Paddle::DoWallCollision( const RectF& walls )
-{
-    RectF rect = GetRect();
+    const RectF rect = GetRect();
     if( rect.left < walls.left )
     {
         pos.x += walls.left - rect.left;
     }
-    if( rect.right > walls.right )
+    else if( rect.right > walls.right )
     {
         pos.x -= rect.right - walls.right;
     }
 }
 
-void Paddle::Update( Keyboard& kbd, float dt )
+void Paddle::Update( const Keyboard & kbd, float dt )
 {
     if( kbd.KeyIsPressed( VK_LEFT ) )
     {
@@ -138,5 +93,5 @@ RectF Paddle::GetRect() const
 
 void Paddle::ResetCooldown()
 {
-    isCooldwon = false;
+    isCooldown = false;
 }

@@ -80,7 +80,7 @@ void Game::ResetGame()
 
 void Game::ResetBall()
 {
-    ball = Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ) , Vec2( -3, -3 ) );
+    ball = Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ) , Vec2( 0, -3 ) );
     ball.Stop();
 }
 

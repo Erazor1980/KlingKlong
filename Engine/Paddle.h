@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Ball.h"
 #include "Vec2.h"
 #include "RectF.h"
@@ -14,17 +15,27 @@ public:
     void Draw( Graphics& gfx ) const;
     bool DoBallCollision( Ball& ball );
     void DoWallCollision( const RectF& walls );
-    void Update( Keyboard& kbd, float dt );
+    void Update( const Keyboard& kbd, float dt );
     RectF GetRect() const;
     void ResetCooldown();
 private:
+    static constexpr Color wingColor = Colors::Red;
+    static constexpr Color color = Colors::White;
     static constexpr float wingWidth = 18.0f;
-    Color wingColor = Colors::Red;
-    Color color = Colors::White;
-    float speed = 500.0f;
-    float exitXFactor = 0.045f;
+    static constexpr float speed = 500.0f;
+    // control the paddle rebound behavior here
+    static constexpr float maximumExitRatio = 2.6f;
+    static constexpr float fixedZoneWidthRatio = 0.1f;
+    // ----------------------------------------
     float halfWidth;
     float halfHeight;
+    // these are derived from above controls
+    float exitXFactor;
+    float fixedZoneHalfWidth;
+    float fixedZoneExitX;
+    // -------------------------------------
     Vec2 pos;
-    bool isCooldwon = false;
+    bool isCooldown = false;
 };
+
+
