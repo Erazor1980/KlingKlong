@@ -37,7 +37,7 @@ void Paddle::DrawAsLifesRemaining( Graphics &gfx, const int lifesRemaining, cons
     }
 }
 
-bool Paddle::DoBallCollision( Ball & ball )
+bool Paddle::DoBallCollision( Ball& ball )
 {
     if( !isCooldown )
     {
@@ -78,7 +78,7 @@ bool Paddle::DoBallCollision( Ball & ball )
     return false;
 }
 
-void Paddle::DoWallCollision( const RectF & walls )
+void Paddle::DoWallCollision( const RectF& walls )
 {
     const RectF rect = GetRect();
     if( rect.left < walls.left )
@@ -91,7 +91,7 @@ void Paddle::DoWallCollision( const RectF & walls )
     }
 }
 
-void Paddle::Update( const Keyboard & kbd, float dt )
+void Paddle::Update( const Keyboard& kbd, float dt )
 {
     if( kbd.KeyIsPressed( VK_LEFT ) )
     {

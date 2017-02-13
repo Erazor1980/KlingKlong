@@ -11,10 +11,10 @@ Ball::Ball( const Vec2& pos_in, const Vec2& dir_in )
 void Ball::Draw( Graphics& gfx ) const
 {
     // draw ball direction line when stopped
-    if( !moving )
+    if(  ballState != MOVING )
     {
         Vec2 dirLine = pos + dir.GetNormalized();
-        for( int i = 1; i <= 10; ++i )
+        for( int i = 1; i <= 15; ++i )
         {
             gfx.PutPixel( ( int )dirLine.x, ( int )dirLine.y, Colors::Gray );
             dirLine += dir.GetNormalized() * 7;
@@ -25,15 +25,19 @@ void Ball::Draw( Graphics& gfx ) const
     SpriteCodex::DrawBall( pos, gfx );
 }
 
-void Ball::Update( float dt, const Vec2& paddleCenter )
+void Ball::Update( float dt, const float paddleCenterX )
 {
-    if( moving )
+    if( MOVING == ballState )
     {
         pos += dir.GetNormalized() * dt * speed;
     }
-    else
+    else if( WAITING == ballState )
     {
-        pos.x = paddleCenter.x;
+        //TODO
+    }
+    else if( STICKING == ballState )
+    {
+        pos.x = paddleCenterX + offsetToPaddleCenter;
     }
 }
 
@@ -101,10 +105,16 @@ void Ball::SetDirection( const Vec2& dir_in )
 
 void Ball::Start()
 {
-    moving = true;
+    ballState = MOVING;
 }
 
 void Ball::Stop()
 {
-    moving = false;
+    ballState = WAITING;
+}
+
+void Ball::StickToPaddle( const float paddleCenterX )
+{
+    offsetToPaddleCenter = pos.x - paddleCenterX;
+    ballState = STICKING;
 }

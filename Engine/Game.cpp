@@ -44,9 +44,7 @@ void Game::ResetGame()
     ResetBall();
     
     // reset bricks
-    //const Color colors[ 4 ] ={ Colors::Red, Colors::Green, Colors::Blue, Colors::Cyan };
     const Vec2 topLeft( walls.GetInnerBounds().left + distWallBricks, walls.GetInnerBounds().top + 50 );
-
     nBricksLeft = nBricks;
     for( int y = 0; y < nBricksDown; ++y )
     {
@@ -81,7 +79,8 @@ void Game::ResetGame()
 void Game::ResetBall()
 {
     ball = Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ) , Vec2( 0, -3 ) );
-    ball.Stop();
+    //ball.Stop();
+    ball.StickToPaddle( pad.GetRect().GetCenter().x );
 }
 
 void Game::ResetPaddle()
@@ -120,7 +119,7 @@ void Game::UpdateModel( float dt )
     {
         pad.Update( wnd.kbd, dt );
         pad.DoWallCollision( walls.GetInnerBounds() );
-        ball.Update( dt, pad.GetRect().GetCenter() );
+        ball.Update( dt, pad.GetRect().GetCenter().x );
 
         bool collisionHappened = false;
         float curColDistSq;
@@ -208,7 +207,7 @@ void Game::DrawGameOver()
     while( rectWidth > 250 )
     {
         Vec2 bottomRight( gfx.ScreenWidth - topLeft.x, gfx.ScreenHeight - topLeft.y );
-        gfx.DrawRectBorder( RectF( topLeft, bottomRight ), 4, Colors::Cyan ); //Colors::MakeRGB( rand() % 255, rand() % 255, rand() % 255 ) );
+        gfx.DrawRectBorder( RectF( topLeft, bottomRight ), 4, Colors::Cyan );
         topLeft += Vec2( 60, 60 );
         rectWidth = bottomRight.x - topLeft.x;
     }
@@ -227,15 +226,6 @@ void Game::DrawVictory()
         rectWidth = bottomRight.x - topLeft.x;
     }
 }
-
-//void Game::DrawLifesLeft()
-//{
-//    const int radius = 10;
-//    for( int i = 1; i <= lifes; ++i )
-//    {
-//        gfx.DrawCircle( i * radius * 3 + 40, 20, radius, Colors::Red );
-//    }
-//}
 
 void Game::ComposeFrame()
 {
