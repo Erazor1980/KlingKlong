@@ -54,7 +54,7 @@ void Game::ResetGame()
             if( 0 == x || nBricksAcross - 1 == x )
             {
                 bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
-                                                                brickWidth, brickHeight ), Colors::LightGray, 1, true );
+                                                                brickWidth, brickHeight ), Colors::LightGray, UNDESTROYABLE );
                 nBricksLeft--;
             }
             else
@@ -62,7 +62,7 @@ void Game::ResetGame()
                 if( 3 == y && x % 2 )
                 {
                     bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
-                                                                    brickWidth, brickHeight ), Colors::MakeRGB( 205, 102, 29 ), 2 );
+                                                                    brickWidth, brickHeight ), Colors::MakeRGB( 205, 102, 29 ), SOLID, 2 );
                 }
                 else
                 {

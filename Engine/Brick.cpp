@@ -1,14 +1,14 @@
 #include "Brick.h"
 #include <assert.h>
 
-Brick::Brick( const RectF& rect_in, Color color_in, int lifeToDestroy, bool isUndestroyable )
+Brick::Brick( const RectF& rect_in, Color color_in, eBrickType type_in, int lifeToDestroy )
     :
     rect( rect_in ),
     bev( color_in ),
     destroyed( false ),
     maxLife( lifeToDestroy ),
     life( maxLife ),
-    undestroyable( isUndestroyable )
+    type( type_in )
 {
 }
 
@@ -16,22 +16,19 @@ void Brick::Draw( Graphics& gfx ) const
 {
     if( !destroyed )
     {
-        //gfx.DrawRect( rect.GetExpanded( -padding ), color );
         bev.DrawBeveledBrick( rect.GetExpanded( -padding ), bevelSize, gfx );
-        /* draw "damaged" brick */
-        if( life < maxLife )
+
+        if( type == UNDESTROYABLE )
         {
-            for( int y = ( int )rect.top; y < ( int )rect.bottom; ++y )
-            {
-                for( int x = ( int )rect.left; x < ( int )rect.right; ++x )
-                {
-                    if( x % 2 == 1 && y % 2 == 1 )
-                    {
-                        gfx.PutPixel( x, y, Colors::Black );
-                    }
-                }
-            }
+            bev.DrawBeveledBrick( rect.GetExpanded( -padding * 6 ), bevelSize, gfx );
         }
+        else if( type == SOLID )
+        {
+            if( life > 1 )
+            {
+                bev.DrawBeveledBrick( rect.GetExpanded( -padding * 12 ), bevelSize, gfx );
+            }
+        }        
     }
 }
 
@@ -60,7 +57,7 @@ bool Brick::ExecuteBallCollision( Ball& ball )
         ball.ReboundX();
     }
 
-    if( !undestroyable )
+    if( type != UNDESTROYABLE )
     {
         life--;
         if( life <= 0 )
