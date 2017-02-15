@@ -9,6 +9,7 @@ Paddle::Paddle( const Vec2 & pos_in, float halfWidth_in, float halfHeight_in )
     fixedZoneHalfWidth( halfWidth * fixedZoneWidthRatio ),
     fixedZoneExitX( fixedZoneHalfWidth * exitXFactor )
 {
+    halfWidthOriginal = halfWidth;
 }
 
 void Paddle::Draw( Graphics& gfx ) const
@@ -101,6 +102,16 @@ void Paddle::Update( const Keyboard& kbd, float dt )
     {
         pos.x += speed * dt;
     }
+
+    if( sizeIncreased )
+    {
+        const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime;
+        if( timeElapsed.count() > powerUpDuration )
+        {
+            halfWidth = halfWidthOriginal;
+            sizeIncreased = false;
+        }
+    }
 }
 
 RectF Paddle::GetRect() const
@@ -111,4 +122,16 @@ RectF Paddle::GetRect() const
 void Paddle::ResetCooldown()
 {
     isCooldown = false;
+}
+
+void Paddle::IncreaseSize( const float duration )
+{
+    startTime = std::chrono::steady_clock::now();
+
+    if( !sizeIncreased )
+    {
+        halfWidth *= 1.5f;
+        powerUpDuration = duration;
+        sizeIncreased = true;
+    }
 }

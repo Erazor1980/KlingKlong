@@ -40,7 +40,7 @@ public:
     void StickToPaddle( const float paddleCenterX );
 private:
     static constexpr float radius = 7.0f;
-    float speed = 500;
+    float speed = 300;
     eBallState ballState = WAITING;
     float offsetToPaddleCenter = 0;     /* for STICKING state, to move with the paddle */
     Vec2 pos;

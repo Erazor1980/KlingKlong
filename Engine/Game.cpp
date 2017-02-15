@@ -20,7 +20,6 @@
  ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
-#include "PowerUp.h"
 
 Game::Game( MainWindow& wnd )
     :
@@ -75,18 +74,44 @@ void Game::ResetGame()
 
     // reset life
     lifes = MAX_LIFES;
+
+    // reset power ups
+    powerUps[ 0 ] = PowerUp( brickWidth, brickHeight, INCR_PADDLE_SIZE, 10, walls.GetInnerBounds().bottom );
+    
+    // not implemented yet!
+    powerUps[ 1 ] = PowerUp( brickWidth, brickHeight, CANNON, 10, walls.GetInnerBounds().bottom );
+    powerUps[ 2 ] = PowerUp( brickWidth, brickHeight, EXTRA_LIFE, 10, walls.GetInnerBounds().bottom );
+
+    powerUpSounds[ 0 ] = Sound( L"Sounds\\grow.wav" );
+
+    powerUps[ 0 ].Activate( Vec2( walls.GetInnerBounds().left + 5, 200 ) );
 }
 
 void Game::ResetBall()
 {
     ball = Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ) , Vec2( -0.2, -1 ) );
     ball.Stop();
-    //ball.StickToPaddle( pad.GetRect().GetCenter().x );
 }
 
 void Game::ResetPaddle()
 {
     pad = Paddle( Vec2( gfx.ScreenWidth / 2, gfx.ScreenHeight - 80 ), 70, 15 );
+}
+
+void Game::ApplyPowerUp( const PowerUp& pu )
+{
+    switch( pu.GetType() )
+    {
+    case INCR_PADDLE_SIZE:
+        pad.IncreaseSize( pu.GetBoostTime() );
+        break;
+    case EXTRA_LIFE:
+        break;
+    case CANNON:
+        break;
+    default:
+        break;
+    }
 }
 
 void Game::Go()
@@ -131,6 +156,18 @@ void Game::UpdateModel( float dt )
             soundPad.Play();
         }
         
+        ////////////////////
+        //// POWER UPS /////
+        ////////////////////
+        for( int i = 0; i < nPowerUps; ++i )
+        {
+            if( true == powerUps[ i ].Update( pad.GetRect(), dt ) )
+            {
+                powerUpSounds[ i ].Play( 1, 1.5F );
+                ApplyPowerUp( powerUps[ i ] );
+            }
+        }
+
         /////////////////
         //// BRICKS /////
         /////////////////
@@ -164,6 +201,12 @@ void Game::UpdateModel( float dt )
             if( bricks[ curColIdx ].ExecuteBallCollision( ball ) )
             {
                 nBricksLeft--;
+
+                // drop power up 
+                if( rand() % 4 == 1 )
+                {
+                    powerUps[ 0 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+                }
             }
             
             soundBrick.Play();
@@ -241,10 +284,6 @@ void Game::DrawVictory()
 
 void Game::ComposeFrame()
 {
-    PowerUp test( RectF( 300, 360, 300, 320 ), INCR_PADDLE_SIZE, 10 );
-
-    test.Draw( gfx );
-
     for( const Brick& b : bricks )
     {
         b.Draw( gfx );
@@ -261,6 +300,11 @@ void Game::ComposeFrame()
     else
     {
         ball.Draw( gfx );
+
+        for( int i = 0; i < nPowerUps; ++i )
+        {
+            powerUps[ i ].Draw( gfx );
+        }
     }
     if( 0 == nBricksLeft )
     {

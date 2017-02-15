@@ -1,21 +1,50 @@
 #include "PowerUp.h"
 
-PowerUp::PowerUp( const RectF& rect_in, ePowerUpType type_in, const float boost_time )
+PowerUp::PowerUp( const float width_in, const float height_in, ePowerUpType type_in, 
+                  const float boost_time, const float level_bottom )
     :
-    rect( rect_in ),
+    width( width_in ),
+    height( height_in ),
     type( type_in ),
-    boostTime( boost_time )
+    boostTime( boost_time ),
+    activated( false ),
+    levelBottom( level_bottom )
 {
 }
 
-void PowerUp::Update( const RectF& paddleRect, const float dt )
+bool PowerUp::Update( const RectF& paddleRect, const float dt )
 {
-    rect.top += speed * dt;
-    rect.bottom += speed * dt;
+    if( !activated )
+    {
+        return false;
+    }
+
+    pos.y += speed * dt;
+
+    if( pos.y + height > levelBottom )
+    {
+        activated = false;
+        return false;
+    }
+
+    if( paddleRect.IsOverlappingWith( RectF( pos, width, height ) ) )
+    {
+        activated = false;
+        return true;
+    }
+
+    return false;
 }
 
 void PowerUp::Draw( Graphics& gfx )
 {
+    if( !activated )
+    {
+        return;
+    }
+
+    RectF rect( pos, width, height );
+
     const int left = int( rect.left );
     const int right = int( rect.right );
     const int top = int( rect.top );
@@ -35,4 +64,24 @@ void PowerUp::Draw( Graphics& gfx )
     {
 
     }
+}
+
+void PowerUp::Activate( const Vec2& pos_in )
+{
+    if( activated )
+    {
+        return;
+    }
+    pos = pos_in;
+    activated = true;
+}
+
+ePowerUpType PowerUp::GetType() const
+{
+    return type;
+}
+
+float PowerUp::GetBoostTime() const
+{
+    return boostTime;
 }

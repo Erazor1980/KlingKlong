@@ -6,6 +6,7 @@
 #include "Colors.h"
 #include "Graphics.h"
 #include "Keyboard.h"
+#include <chrono>
 
 class Paddle
 {
@@ -19,6 +20,7 @@ public:
     void Update( const Keyboard& kbd, float dt );
     RectF GetRect() const;
     void ResetCooldown();
+    void IncreaseSize( const float duration );
 private:
     static constexpr Color wingColor = { 210, 33, 33 };// Colors::Red;
     static constexpr Color color = Colors::White;
@@ -37,6 +39,12 @@ private:
     // -------------------------------------
     Vec2 pos;
     bool isCooldown = false;
+
+    // power up
+    bool sizeIncreased = false;
+    float powerUpDuration;      /* in seconds */
+    std::chrono::steady_clock::time_point startTime;
+    float halfWidthOriginal;    /* for reducing size after power up duration */
 };
 
 

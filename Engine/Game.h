@@ -29,6 +29,7 @@
 #include "Brick.h"
 #include "Paddle.h"
 #include "Walls.h"
+#include "PowerUp.h"
 
 #define MAX_LIFES 1
 //#define BOARD_PADDING 40 /* in pixel from screen border to game border */
@@ -47,10 +48,10 @@ private:
 	/*  User Functions              */
     void DrawGameOver();
     void DrawVictory();
-    //void DrawLifesLeft();
     void ResetGame();
     void ResetBall();
     void ResetPaddle();
+    void ApplyPowerUp( const PowerUp& pu );
 	/********************************/
 private:
 	MainWindow& wnd;
@@ -62,7 +63,7 @@ private:
     static constexpr int nBricksAcross = 12;
     static constexpr int nBricksDown = 4;
     static constexpr int nBricks = nBricksDown * nBricksAcross;
-    int nBricksLeft = nBricks;  /* only destructible bricks! */
+    int nBricksLeft = nBricks;  /* only destructible bricks! is updated while creating bricks in ResetGame() */
 
     static constexpr float wallThickness = 12.0f;
     static constexpr float fieldWidth = float( nBricksAcross ) * brickWidth + 100;
@@ -81,6 +82,10 @@ private:
     Sound soundGameOver;
     Sound soundLifeLoss;
     Sound soundVictory;
+
+    static constexpr int nPowerUps = 3;     /* maximal number of powerups */
+    PowerUp powerUps[ nPowerUps ];
+    Sound powerUpSounds[ nPowerUps ];
     int lifes = MAX_LIFES;
 	/********************************/
 };
