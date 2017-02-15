@@ -100,9 +100,9 @@ void Game::ResetGame()
     /////////////////
     //// TESTING ////
     /////////////////
-#if 1
+#if 0
     //powerUps[ 0 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 400 ) );
-    //powerUps[ 2 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 300 ) );
+    powerUps[ 2 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 300 ) );
     //laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );
 #endif
 }
@@ -321,10 +321,10 @@ void Game::UpdateModel( float dt )
             }
             
             soundBrick.Play();
-            if( 0 == nBricksLeft )
-            {
-                soundVictory.Play();
-            }
+        }
+        if( 0 == nBricksLeft )
+        {
+            soundVictory.Play();
         }
 
         //////////////////////

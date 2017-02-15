@@ -90,7 +90,7 @@ private:
     LaserShot laserShots[ nMaxLaserShots ];
     std::chrono::steady_clock::time_point startTime_shot;
     bool startedShooting = false;
-    static constexpr float timeBetweenShots = 0.5f;     /* in seconds */
+    static constexpr float timeBetweenShots = 0.35f;     /* in seconds */
     int shotIdx = 0;                                    /* idx to add next shot */
 
 
