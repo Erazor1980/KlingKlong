@@ -52,9 +52,11 @@ private:
     void ResetBall();
     void ResetPaddle();
     void ResetPowerUps();
+    void ResetShots();
     void ApplyPowerUp( const PowerUp& pu );
     void Shoot();
     void CreatePowerUp( int curColIdx );
+    void CreateLevel( int lvl );
 	/********************************/
 private:
 	MainWindow& wnd;
@@ -63,13 +65,13 @@ private:
 	/*  User Variables              */
     static constexpr float brickWidth = 56.0f;
     static constexpr float brickHeight = 22.0f;
-    static constexpr int nBricksAcross = 12;
+    static constexpr int nBricksAcross = 13;
     static constexpr int nBricksDown = 4;
     static constexpr int nBricks = nBricksDown * nBricksAcross;
     int nBricksLeft = nBricks;  /* only destructible bricks! is updated while creating bricks in ResetGame() */
 
     static constexpr float wallThickness = 12.0f;
-    static constexpr float fieldWidth = float( nBricksAcross ) * brickWidth + 100;
+    static constexpr float fieldWidth = float( Graphics::ScreenWidth ) - 50;
     static constexpr float fieldHeight = float( Graphics::ScreenHeight ) - 100;
     static constexpr float distWallBricks = ( fieldWidth - brickWidth * nBricksAcross ) / 2.0f;
     static constexpr Color wallColor = { 20, 60, 200 };
@@ -99,5 +101,6 @@ private:
     PowerUp powerUps[ nPowerUps ];
     Sound powerUpSounds[ nPowerUps ];
     int lifes = MAX_LIFES;
+    int level = 0;
 	/********************************/
 };

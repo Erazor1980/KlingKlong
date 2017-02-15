@@ -56,33 +56,7 @@ void Game::ResetGame()
     ResetBall();
     
     // reset bricks
-    const Vec2 topLeft( walls.GetInnerBounds().left + distWallBricks, walls.GetInnerBounds().top + 50 );
-    nBricksLeft = nBricks;
-    for( int y = 0; y < nBricksDown; ++y )
-    {
-        const Color c = brickColors[ y ];
-        for( int x = 0; x < nBricksAcross; ++x )
-        {
-            if( 0 == x || nBricksAcross - 1 == x )
-            {
-                bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
-                                                                brickWidth, brickHeight ), Colors::LightGray, UNDESTROYABLE );
-                nBricksLeft--;
-            }
-            else
-            {
-                if( 0 == y && x % 2 )
-                {
-                    bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
-                                                                    brickWidth, brickHeight ), Colors::MakeRGB( 205, 102, 29 ), SOLID, 2 );
-                }
-                else
-                {
-                    bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c );
-                }                
-            }
-        }
-    }
+    CreateLevel( level );
 
     // reset life
     lifes = MAX_LIFES;
@@ -91,11 +65,7 @@ void Game::ResetGame()
     ResetPowerUps();
 
     // reset shots
-    for( int i = 0; i < nMaxLaserShots; ++i )
-    {
-        laserShots[ i ] = LaserShot();
-    }
-    startedShooting = false;
+    ResetShots();
 
     /////////////////
     //// TESTING ////
@@ -124,6 +94,15 @@ void Game::ResetPowerUps()
     {
         powerUps[ i ].DeActivate();
     }
+}
+
+void Game::ResetShots()
+{
+    for( int i = 0; i < nMaxLaserShots; ++i )
+    {
+        laserShots[ i ] = LaserShot();
+    }
+    startedShooting = false;
 }
 
 void Game::ApplyPowerUp( const PowerUp& pu )
@@ -204,6 +183,109 @@ void Game::CreatePowerUp( int curColIdx )
 #endif
 }
 
+void Game::CreateLevel( int lvl )
+{
+    if( level > 2 )
+    {
+        level = 0;
+    }
+
+    const Vec2 topLeft( walls.GetInnerBounds().left + distWallBricks, walls.GetInnerBounds().top + 50 );
+    if( 0 == lvl )
+    {
+        nBricksLeft = 0;
+        for( int y = 0; y < nBricksDown; ++y )
+        {
+            const Color c = brickColors[ y ];
+            for( int x = 0; x < nBricksAcross; ++x )
+            {
+                if( 0 == x || nBricksAcross - 1 == x )
+                {
+                    bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
+                                                                    brickWidth, brickHeight ), Colors::LightGray, UNDESTROYABLE );
+                }
+                else
+                {
+                    if( 0 == y && x % 2 )
+                    {
+                        bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
+                                                                        brickWidth, brickHeight ), Colors::MakeRGB( 205, 102, 29 ), SOLID, 2 );
+                        nBricksLeft++;
+                    }
+                    else
+                    {
+                        bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c );
+                        nBricksLeft++;
+                    }
+                }
+            }
+        }
+    }
+    else if( 1 == lvl )
+    {
+        nBricksLeft = 0;
+        for( int y = 0; y < nBricksDown; ++y )
+        {
+            const Color c = brickColors[ 3 - y ];
+            for( int x = 0; x < nBricksAcross; ++x )
+            {
+                if( 3 == y && ( x < 3 || x > 9 ) )
+                {
+                    bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
+                                                                    brickWidth, brickHeight ), Colors::LightGray, UNDESTROYABLE );
+                }
+                else
+                {
+                    if( ( 0 == y || 2 == y ) && x % 2 )
+                    {
+                        bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
+                                                                        brickWidth, brickHeight ), c, SOLID, 2 );
+                        nBricksLeft++;
+                    }
+                    else
+                    {
+                        bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c );
+                        nBricksLeft++;
+                    }
+                }
+            }
+        }
+    }
+    else if( 2 == lvl )
+    {
+        nBricksLeft = 0;
+        for( int y = 0; y < nBricksDown; ++y )
+        {
+            const Color c = brickColors[ 3 - y ];
+            for( int x = 0; x < nBricksAcross; ++x )
+            {
+                if( y % 2 - 1 && x % 2 - 1 )
+                {
+                  // empty space
+                }
+                else
+                {
+                    if( ( 0 == y || 2 == y ) && x % 2 )
+                    {
+                        bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
+                                                                        brickWidth, brickHeight ), c, SOLID, 2 );
+                        nBricksLeft++;
+                    }
+                    else
+                    {
+                        bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c );
+                        nBricksLeft++;
+                    }
+                }
+            }
+        }
+        bricks[ 0 ] = Brick( RectF( topLeft + Vec2( -brickWidth, ( nBricksDown - 1 ) * brickHeight ),
+                                    brickWidth, brickHeight ), Colors::LightGray, UNDESTROYABLE );
+        bricks[ 2 ] = Brick( RectF( topLeft + Vec2( nBricksAcross * brickWidth, ( nBricksDown - 1 ) * brickHeight ),
+                                    brickWidth, brickHeight ), Colors::LightGray, UNDESTROYABLE );
+    }
+}
+
 void Game::Go()
 {
     gfx.BeginFrame();
@@ -228,9 +310,10 @@ void Game::UpdateModel( float dt )
     // Restart game
     if( wnd.kbd.KeyIsPressed( VK_RETURN ) )
     {
+        level = 0;
         ResetGame();
     }
-    
+
     if( lifes > 0 && nBricksLeft > 0 )
     {
         /////////////////
@@ -324,9 +407,10 @@ void Game::UpdateModel( float dt )
             
             soundBrick.Play();
         }
-        if( 0 == nBricksLeft )
+        if( nBricksLeft <= 0 )
         {
             soundVictory.Play();
+            level++;
         }
 
         //////////////////////
@@ -354,15 +438,23 @@ void Game::UpdateModel( float dt )
             {
                 ResetPaddle();
                 ResetBall();
+                ResetPowerUps();
+                ResetShots();
                 soundLifeLoss.Play();
             }
         }
     }
-    else
+    else if( nBricksLeft <= 0 )
     {
-        if( wnd.kbd.KeyIsPressed( VK_RETURN ) )
+        // next level
+        if( wnd.kbd.KeyIsPressed( VK_SPACE ) )
         {
-            ResetGame();
+            level++;
+            ResetPaddle();
+            ResetBall();
+            ResetPowerUps();
+            ResetShots();
+            CreateLevel( level );
         }
     }
 }
