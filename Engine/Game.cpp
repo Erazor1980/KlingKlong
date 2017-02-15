@@ -31,12 +31,12 @@ Game::Game( MainWindow& wnd )
     soundLifeLoss( L"Sounds\\fart1.wav" ),
     soundGameOver( L"Sounds\\gameover.wav" ),
     soundVictory( L"Sounds\\victory.wav" ),
+    soundLaserShot( L"Sounds\\laserShot.wav" ),
     walls( RectF::FromCenter( Graphics::GetScreenRect().GetCenter(), fieldWidth / 2.0f, fieldHeight / 2.0f ), wallThickness, wallColor )
 {
-    powerUps[ 0 ] = PowerUp( brickWidth, brickHeight, INCR_PADDLE_SIZE, 10, walls.GetInnerBounds().bottom );
+    powerUps[ 0 ] = PowerUp( brickWidth, brickHeight, INCR_PADDLE_SIZE, 5, walls.GetInnerBounds().bottom );
     powerUps[ 1 ] = PowerUp( brickWidth, brickHeight, EXTRA_LIFE, 0, walls.GetInnerBounds().bottom );
-    // not implemented yet!
-    powerUps[ 2 ] = PowerUp( brickWidth, brickHeight, LASER_GUN, 5, walls.GetInnerBounds().bottom );
+    powerUps[ 2 ] = PowerUp( brickWidth, brickHeight, LASER_GUN, 4, walls.GetInnerBounds().bottom );
 
     powerUpSounds[ 0 ] = Sound( L"Sounds\\grow.wav" );
     powerUpSounds[ 1 ] = Sound( L"Sounds\\extraLife.wav" );
@@ -46,6 +46,9 @@ Game::Game( MainWindow& wnd )
 
 void Game::ResetGame()
 {
+    // seed rand()
+    std::srand( ( unsigned int )std::time( 0 ) );
+
     // reset paddle
     ResetPaddle();
 
@@ -87,7 +90,12 @@ void Game::ResetGame()
     // reset power ups
     ResetPowerUps();
 
-    std::srand( ( unsigned int )std::time( 0 ) );
+    // reset shots
+    for( int i = 0; i < nMaxLaserShots; ++i )
+    {
+        laserShots[ i ] = LaserShot();
+    }
+    startedShooting = false;
 
     /////////////////
     //// TESTING ////
@@ -95,7 +103,7 @@ void Game::ResetGame()
 #if 1
     //powerUps[ 0 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 400 ) );
     //powerUps[ 2 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 300 ) );
-    laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );
+    //laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );
 #endif
 }
 
@@ -133,9 +141,39 @@ void Game::ApplyPowerUp( const PowerUp& pu )
         break;
     case LASER_GUN:
         pad.AddLaserGun( pu.GetBoostTime() );
+        startTime_shot = std::chrono::steady_clock::now();
         break;
     default:
         break;
+    }
+}
+
+void Game::Shoot()
+{
+    if( !pad.HasLaserGun() )
+    {
+        return;
+    }
+    
+    const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime_shot;
+    if( timeElapsed.count() > timeBetweenShots || !startedShooting )
+    {
+        soundLaserShot.Play();
+        laserShots[ shotIdx ] = LaserShot( pad.GetRightGunPosition().GetCenter(), walls.GetInnerBounds().top );
+        shotIdx++;
+        if( shotIdx == nMaxLaserShots )
+        {
+            shotIdx = 0;
+        }
+        laserShots[ shotIdx ] = LaserShot( pad.GetLeftGunPosition().GetCenter(), walls.GetInnerBounds().top );
+        shotIdx++;
+        if( shotIdx == nMaxLaserShots )
+        {
+            shotIdx = 0;
+        }
+        startTime_shot = std::chrono::steady_clock::now();
+
+        startedShooting = true;
     }
 }
 
@@ -184,6 +222,14 @@ void Game::UpdateModel( float dt )
         //////////////////////
         //// LASER SHOTS /////
         //////////////////////
+        if( pad.HasLaserGun() )
+        {
+            Shoot();
+        }
+        else
+        {
+            startedShooting = false;
+        }
         for( int i = 0; i < nMaxLaserShots; ++i )
         {
             laserShots[ i ].Update( dt );
@@ -234,6 +280,7 @@ void Game::UpdateModel( float dt )
             {
                 if( laserShots[ ls ].IsActivated() && bricks[ i ].CheckLaserCollision( laserShots[ ls ] ) )
                 {
+                    nBricksLeft--;
                     //TODO add sound for collision
                 }
             }
@@ -258,13 +305,17 @@ void Game::UpdateModel( float dt )
                     powerUps[ 1 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
                 }
 #else
-                if( rand() % 10 == 1 )
+                if( rand() % 10 == 1 )  /* increased size */
                 {
                     powerUps[ 0 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
                 }
-                else if( lifes < MAX_LIFES && rand() % 10 == 1 )
+                else if( lifes < MAX_LIFES && rand() % 10 == 1 )    /* extra life */
                 {
                     powerUps[ 1 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+                }
+                else if( rand() % 3 == 1 )  /* laser gun */
+                {
+                    powerUps[ 2 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
                 }
 #endif
             }

@@ -53,6 +53,7 @@ private:
     void ResetPaddle();
     void ResetPowerUps();
     void ApplyPowerUp( const PowerUp& pu );
+    void Shoot();
 	/********************************/
 private:
 	MainWindow& wnd;
@@ -83,9 +84,15 @@ private:
     Sound soundGameOver;
     Sound soundLifeLoss;
     Sound soundVictory;
+    Sound soundLaserShot;
 
-    static constexpr int nMaxLaserShots = 20;       /* maximal number of laser shots */
+    static constexpr int nMaxLaserShots = 20;           /* maximal number of laser shots */
     LaserShot laserShots[ nMaxLaserShots ];
+    std::chrono::steady_clock::time_point startTime_shot;
+    bool startedShooting = false;
+    static constexpr float timeBetweenShots = 0.5f;     /* in seconds */
+    int shotIdx = 0;                                    /* idx to add next shot */
+
 
     static constexpr int nPowerUps = 3;             /* maximal number of powerups */
     PowerUp powerUps[ nPowerUps ];

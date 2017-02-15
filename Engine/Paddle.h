@@ -19,12 +19,16 @@ public:
     void DoWallCollision( const RectF& walls );
     void Update( const Keyboard& kbd, float dt );
     RectF GetRect() const;
+    RectF GetLeftGunPosition() const;
+    RectF GetRightGunPosition() const;
     void ResetCooldown();
 
     // power ups
     void IncreaseSize( const float duration );
     void AddLaserGun( const float duration );
+    bool HasLaserGun() const;
 private:
+    void CalcLaserPositions();
     static constexpr Color wingColor = { 210, 33, 33 };// Colors::Red;
     static constexpr Color color = Colors::White;
     static constexpr float wingWidth = 18.0f;
@@ -54,6 +58,8 @@ private:
     float powerUpDuration_laserGun;    /* in seconds */
     std::chrono::steady_clock::time_point startTime_incrSize;
     std::chrono::steady_clock::time_point startTime_laserGun;
+    RectF leftGun;
+    RectF rightGun;
 
     float halfWidthOriginal;    /* for reducing size after power up duration */
 };

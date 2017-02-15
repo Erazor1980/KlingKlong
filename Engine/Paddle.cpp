@@ -7,9 +7,13 @@ Paddle::Paddle( const Vec2 & pos_in, float halfWidth_in, float halfHeight_in )
     halfHeight( halfHeight_in ),
     exitXFactor( maximumExitRatio / halfWidth ),
     fixedZoneHalfWidth( halfWidth * fixedZoneWidthRatio ),
-    fixedZoneExitX( fixedZoneHalfWidth * exitXFactor )
+    fixedZoneExitX( fixedZoneHalfWidth * exitXFactor ),
+    hasLaserGun( false ),
+    sizeIncreased( false )
 {
     halfWidthOriginal = halfWidth;
+
+    CalcLaserPositions();
 }
 
 void Paddle::Draw( Graphics& gfx ) const
@@ -22,8 +26,6 @@ void Paddle::Draw( Graphics& gfx ) const
 
     if( hasLaserGun )
     {
-        RectF leftGun( Vec2( rect.left + 1, rect.top - wingWidth / 2 ), wingWidth / 2, wingWidth / 2 );
-        RectF rightGun( Vec2( rect.right - 1 - wingWidth / 2, rect.top - wingWidth / 2 ), wingWidth / 2, wingWidth / 2 );
         gfx.DrawRect( leftGun, Colors::Gray );
         gfx.DrawRect( rightGun, Colors::Gray );
     }
@@ -105,10 +107,12 @@ void Paddle::Update( const Keyboard& kbd, float dt )
     if( kbd.KeyIsPressed( VK_LEFT ) )
     {
         pos.x -= speed * dt;
+        CalcLaserPositions();
     }
     if( kbd.KeyIsPressed( VK_RIGHT ) )
     {
         pos.x += speed * dt;
+        CalcLaserPositions();
     }
 
     if( sizeIncreased )
@@ -118,6 +122,7 @@ void Paddle::Update( const Keyboard& kbd, float dt )
         {
             halfWidth = halfWidthOriginal;
             sizeIncreased = false;
+            CalcLaserPositions();
         }
     }
 
@@ -128,16 +133,22 @@ void Paddle::Update( const Keyboard& kbd, float dt )
         {
             hasLaserGun = false;
         }
-        else
-        {
-            //TODO implement shooting
-        }
     }
 }
 
 RectF Paddle::GetRect() const
 {
     return RectF::FromCenter( pos, halfWidth, halfHeight );
+}
+
+RectF Paddle::GetLeftGunPosition() const
+{
+    return leftGun;
+}
+
+RectF Paddle::GetRightGunPosition() const
+{
+    return rightGun;
 }
 
 void Paddle::ResetCooldown()
@@ -165,5 +176,18 @@ void Paddle::AddLaserGun( const float duration )
     {
         powerUpDuration_laserGun = duration;
         hasLaserGun = true;
+        CalcLaserPositions();
     }
+}
+
+bool Paddle::HasLaserGun() const
+{
+    return hasLaserGun;
+}
+
+void Paddle::CalcLaserPositions()
+{
+    RectF rect = GetRect();
+    leftGun = RectF( Vec2( rect.left + wingWidth + 1, rect.top - wingWidth / 2 ), wingWidth / 2, wingWidth / 2 );
+    rightGun = RectF( Vec2( rect.right - wingWidth * 1.5f - 1, rect.top - wingWidth / 2 ), wingWidth / 2, wingWidth / 2 );
 }
