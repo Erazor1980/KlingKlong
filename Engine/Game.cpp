@@ -68,7 +68,7 @@ void Game::ResetGame()
             }
             else
             {
-                if( 3 == y && x % 2 )
+                if( 0 == y && x % 2 )
                 {
                     bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
                                                                     brickWidth, brickHeight ), Colors::MakeRGB( 205, 102, 29 ), SOLID, 2 );
