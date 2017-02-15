@@ -19,10 +19,12 @@ public:
     bool Update( const RectF& paddleRect, const float dt );         /* returns true, when hit paddle */
     void Draw( Graphics& gfx );
     void Activate( const Vec2& pos_in );
+    void DeActivate();
     ePowerUpType GetType() const;
     float GetBoostTime() const;
+    bool IsActivated() const;
 private:
-    static constexpr float speed = 200;
+    static constexpr float speed = 300;
     Vec2 pos;
     float width;
     float height;

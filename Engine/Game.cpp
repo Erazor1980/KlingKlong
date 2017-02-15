@@ -32,6 +32,14 @@ Game::Game( MainWindow& wnd )
     soundVictory( L"Sounds\\victory.wav" ),
     walls( RectF::FromCenter( Graphics::GetScreenRect().GetCenter(), fieldWidth / 2.0f, fieldHeight / 2.0f ), wallThickness, wallColor )
 {
+    powerUps[ 0 ] = PowerUp( brickWidth, brickHeight, INCR_PADDLE_SIZE, 10, walls.GetInnerBounds().bottom );
+    powerUps[ 1 ] = PowerUp( brickWidth, brickHeight, EXTRA_LIFE, 0, walls.GetInnerBounds().bottom );
+    // not implemented yet!
+    powerUps[ 2 ] = PowerUp( brickWidth, brickHeight, CANNON, 10, walls.GetInnerBounds().bottom );
+
+    powerUpSounds[ 0 ] = Sound( L"Sounds\\grow.wav" );
+    powerUpSounds[ 1 ] = Sound( L"Sounds\\extraLife.wav" );
+
     ResetGame();
 }
 
@@ -76,15 +84,9 @@ void Game::ResetGame()
     lifes = MAX_LIFES;
 
     // reset power ups
-    powerUps[ 0 ] = PowerUp( brickWidth, brickHeight, INCR_PADDLE_SIZE, 10, walls.GetInnerBounds().bottom );
-    
-    // not implemented yet!
-    powerUps[ 1 ] = PowerUp( brickWidth, brickHeight, CANNON, 10, walls.GetInnerBounds().bottom );
-    powerUps[ 2 ] = PowerUp( brickWidth, brickHeight, EXTRA_LIFE, 10, walls.GetInnerBounds().bottom );
+    ResetPowerUps();
 
-    powerUpSounds[ 0 ] = Sound( L"Sounds\\grow.wav" );
-
-    powerUps[ 0 ].Activate( Vec2( walls.GetInnerBounds().left + 5, 200 ) );
+    powerUps[ 1 ].Activate( Vec2( walls.GetInnerBounds().left + 30, 200 ) );
 }
 
 void Game::ResetBall()
@@ -98,6 +100,14 @@ void Game::ResetPaddle()
     pad = Paddle( Vec2( gfx.ScreenWidth / 2, gfx.ScreenHeight - 80 ), 70, 15 );
 }
 
+void Game::ResetPowerUps()
+{
+    for( int i = 0; i < nPowerUps; ++i )
+    {
+        powerUps[ i ].DeActivate();
+    }
+}
+
 void Game::ApplyPowerUp( const PowerUp& pu )
 {
     switch( pu.GetType() )
@@ -106,6 +116,10 @@ void Game::ApplyPowerUp( const PowerUp& pu )
         pad.IncreaseSize( pu.GetBoostTime() );
         break;
     case EXTRA_LIFE:
+        if( lifes < MAX_LIFES )
+        {
+            lifes++;
+        }
         break;
     case CANNON:
         break;

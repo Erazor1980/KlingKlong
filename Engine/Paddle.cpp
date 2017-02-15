@@ -24,7 +24,7 @@ void Paddle::Draw( Graphics& gfx ) const
 void Paddle::DrawAsLifesRemaining( Graphics &gfx, const int lifesRemaining, const Vec2& pos, const float sizeRatio ) const
 {
     /* calc size of life paddles to draw */
-    const float w = ( halfWidth * 2 ) * sizeRatio;
+    const float w = ( halfWidthOriginal * 2 ) * sizeRatio;
     const float h = ( halfHeight * 2 ) * sizeRatio;
     const float wingW = wingWidth * sizeRatio;
 

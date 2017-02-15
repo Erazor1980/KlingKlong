@@ -31,8 +31,7 @@
 #include "Walls.h"
 #include "PowerUp.h"
 
-#define MAX_LIFES 1
-//#define BOARD_PADDING 40 /* in pixel from screen border to game border */
+#define MAX_LIFES 5
 
 class Game
 {
@@ -51,6 +50,7 @@ private:
     void ResetGame();
     void ResetBall();
     void ResetPaddle();
+    void ResetPowerUps();
     void ApplyPowerUp( const PowerUp& pu );
 	/********************************/
 private:

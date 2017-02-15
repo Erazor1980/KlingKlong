@@ -4,7 +4,9 @@
 #include "Keyboard.h"
 #include <cmath>
 
-#define M_PI       3.14159265358979323846
+#define EASY_MODE   false
+
+#define M_PI        3.14159265358979323846
 
 // Converts degrees to radians.
 #define DEG2RAD( angleDegrees ) ( float )( angleDegrees * M_PI / 180.0 )
@@ -40,7 +42,11 @@ public:
     void StickToPaddle( const float paddleCenterX );
 private:
     static constexpr float radius = 7.0f;
-    float speed = 300;
+#if EASY_MODE
+    float speed = 200;
+#else
+    float speed  = 500;
+#endif
     eBallState ballState = WAITING;
     float offsetToPaddleCenter = 0;     /* for STICKING state, to move with the paddle */
     Vec2 pos;

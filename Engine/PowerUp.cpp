@@ -51,6 +51,7 @@ void PowerUp::Draw( Graphics& gfx )
     const int bottom = int( rect.bottom );
     const int width = right - left;
     const int halfHeight = ( bottom - top ) / 2;
+    const int halfWidth = ( right - left ) / 2;
     if( INCR_PADDLE_SIZE == type )
     {
         gfx.DrawRect( rect, { 200, 20, 20 } );
@@ -59,7 +60,13 @@ void PowerUp::Draw( Graphics& gfx )
         gfx.DrawIsoRightTriUR( right - halfHeight, top, halfHeight, Colors::Black );
         gfx.DrawIsoRightTriBR( right - halfHeight, bottom - halfHeight, halfHeight, Colors::Black );
     }
-    //TODO add other drawings, when new types implemented!
+    else if( EXTRA_LIFE == type )
+    {
+        gfx.DrawRect( rect, Colors::White );
+        gfx.DrawRect( RectF::FromCenter( rect.GetCenter(), halfWidth / 2 - 1, halfHeight / 2 - 1 ), Colors::Red );
+        gfx.DrawRect( RectF::FromCenter( rect.GetCenter(), halfHeight / 2 - 1, halfHeight - 1 ), Colors::Red );
+        gfx.DrawRectBorder( rect, 2, Colors::Cyan );
+    }
     else
     {
 
@@ -76,6 +83,11 @@ void PowerUp::Activate( const Vec2& pos_in )
     activated = true;
 }
 
+void PowerUp::DeActivate()
+{
+    activated = false;
+}
+
 ePowerUpType PowerUp::GetType() const
 {
     return type;
@@ -84,4 +96,9 @@ ePowerUpType PowerUp::GetType() const
 float PowerUp::GetBoostTime() const
 {
     return boostTime;
+}
+
+bool PowerUp::IsActivated() const
+{
+    return activated;
 }
