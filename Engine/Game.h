@@ -30,7 +30,7 @@
 #include "Paddle.h"
 #include "Walls.h"
 
-#define MAX_LIFES 5
+#define MAX_LIFES 1
 //#define BOARD_PADDING 40 /* in pixel from screen border to game border */
 
 class Game

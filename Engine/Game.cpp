@@ -20,6 +20,7 @@
  ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
+#include "PowerUp.h"
 
 Game::Game( MainWindow& wnd )
     :
@@ -109,7 +110,7 @@ void Game::UpdateModel( float dt )
         ball.Start();
     }
 
-    //TODO remove later! for testing
+    // Restart game
     if( wnd.kbd.KeyIsPressed( VK_RETURN ) )
     {
         ResetGame();
@@ -117,13 +118,22 @@ void Game::UpdateModel( float dt )
     
     if( lifes > 0 && nBricksLeft > 0 )
     {
+        /////////////////
+        //// PADDLE /////
+        /////////////////
         if( ball.GetState() != WAITING )
         {
             pad.Update( wnd.kbd, dt );
         }
         pad.DoWallCollision( walls.GetInnerBounds() );
-        ball.Update( dt, pad.GetRect().GetCenter().x, wnd.kbd );
-
+        if( pad.DoBallCollision( ball ) )
+        {
+            soundPad.Play();
+        }
+        
+        /////////////////
+        //// BRICKS /////
+        /////////////////
         bool collisionHappened = false;
         float curColDistSq;
         int curColIdx;
@@ -163,11 +173,10 @@ void Game::UpdateModel( float dt )
             }
         }
 
-        if( pad.DoBallCollision( ball ) )
-        {
-            soundPad.Play();
-        }
-
+        //////////////////////
+        //// BALL & LIFE /////
+        //////////////////////
+        ball.Update( dt, pad.GetRect().GetCenter().x, wnd.kbd );
         const int collResult = ball.DoWallCollision( walls.GetInnerBounds() );
         if( 1 == collResult )
         {
@@ -232,21 +241,26 @@ void Game::DrawVictory()
 
 void Game::ComposeFrame()
 {
-    ball.Draw( gfx );
+    PowerUp test( RectF( 300, 360, 300, 320 ), INCR_PADDLE_SIZE, 10 );
+
+    test.Draw( gfx );
+
     for( const Brick& b : bricks )
     {
         b.Draw( gfx );
     }
+
     pad.Draw( gfx );
-
-    //gfx.DrawRectBorder( walls, 3, Colors::LightGray );
     walls.Draw( gfx );
-
     pad.DrawAsLifesRemaining( gfx, lifes, Vec2( walls.GetInnerBounds().left, 15 ), 0.3f );
 
     if( 0 == lifes )
     {
         DrawGameOver();
+    }
+    else
+    {
+        ball.Draw( gfx );
     }
     if( 0 == nBricksLeft )
     {
