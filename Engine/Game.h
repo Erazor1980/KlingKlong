@@ -54,6 +54,7 @@ private:
     void ResetPowerUps();
     void ApplyPowerUp( const PowerUp& pu );
     void Shoot();
+    void CreatePowerUp( int curColIdx );
 	/********************************/
 private:
 	MainWindow& wnd;

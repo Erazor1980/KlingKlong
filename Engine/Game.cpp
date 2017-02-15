@@ -177,6 +177,33 @@ void Game::Shoot()
     }
 }
 
+void Game::CreatePowerUp( int curColIdx )
+{
+#if EASY_MODE
+    if( rand() % 3 == 1 )
+    {
+        powerUps[ 0 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+    }
+    else if( lifes < MAX_LIFES && rand() % 3 == 1 )
+    {
+        powerUps[ 1 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+    }
+#else
+    if( rand() % 6 == 1 )  /* increased size */
+    {
+        powerUps[ 0 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+    }
+    else if( lifes < MAX_LIFES && rand() % 6 == 1 )    /* extra life */
+    {
+        powerUps[ 1 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+    }
+    else if( rand() % 6 == 1 )  /* laser gun */
+    {
+        powerUps[ 2 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+    }
+#endif
+}
+
 void Game::Go()
 {
     gfx.BeginFrame();
@@ -281,6 +308,7 @@ void Game::UpdateModel( float dt )
                 if( laserShots[ ls ].IsActivated() && bricks[ i ].CheckLaserCollision( laserShots[ ls ] ) )
                 {
                     nBricksLeft--;
+                    CreatePowerUp( i );
                     //TODO add sound for collision
                 }
             }
@@ -291,33 +319,7 @@ void Game::UpdateModel( float dt )
             if( bricks[ curColIdx ].ExecuteBallCollision( ball ) )
             {
                 nBricksLeft--;
-
-                ////////////////////
-                //// POWER UPS /////
-                ////////////////////
-#if EASY_MODE
-                if( rand() % 3 == 1 )
-                {
-                    powerUps[ 0 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
-                }
-                else if( lifes < MAX_LIFES && rand() % 3 == 1 )
-                {
-                    powerUps[ 1 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
-                }
-#else
-                if( rand() % 10 == 1 )  /* increased size */
-                {
-                    powerUps[ 0 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
-                }
-                else if( lifes < MAX_LIFES && rand() % 10 == 1 )    /* extra life */
-                {
-                    powerUps[ 1 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
-                }
-                else if( rand() % 3 == 1 )  /* laser gun */
-                {
-                    powerUps[ 2 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
-                }
-#endif
+                CreatePowerUp( curColIdx );
             }
             
             soundBrick.Play();
