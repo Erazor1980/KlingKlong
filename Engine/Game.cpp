@@ -36,7 +36,7 @@ Game::Game( MainWindow& wnd )
     powerUps[ 0 ] = PowerUp( brickWidth, brickHeight, INCR_PADDLE_SIZE, 10, walls.GetInnerBounds().bottom );
     powerUps[ 1 ] = PowerUp( brickWidth, brickHeight, EXTRA_LIFE, 0, walls.GetInnerBounds().bottom );
     // not implemented yet!
-    powerUps[ 2 ] = PowerUp( brickWidth, brickHeight, CANNON, 10, walls.GetInnerBounds().bottom );
+    powerUps[ 2 ] = PowerUp( brickWidth, brickHeight, LASER_GUN, 5, walls.GetInnerBounds().bottom );
 
     powerUpSounds[ 0 ] = Sound( L"Sounds\\grow.wav" );
     powerUpSounds[ 1 ] = Sound( L"Sounds\\extraLife.wav" );
@@ -88,6 +88,15 @@ void Game::ResetGame()
     ResetPowerUps();
 
     std::srand( ( unsigned int )std::time( 0 ) );
+
+    /////////////////
+    //// TESTING ////
+    /////////////////
+#if 1
+    //powerUps[ 0 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 400 ) );
+    //powerUps[ 2 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 300 ) );
+    laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );
+#endif
 }
 
 void Game::ResetBall()
@@ -122,7 +131,8 @@ void Game::ApplyPowerUp( const PowerUp& pu )
             lifes++;
         }
         break;
-    case CANNON:
+    case LASER_GUN:
+        pad.AddLaserGun( pu.GetBoostTime() );
         break;
     default:
         break;
@@ -170,6 +180,14 @@ void Game::UpdateModel( float dt )
         {
             soundPad.Play();
         }
+
+        //////////////////////
+        //// LASER SHOTS /////
+        //////////////////////
+        for( int i = 0; i < nMaxLaserShots; ++i )
+        {
+            laserShots[ i ].Update( dt );
+        }
         
         ////////////////////
         //// POWER UPS /////
@@ -191,6 +209,7 @@ void Game::UpdateModel( float dt )
         int curColIdx;
         for( int i = 0; i < nBricks; ++i )
         {
+            // ball collision
             if( bricks[ i ].CheckBallCollision( ball ) )
             {
                 const float newColDistSq = ( ball.GetPosition() - bricks[ i ].GetCenter() ).GetLengthSq();
@@ -207,6 +226,15 @@ void Game::UpdateModel( float dt )
                     curColDistSq = newColDistSq;
                     curColIdx = i;
                     collisionHappened = true;
+                }
+            }
+
+            // laser collision
+            for( int ls = 0; ls < nMaxLaserShots; ++ls )
+            {
+                if( laserShots[ ls ].IsActivated() && bricks[ i ].CheckLaserCollision( laserShots[ ls ] ) )
+                {
+                    //TODO add sound for collision
                 }
             }
         }
@@ -336,6 +364,11 @@ void Game::ComposeFrame()
         for( int i = 0; i < nPowerUps; ++i )
         {
             powerUps[ i ].Draw( gfx );
+        }
+
+        for( int i = 0; i < nMaxLaserShots; ++i )
+        {
+            laserShots[ i ].Draw( gfx );
         }
     }
     if( 0 == nBricksLeft )

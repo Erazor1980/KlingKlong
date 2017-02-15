@@ -30,6 +30,7 @@
 #include "Paddle.h"
 #include "Walls.h"
 #include "PowerUp.h"
+#include "Laser.h"
 
 #define MAX_LIFES 3
 
@@ -83,7 +84,10 @@ private:
     Sound soundLifeLoss;
     Sound soundVictory;
 
-    static constexpr int nPowerUps = 3;     /* maximal number of powerups */
+    static constexpr int nMaxLaserShots = 20;       /* maximal number of laser shots */
+    LaserShot laserShots[ nMaxLaserShots ];
+
+    static constexpr int nPowerUps = 3;             /* maximal number of powerups */
     PowerUp powerUps[ nPowerUps ];
     Sound powerUpSounds[ nPowerUps ];
     int lifes = MAX_LIFES;

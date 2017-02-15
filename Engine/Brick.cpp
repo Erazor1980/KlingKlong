@@ -32,7 +32,7 @@ void Brick::Draw( Graphics& gfx ) const
     }
 }
 
-bool Brick::CheckBallCollision( const Ball & ball ) const
+bool Brick::CheckBallCollision( const Ball& ball ) const
 {
     return !destroyed && rect.IsOverlappingWith( ball.GetRect() );
 }
@@ -56,6 +56,27 @@ bool Brick::ExecuteBallCollision( Ball& ball )
     {
         ball.ReboundX();
     }
+
+    if( type != UNDESTROYABLE )
+    {
+        life--;
+        if( life <= 0 )
+        {
+            destroyed = true;
+        }
+    }
+
+    return destroyed;
+}
+
+bool Brick::CheckLaserCollision( LaserShot& laser )
+{
+    if( destroyed || !rect.IsOverlappingWith( laser.GetRect() ) )
+    {
+        return false;
+    }
+
+    laser.DeActivate();
 
     if( type != UNDESTROYABLE )
     {

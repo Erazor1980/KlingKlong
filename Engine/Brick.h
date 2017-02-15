@@ -4,6 +4,7 @@
 #include "Graphics.h"
 #include "Ball.h"
 #include "Beveler.h"
+#include "Laser.h"
 
 enum eBrickType
 {
@@ -19,7 +20,8 @@ public:
     Brick( const RectF& rect_in, Color color_in, eBrickType type_in = STANDARD, int lifeToDestroy = 1 );
     void Draw( Graphics& gfx ) const;
     bool CheckBallCollision( const Ball& ball ) const;
-    bool ExecuteBallCollision( Ball& ball );    /* returns true, if brick has been destroyed */
+    bool ExecuteBallCollision( Ball& ball );        /* returns true, if brick has been destroyed */
+    bool CheckLaserCollision( LaserShot& laser );   /* returns true, if brick has been destroyed */
     bool IsDestroyed() const;
     Vec2 GetCenter() const;
 private:

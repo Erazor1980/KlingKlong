@@ -63,9 +63,17 @@ void PowerUp::Draw( Graphics& gfx )
     else if( EXTRA_LIFE == type )
     {
         gfx.DrawRect( rect, Colors::White );
-        gfx.DrawRect( RectF::FromCenter( rect.GetCenter(), halfWidth / 2 - 1, halfHeight / 2 - 1 ), Colors::Red );
-        gfx.DrawRect( RectF::FromCenter( rect.GetCenter(), halfHeight / 2 - 1, halfHeight - 1 ), Colors::Red );
+        gfx.DrawRect( RectF::FromCenter( rect.GetCenter(), halfWidth / 2.0f - 1, halfHeight / 2.0f - 1 ), Colors::Red );
+        gfx.DrawRect( RectF::FromCenter( rect.GetCenter(), halfHeight / 2.0f - 1, halfHeight - 1.0f ), Colors::Red );
         gfx.DrawRectBorder( rect, 2, Colors::Cyan );
+    }
+    else if( LASER_GUN == type )
+    {
+        gfx.DrawRect( rect, Colors::White );
+
+        RectF r( Vec2( left + halfWidth / 4.0f, top + halfHeight - 1.0f ), ( float )halfWidth, halfHeight / 2.0f );
+        gfx.DrawRect( r, Colors::Black );
+        gfx.DrawCircle( ( int )pos.x + int( halfWidth * 1.5 ), ( int )pos.y + halfHeight, int( halfHeight / 1.5 ), Colors::Red );
     }
     else
     {

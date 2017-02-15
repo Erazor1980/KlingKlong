@@ -19,6 +19,14 @@ void Paddle::Draw( Graphics& gfx ) const
     rect.left += wingWidth;
     rect.right -= wingWidth;
     gfx.DrawRect( rect, color );
+
+    if( hasLaserGun )
+    {
+        RectF leftGun( Vec2( rect.left + 1, rect.top - wingWidth / 2 ), wingWidth / 2, wingWidth / 2 );
+        RectF rightGun( Vec2( rect.right - 1 - wingWidth / 2, rect.top - wingWidth / 2 ), wingWidth / 2, wingWidth / 2 );
+        gfx.DrawRect( leftGun, Colors::Gray );
+        gfx.DrawRect( rightGun, Colors::Gray );
+    }
 }
 
 void Paddle::DrawAsLifesRemaining( Graphics &gfx, const int lifesRemaining, const Vec2& pos, const float sizeRatio ) const
@@ -105,11 +113,24 @@ void Paddle::Update( const Keyboard& kbd, float dt )
 
     if( sizeIncreased )
     {
-        const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime;
-        if( timeElapsed.count() > powerUpDuration )
+        const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime_incrSize;
+        if( timeElapsed.count() > powerUpDuration_incrSize )
         {
             halfWidth = halfWidthOriginal;
             sizeIncreased = false;
+        }
+    }
+
+    if( hasLaserGun )
+    {
+        const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime_laserGun;
+        if( timeElapsed.count() > powerUpDuration_laserGun )
+        {
+            hasLaserGun = false;
+        }
+        else
+        {
+            //TODO implement shooting
         }
     }
 }
@@ -126,12 +147,23 @@ void Paddle::ResetCooldown()
 
 void Paddle::IncreaseSize( const float duration )
 {
-    startTime = std::chrono::steady_clock::now();
+    startTime_incrSize = std::chrono::steady_clock::now();
 
     if( !sizeIncreased )
     {
         halfWidth *= 1.5f;
-        powerUpDuration = duration;
+        powerUpDuration_incrSize = duration;
         sizeIncreased = true;
+    }
+}
+
+void Paddle::AddLaserGun( const float duration )
+{
+    startTime_laserGun = std::chrono::steady_clock::now();
+
+    if( !hasLaserGun )
+    {
+        powerUpDuration_laserGun = duration;
+        hasLaserGun = true;
     }
 }

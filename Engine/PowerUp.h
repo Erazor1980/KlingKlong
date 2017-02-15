@@ -6,8 +6,8 @@
 enum ePowerUpType
 {
     INCR_PADDLE_SIZE = 0,
-    CANNON,
-    EXTRA_LIFE
+    EXTRA_LIFE,
+    LASER_GUN
 };
 
 class PowerUp

@@ -20,7 +20,10 @@ public:
     void Update( const Keyboard& kbd, float dt );
     RectF GetRect() const;
     void ResetCooldown();
+
+    // power ups
     void IncreaseSize( const float duration );
+    void AddLaserGun( const float duration );
 private:
     static constexpr Color wingColor = { 210, 33, 33 };// Colors::Red;
     static constexpr Color color = Colors::White;
@@ -44,10 +47,14 @@ private:
     Vec2 pos;
     bool isCooldown = false;
 
-    // power up
+    // power ups
     bool sizeIncreased = false;
-    float powerUpDuration;      /* in seconds */
-    std::chrono::steady_clock::time_point startTime;
+    bool hasLaserGun = false;
+    float powerUpDuration_incrSize;      /* in seconds */
+    float powerUpDuration_laserGun;    /* in seconds */
+    std::chrono::steady_clock::time_point startTime_incrSize;
+    std::chrono::steady_clock::time_point startTime_laserGun;
+
     float halfWidthOriginal;    /* for reducing size after power up duration */
 };
 
