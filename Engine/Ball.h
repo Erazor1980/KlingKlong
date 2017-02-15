@@ -4,7 +4,7 @@
 #include "Keyboard.h"
 #include <cmath>
 
-#define EASY_MODE   false
+#define EASY_MODE   false    /* for Julia */
 
 #define M_PI        3.14159265358979323846
 
@@ -45,7 +45,7 @@ private:
 #if EASY_MODE
     float speed = 200;
 #else
-    float speed  = 500;
+    float speed  = 600;
 #endif
     eBallState ballState = WAITING;
     float offsetToPaddleCenter = 0;     /* for STICKING state, to move with the paddle */

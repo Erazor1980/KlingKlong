@@ -31,7 +31,7 @@
 #include "Walls.h"
 #include "PowerUp.h"
 
-#define MAX_LIFES 5
+#define MAX_LIFES 3
 
 class Game
 {

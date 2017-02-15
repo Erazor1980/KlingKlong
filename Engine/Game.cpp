@@ -20,6 +20,7 @@
  ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
+#include <ctime>
 
 Game::Game( MainWindow& wnd )
     :
@@ -86,7 +87,7 @@ void Game::ResetGame()
     // reset power ups
     ResetPowerUps();
 
-    powerUps[ 1 ].Activate( Vec2( walls.GetInnerBounds().left + 30, 200 ) );
+    std::srand( ( unsigned int )std::time( 0 ) );
 }
 
 void Game::ResetBall()
@@ -216,11 +217,28 @@ void Game::UpdateModel( float dt )
             {
                 nBricksLeft--;
 
-                // drop power up 
-                if( rand() % 4 == 1 )
+                ////////////////////
+                //// POWER UPS /////
+                ////////////////////
+#if EASY_MODE
+                if( rand() % 3 == 1 )
                 {
                     powerUps[ 0 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
                 }
+                else if( lifes < MAX_LIFES && rand() % 3 == 1 )
+                {
+                    powerUps[ 1 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+                }
+#else
+                if( rand() % 10 == 1 )
+                {
+                    powerUps[ 0 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+                }
+                else if( lifes < MAX_LIFES && rand() % 10 == 1 )
+                {
+                    powerUps[ 1 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+                }
+#endif
             }
             
             soundBrick.Play();
