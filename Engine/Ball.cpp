@@ -45,7 +45,7 @@ void Ball::Update( float dt, const float paddleCenterX, const Keyboard& kbd )
     else if( WAITING == ballState )
     {
         //Vec2 dirNorm = dir.GetNormalized();
-        float angle = atan2( dir.y, dir.x );
+        //float angle = atan2( dir.y, dir.x );
         
         float angleChange = DEG2RAD( 0.3 );
         if( kbd.KeyIsPressed( VK_LEFT ) && atan2( dir.y, dir.x ) > DEG2RAD( -150 ) )

@@ -38,8 +38,10 @@ private:
     static constexpr float speed = 500.0f;
 #endif
     // control the paddle rebound behavior here
-    static constexpr float maximumExitRatio = 2.6f;
     static constexpr float fixedZoneWidthRatio = 0.1f;
+public:
+    static constexpr float maximumExitRatio = 2.6f; // made it public to be able to use it in multiBallCreation
+private:
     // ----------------------------------------
     float halfWidth;
     float halfHeight;

@@ -76,16 +76,17 @@ void Game::ResetGame()
     /////////////////
     //powerUps[ 0 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 400 ) );
     //powerUps[ 2 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 300 ) );
-    //powerUps[ 3 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 300 ) );
+    powerUps[ 3 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ) );
     //laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );
 
-    balls[ 1 ] = Ball( Vec2( 120, 70 ), Vec2( 0.5f, -1 ) );
+    /*balls[ 1 ] = Ball( Vec2( 120, 70 ), Vec2( 0.5f, -1 ) );
     balls[ 1 ].Start();
-    multiBalls = true;
+    multiBalls = true;*/
 }
 
 void Game::ResetBall()
 {
+    multiBalls = false;
     for( int i = 0; i < nMaxBalls; ++i )
     {
         balls[ i ] = Ball();
@@ -312,6 +313,25 @@ void Game::CreateMultiBalls()
     {
         //TODO maybe add possibility to get more then 3 balls later
         return;
+    }
+    multiBalls = true;
+
+    /* add 2 new balls on the 2 free indexes */
+    for( int i = 0; i < nMaxBalls; ++i )
+    {
+        if( i != lastBallIdx )
+        {
+            balls[ i ] = Ball( balls[ lastBallIdx ].GetPosition(), Vec2() );
+            float xDir;
+            float yDir;
+            do
+            {
+                xDir = ( float )( rand() % 200 - 100 );
+                yDir = ( float )( -rand() % 100 );
+            } while( Paddle::maximumExitRatio * yDir > xDir );
+            balls[ i ].SetDirection( Vec2( xDir, yDir ) );
+            balls[ i ].Start();
+        }
     }
 }
 
