@@ -76,9 +76,12 @@ void PowerUp::Draw( Graphics& gfx )
         gfx.DrawRect( r, Colors::Black );
         gfx.DrawCircle( ( int )pos.x + int( halfWidth * 1.5 ), ( int )pos.y + halfHeight, int( halfHeight / 1.5 ), Colors::Red );
     }
-    else
+    else if( MULTI_BALL == type )
     {
-
+        gfx.DrawRect( rect, Colors::White );
+        gfx.DrawCircle( ( int )pos.x + int( halfWidth ), ( int )pos.y + halfHeight, int( halfHeight / 1.8 ), { 240, 90, 70 } );
+        gfx.DrawCircle( ( int )pos.x + int( halfWidth * 1.5 ), ( int )pos.y + halfHeight, int( halfHeight / 1.8 ), { 240, 90, 70 } );
+        gfx.DrawCircle( ( int )pos.x + int( halfWidth * 0.5 ), ( int )pos.y + halfHeight, int( halfHeight / 1.8 ), { 240, 90, 70 } );
     }
 }
 

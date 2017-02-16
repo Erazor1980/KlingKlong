@@ -3,15 +3,21 @@
 
 Ball::Ball( const Vec2& pos_in, const Vec2& dir_in )
     :
-    pos( pos_in )
+    pos( pos_in ),
+    ballState( WAITING )
 {
     SetDirection( dir_in );
 }
 
 void Ball::Draw( Graphics& gfx ) const
 {
+    if( INACTIVE == ballState )
+    {
+        return;
+    }
+
     // draw ball direction line when stopped
-    if(  ballState != MOVING )
+    if( ballState != MOVING )
     {
         Vec2 dirLine = pos + dir.GetNormalized();
         for( int i = 1; i <= 15; ++i )
@@ -27,6 +33,11 @@ void Ball::Draw( Graphics& gfx ) const
 
 void Ball::Update( float dt, const float paddleCenterX, const Keyboard& kbd )
 {
+    if( INACTIVE == ballState )
+    {
+        return;
+    }
+
     if( MOVING == ballState )
     {
         pos += dir.GetNormalized() * dt * speed;
@@ -49,8 +60,6 @@ void Ball::Update( float dt, const float paddleCenterX, const Keyboard& kbd )
             float rotatedY = dir.x * sin( angleChange ) + dir.y * cos( angleChange );
             SetDirection( Vec2( rotatedX, rotatedY ) );
         }
-
-
     }
     else if( STICKING == ballState )
     {
@@ -60,6 +69,10 @@ void Ball::Update( float dt, const float paddleCenterX, const Keyboard& kbd )
 
 int Ball::DoWallCollision( const RectF& walls )
 {
+    if( INACTIVE == ballState )
+    {
+        return 0;
+    }
     int collisionResult = 0;
     const RectF rect = GetRect();
     if( rect.left < walls.left )
@@ -127,16 +140,28 @@ void Ball::SetDirection( const Vec2& dir_in )
 
 void Ball::Start()
 {
+    if( INACTIVE == ballState )
+    {
+        return;
+    }
     ballState = MOVING;
 }
 
 void Ball::Stop()
 {
+    if( INACTIVE == ballState )
+    {
+        return;
+    }
     ballState = WAITING;
 }
 
 void Ball::StickToPaddle( const float paddleCenterX )
 {
+    if( INACTIVE == ballState )
+    {
+        return;
+    }
     offsetToPaddleCenter = pos.x - paddleCenterX;
     ballState = STICKING;
 }

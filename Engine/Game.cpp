@@ -38,9 +38,12 @@ Game::Game( MainWindow& wnd )
     powerUps[ 0 ] = PowerUp( brickWidth, brickHeight, INCR_PADDLE_SIZE, 5, walls.GetInnerBounds().bottom );
     powerUps[ 1 ] = PowerUp( brickWidth, brickHeight, EXTRA_LIFE, 0, walls.GetInnerBounds().bottom );
     powerUps[ 2 ] = PowerUp( brickWidth, brickHeight, LASER_GUN, 4, walls.GetInnerBounds().bottom );
+    powerUps[ 3 ] = PowerUp( brickWidth, brickHeight, MULTI_BALL, 7, walls.GetInnerBounds().bottom );
 
     powerUpSounds[ 0 ] = Sound( L"Sounds\\grow.wav" );
     powerUpSounds[ 1 ] = Sound( L"Sounds\\extraLife.wav" );
+    // no sound for gun, because it directly starts to shoot
+    powerUpSounds[ 3 ] = Sound( L"Sounds\\multiBall.wav" );
 
     ResetGame();
 }
@@ -71,17 +74,20 @@ void Game::ResetGame()
     /////////////////
     //// TESTING ////
     /////////////////
-#if 0
     //powerUps[ 0 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 400 ) );
-    powerUps[ 2 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 300 ) );
+    //powerUps[ 2 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 300 ) );
+    powerUps[ 3 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 300 ) );
     //laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );
-#endif
 }
 
 void Game::ResetBall()
 {
-    ball = Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ) , Vec2( -0.2, -1 ) );
-    ball.Stop();
+    for( int i = 0; i < 3; ++i )
+    {
+        balls[ i ] = Ball();
+    }
+    balls[ 0 ] = Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ) , Vec2( -0.2, -1 ) );
+    balls[ 0 ].Stop();
 }
 
 void Game::ResetPaddle()
@@ -123,6 +129,8 @@ void Game::ApplyPowerUp( const PowerUp& pu )
         pad.AddLaserGun( pu.GetBoostTime() );
         startTime_shot = std::chrono::steady_clock::now();
         break;
+    case MULTI_BALL:
+        startTime_multiBall = std::chrono::steady_clock::now();;
     default:
         break;
     }
@@ -293,6 +301,10 @@ void Game::CreateNextLevel()
     }
 }
 
+void Game::CreateMultiBalls()
+{
+}
+
 void Game::Go()
 {
     gfx.BeginFrame();
@@ -311,7 +323,10 @@ void Game::UpdateModel( float dt )
 {
     if( wnd.kbd.KeyIsPressed( VK_SPACE ) )
     {
-        ball.Start();
+        for( int i = 0; i < 3; ++i )
+        {
+            balls[ i ].Start();
+        }
     }
 
     // Restart game
@@ -326,15 +341,18 @@ void Game::UpdateModel( float dt )
         /////////////////
         //// PADDLE /////
         /////////////////
-        if( ball.GetState() != WAITING )
+        if( balls[ 0 ].GetState() != WAITING )
         {
             pad.Update( wnd.kbd, dt );
         }
         pad.DoWallCollision( walls.GetInnerBounds() );
-        if( pad.DoBallCollision( ball ) )
+        for( int i = 0; i < 3; ++i )
         {
-            soundPad.Play();
-        }
+            if( pad.DoBallCollision( balls[ i ] ) )
+            {
+                soundPad.Play();
+            }
+        }        
 
         //////////////////////
         //// LASER SHOTS /////
@@ -373,9 +391,9 @@ void Game::UpdateModel( float dt )
         for( int i = 0; i < nBricks; ++i )
         {
             // ball collision
-            if( bricks[ i ].CheckBallCollision( ball ) )
+            if( bricks[ i ].CheckBallCollision( balls[ 0 ] ) )
             {
-                const float newColDistSq = ( ball.GetPosition() - bricks[ i ].GetCenter() ).GetLengthSq();
+                const float newColDistSq = ( balls[ 0 ].GetPosition() - bricks[ i ].GetCenter() ).GetLengthSq();
                 if( collisionHappened )
                 {
                     if( newColDistSq < curColDistSq )
@@ -405,7 +423,7 @@ void Game::UpdateModel( float dt )
         if( collisionHappened )
         {
             pad.ResetCooldown();
-            if( bricks[ curColIdx ].ExecuteBallCollision( ball ) )
+            if( bricks[ curColIdx ].ExecuteBallCollision( balls[ 0 ] ) )
             {
                 nBricksLeft--;
                 CreatePowerUp( curColIdx );
@@ -429,13 +447,13 @@ void Game::UpdateModel( float dt )
         //////////////////////
         //// BALL & LIFE /////
         //////////////////////
-        ball.Update( dt, pad.GetRect().GetCenter().x, wnd.kbd );
-        const int collResult = ball.DoWallCollision( walls.GetInnerBounds() );
+        balls[ 0 ].Update( dt, pad.GetRect().GetCenter().x, wnd.kbd );
+        const int collResult = balls[ 0 ].DoWallCollision( walls.GetInnerBounds() );
         if( 1 == collResult )
         {
             // only reset cooldown if not still coliding with ball
             // (helps prevent weird shit when ball is trapped against wall)
-            if( !pad.GetRect().IsOverlappingWith( ball.GetRect() ) )
+            if( !pad.GetRect().IsOverlappingWith( balls[ 0 ].GetRect() ) )
             {
                 pad.ResetCooldown();
             }
@@ -518,7 +536,7 @@ void Game::ComposeFrame()
     }
     else
     {
-        ball.Draw( gfx );
+        balls[ 0 ].Draw( gfx );
 
         for( int i = 0; i < nPowerUps; ++i )
         {

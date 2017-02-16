@@ -18,7 +18,8 @@ enum eBallState
 {
     MOVING = 0, /* ball moving in game */
     WAITING,    /* starting game / after life loss -> direction can be changed */
-    STICKING    /* stuck to paddle -> moving with paddle */
+    STICKING,   /* stuck to paddle -> moving with paddle */
+    INACTIVE    /* for multi ball power up */
 };
 
 class Ball
@@ -47,7 +48,7 @@ private:
 #else
     float speed  = 600;
 #endif
-    eBallState ballState = WAITING;
+    eBallState ballState = INACTIVE;
     float offsetToPaddleCenter = 0;     /* for STICKING state, to move with the paddle */
     Vec2 pos;
     Vec2 dir;

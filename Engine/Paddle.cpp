@@ -50,7 +50,7 @@ void Paddle::DrawAsLifesRemaining( Graphics &gfx, const int lifesRemaining, cons
 
 bool Paddle::DoBallCollision( Ball& ball )
 {
-    if( !isCooldown )
+    if( !isCooldown && ball.GetState() == MOVING )
     {
         const RectF rect = GetRect();
         if( rect.IsOverlappingWith( ball.GetRect() ) )
