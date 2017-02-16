@@ -21,7 +21,6 @@ public:
     RectF GetRect() const;
     RectF GetLeftGunPosition() const;
     RectF GetRightGunPosition() const;
-    void ResetCooldown();
 
     // power ups
     void IncreaseSize( const float duration );
@@ -51,7 +50,6 @@ private:
     float fixedZoneExitX;
     // -------------------------------------
     Vec2 pos;
-    bool isCooldown = false;
 
     // power ups
     bool sizeIncreased = false;

@@ -43,10 +43,7 @@ void Ball::Update( float dt, const float paddleCenterX, const Keyboard& kbd )
         pos += dir.GetNormalized() * dt * speed;
     }
     else if( WAITING == ballState )
-    {
-        //Vec2 dirNorm = dir.GetNormalized();
-        //float angle = atan2( dir.y, dir.x );
-        
+    {        
         float angleChange = DEG2RAD( 0.3 );
         if( kbd.KeyIsPressed( VK_LEFT ) && atan2( dir.y, dir.x ) > DEG2RAD( -150 ) )
         {
@@ -103,14 +100,16 @@ int Ball::DoWallCollision( const RectF& walls )
     return collisionResult;
 }
 
-void Ball::ReboundX()
+void Ball::ReboundX( bool paddleBounce )
 {
     dir.x = -dir.x;
+    paddleCooldown = paddleBounce;
 }
 
-void Ball::ReboundY()
+void Ball::ReboundY( bool paddleBounce )
 {
     dir.y = -dir.y;
+    paddleCooldown = paddleBounce;
 }
 
 RectF Ball::GetRect() const
@@ -164,4 +163,9 @@ void Ball::StickToPaddle( const float paddleCenterX )
     }
     offsetToPaddleCenter = pos.x - paddleCenterX;
     ballState = STICKING;
+}
+
+bool Ball::HasPaddleCooldown() const
+{
+    return paddleCooldown;
 }

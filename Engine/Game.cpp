@@ -79,9 +79,9 @@ void Game::ResetGame()
     //powerUps[ 3 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ) );
     //laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );
 
-    /*balls[ 1 ] = Ball( Vec2( 120, 70 ), Vec2( 0.5f, -1 ) );
+    balls[ 1 ] = Ball( Vec2( walls.GetInnerBounds().left + 20, walls.GetInnerBounds().bottom - 10 ), Vec2( 1, -0.1 ) );
     balls[ 1 ].Start();
-    multiBalls = true;*/
+    multiBalls = true;
 }
 
 void Game::ResetBall()
@@ -491,7 +491,7 @@ void Game::UpdateModel( float dt )
         }
         if( collisionHappened )
         {
-            pad.ResetCooldown();
+            //pad.ResetCooldown();
             if( bricks[ curColIdx ].ExecuteBallCollision( balls[ ballIdx ] ) )
             {
                 nBricksLeft--;
@@ -526,7 +526,6 @@ void Game::UpdateModel( float dt )
                 // (helps prevent weird shit when ball is trapped against wall)
                 if( !pad.GetRect().IsOverlappingWith( balls[ i ].GetRect() ) )
                 {
-                    pad.ResetCooldown();
                 }
             }
             else if( 2 == collResult )

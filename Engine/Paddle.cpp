@@ -51,7 +51,7 @@ void Paddle::DrawAsLifesRemaining( Graphics &gfx, const int lifesRemaining, cons
 bool Paddle::DoBallCollision( Ball& ball )
 {
     //TODO multi ball does not work, when cooldown is used! think about another solution!
-    if( /*!isCooldown && */ball.GetState() == MOVING )
+    if( !ball.HasPaddleCooldown() && ball.GetState() == MOVING )
     {
         const RectF rect = GetRect();
         if( rect.IsOverlappingWith( ball.GetRect() ) )
@@ -81,9 +81,8 @@ bool Paddle::DoBallCollision( Ball& ball )
             }
             else
             {
-                ball.ReboundX();
+                ball.ReboundX( true );
             }
-            isCooldown = true;
             return true;
         }
     }
@@ -150,11 +149,6 @@ RectF Paddle::GetLeftGunPosition() const
 RectF Paddle::GetRightGunPosition() const
 {
     return rightGun;
-}
-
-void Paddle::ResetCooldown()
-{
-    isCooldown = false;
 }
 
 void Paddle::IncreaseSize( const float duration )
