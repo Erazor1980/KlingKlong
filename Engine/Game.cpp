@@ -152,7 +152,7 @@ void Game::Shoot()
     const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime_shot;
     if( timeElapsed.count() > timeBetweenShots || !startedShooting )
     {
-        soundLaserShot.Play();
+        soundLaserShot.Play( 1, 0.35f );
         laserShots[ shotIdx ] = LaserShot( pad.GetRightGunPosition().GetCenter(), walls.GetInnerBounds().top );
         shotIdx++;
         if( shotIdx == nMaxLaserShots )
@@ -182,6 +182,14 @@ void Game::CreatePowerUp( int curColIdx )
     {
         powerUps[ 1 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
     }
+    else if( rand() % 4 == 1 )  /* laser gun */
+    {
+        powerUps[ 2 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+    }
+    else if( !multiBalls && rand() % 4 == 1 )  /* multi ball */
+    {
+        powerUps[ 3 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+    }
 #else
     if( rand() % 9 == 1 )  /* increased size */
     {
@@ -195,7 +203,7 @@ void Game::CreatePowerUp( int curColIdx )
     {
         powerUps[ 2 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
     }
-    else if( rand() % 9 == 1 )  /* laser gun */
+    else if( !multiBalls && rand() % 9 == 1 )  /* multi ball */
     {
         powerUps[ 3 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
     }
