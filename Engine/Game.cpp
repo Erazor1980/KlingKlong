@@ -76,17 +76,22 @@ void Game::ResetGame()
     /////////////////
     //powerUps[ 0 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 400 ) );
     //powerUps[ 2 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 300 ) );
-    powerUps[ 3 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 300 ) );
+    //powerUps[ 3 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 300 ) );
     //laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );
+
+    balls[ 1 ] = Ball( Vec2( 120, 70 ), Vec2( 0.5f, -1 ) );
+    balls[ 1 ].Start();
+    multiBalls = true;
 }
 
 void Game::ResetBall()
 {
-    for( int i = 0; i < 3; ++i )
+    for( int i = 0; i < nMaxBalls; ++i )
     {
         balls[ i ] = Ball();
     }
-    balls[ 0 ] = Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ) , Vec2( -0.2, -1 ) );
+    lastBallIdx = 0;
+    balls[ 0 ] = Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ) , Vec2( -0.2f, -1 ) );
     balls[ 0 ].Stop();
 }
 
@@ -130,7 +135,7 @@ void Game::ApplyPowerUp( const PowerUp& pu )
         startTime_shot = std::chrono::steady_clock::now();
         break;
     case MULTI_BALL:
-        startTime_multiBall = std::chrono::steady_clock::now();;
+        CreateMultiBalls();
     default:
         break;
     }
@@ -303,6 +308,32 @@ void Game::CreateNextLevel()
 
 void Game::CreateMultiBalls()
 {
+    if( multiBalls )
+    {
+        //TODO maybe add possibility to get more then 3 balls later
+        return;
+    }
+}
+
+void Game::UpdateMultiBalls( int idxBallToDeactivate )
+{
+    // deactivate ball
+    balls[ idxBallToDeactivate ] = Ball();
+
+    int nActiveBalls = 0;
+    for( int i = 0; i < nMaxBalls; ++i )
+    {
+        if( balls[ i ].GetState() != INACTIVE )
+        {
+            nActiveBalls++;
+            lastBallIdx = i;
+        }
+    }
+
+    if( 1 == nActiveBalls )
+    {
+        multiBalls = false;
+    }
 }
 
 void Game::Go()
@@ -323,7 +354,7 @@ void Game::UpdateModel( float dt )
 {
     if( wnd.kbd.KeyIsPressed( VK_SPACE ) )
     {
-        for( int i = 0; i < 3; ++i )
+        for( int i = 0; i < nMaxBalls; ++i )
         {
             balls[ i ].Start();
         }
@@ -341,12 +372,12 @@ void Game::UpdateModel( float dt )
         /////////////////
         //// PADDLE /////
         /////////////////
-        if( balls[ 0 ].GetState() != WAITING )
+        if( balls[ lastBallIdx ].GetState() != WAITING )
         {
             pad.Update( wnd.kbd, dt );
         }
         pad.DoWallCollision( walls.GetInnerBounds() );
-        for( int i = 0; i < 3; ++i )
+        for( int i = 0; i < nMaxBalls; ++i )
         {
             if( pad.DoBallCollision( balls[ i ] ) )
             {
@@ -388,25 +419,31 @@ void Game::UpdateModel( float dt )
         bool collisionHappened = false;
         float curColDistSq;
         int curColIdx;
+        int ballIdx;
         for( int i = 0; i < nBricks; ++i )
         {
             // ball collision
-            if( bricks[ i ].CheckBallCollision( balls[ 0 ] ) )
+            for( int b = 0; b < nMaxBalls; ++b )
             {
-                const float newColDistSq = ( balls[ 0 ].GetPosition() - bricks[ i ].GetCenter() ).GetLengthSq();
-                if( collisionHappened )
+                if( MOVING == balls[ b ].GetState() && bricks[ i ].CheckBallCollision( balls[ b ] ) )
                 {
-                    if( newColDistSq < curColDistSq )
+                    const float newColDistSq = ( balls[ b ].GetPosition() - bricks[ i ].GetCenter() ).GetLengthSq();
+                    if( collisionHappened )
+                    {
+                        if( newColDistSq < curColDistSq )
+                        {
+                            curColDistSq = newColDistSq;
+                            curColIdx = i;
+                            ballIdx = b;
+                        }
+                    }
+                    else
                     {
                         curColDistSq = newColDistSq;
                         curColIdx = i;
+                        ballIdx = b;
+                        collisionHappened = true;
                     }
-                }
-                else
-                {
-                    curColDistSq = newColDistSq;
-                    curColIdx = i;
-                    collisionHappened = true;
                 }
             }
 
@@ -423,7 +460,7 @@ void Game::UpdateModel( float dt )
         if( collisionHappened )
         {
             pad.ResetCooldown();
-            if( bricks[ curColIdx ].ExecuteBallCollision( balls[ 0 ] ) )
+            if( bricks[ curColIdx ].ExecuteBallCollision( balls[ ballIdx ] ) )
             {
                 nBricksLeft--;
                 CreatePowerUp( curColIdx );
@@ -447,31 +484,41 @@ void Game::UpdateModel( float dt )
         //////////////////////
         //// BALL & LIFE /////
         //////////////////////
-        balls[ 0 ].Update( dt, pad.GetRect().GetCenter().x, wnd.kbd );
-        const int collResult = balls[ 0 ].DoWallCollision( walls.GetInnerBounds() );
-        if( 1 == collResult )
+        for( int i = 0; i < nMaxBalls; ++i )
         {
-            // only reset cooldown if not still coliding with ball
-            // (helps prevent weird shit when ball is trapped against wall)
-            if( !pad.GetRect().IsOverlappingWith( balls[ 0 ].GetRect() ) )
+            balls[ i ].Update( dt, pad.GetRect().GetCenter().x, wnd.kbd );
+            const int collResult = balls[ i ].DoWallCollision( walls.GetInnerBounds() );
+            if( 1 == collResult )
             {
-                pad.ResetCooldown();
+                // only reset cooldown if not still coliding with ball
+                // (helps prevent weird shit when ball is trapped against wall)
+                if( !pad.GetRect().IsOverlappingWith( balls[ i ].GetRect() ) )
+                {
+                    pad.ResetCooldown();
+                }
             }
-        }
-        else if( 2 == collResult )
-        {
-            lifes--;
-            if( 0 == lifes )
+            else if( 2 == collResult )
             {
-                soundGameOver.Play();
-            }
-            else
-            {
-                ResetPaddle();
-                ResetBall();
-                ResetPowerUps();
-                ResetShots();
-                soundLifeLoss.Play();
+                if( multiBalls )
+                {
+                    UpdateMultiBalls( i );
+                }
+                else
+                {
+                    lifes--;
+                    if( 0 == lifes )
+                    {
+                        soundGameOver.Play();
+                    }
+                    else
+                    {
+                        ResetPaddle();
+                        ResetBall();
+                        ResetPowerUps();
+                        ResetShots();
+                        soundLifeLoss.Play();
+                    }
+                }
             }
         }
     }
@@ -536,7 +583,10 @@ void Game::ComposeFrame()
     }
     else
     {
-        balls[ 0 ].Draw( gfx );
+        for( int i = 0; i < nMaxBalls; ++i )
+        {
+            balls[ i ].Draw( gfx );
+        }
 
         for( int i = 0; i < nPowerUps; ++i )
         {

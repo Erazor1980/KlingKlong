@@ -58,6 +58,7 @@ private:
     void CreatePowerUp( int curColIdx );
     void CreateNextLevel();
     void CreateMultiBalls();
+    void UpdateMultiBalls( int idxBallToDeactivate );
 	/********************************/
 private:
 	MainWindow& wnd;
@@ -79,7 +80,6 @@ private:
     static constexpr Color brickColors[ 4 ] = { { 230, 0, 0 }, { 0, 230, 0 }, { 0, 0, 230 }, { 0, 230 ,230 } };
 
     FrameTimer ft;
-    Ball balls[3];   //TODO maybe add possibility to create more balls later
     Paddle pad;
     Walls walls;
     Brick bricks[ nBricks ];
@@ -105,8 +105,10 @@ private:
     static constexpr float timeBetweenShots = 0.35f;     /* in seconds */
     int shotIdx = 0;                                    /* idx to add next shot */
     /* multi ball */
-    std::chrono::steady_clock::time_point startTime_multiBall;
+    static constexpr int nMaxBalls = 3;           /* maximal number of balls */
+    Ball balls[ nMaxBalls ];
     bool multiBalls = false;
+    int lastBallIdx = 0;
 
 
     int lifes = MAX_LIFES;

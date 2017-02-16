@@ -50,7 +50,8 @@ void Paddle::DrawAsLifesRemaining( Graphics &gfx, const int lifesRemaining, cons
 
 bool Paddle::DoBallCollision( Ball& ball )
 {
-    if( !isCooldown && ball.GetState() == MOVING )
+    //TODO multi ball does not work, when cooldown is used! think about another solution!
+    if( /*!isCooldown && */ball.GetState() == MOVING )
     {
         const RectF rect = GetRect();
         if( rect.IsOverlappingWith( ball.GetRect() ) )
