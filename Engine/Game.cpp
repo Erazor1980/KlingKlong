@@ -79,9 +79,9 @@ void Game::ResetGame()
     //powerUps[ 3 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ) );
     //laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );
 
-    balls[ 1 ] = Ball( Vec2( walls.GetInnerBounds().left + 20, walls.GetInnerBounds().bottom - 10 ), Vec2( 1, -0.1 ) );
-    balls[ 1 ].Start();
-    multiBalls = true;
+    //balls[ 1 ] = Ball( Vec2( walls.GetInnerBounds().left + 20, walls.GetInnerBounds().bottom - 10 ), Vec2( 1, -0.1 ) );
+    //balls[ 1 ].Start();
+    //multiBalls = true;
 }
 
 void Game::ResetBall()
@@ -519,16 +519,8 @@ void Game::UpdateModel( float dt )
         for( int i = 0; i < nMaxBalls; ++i )
         {
             balls[ i ].Update( dt, pad.GetRect().GetCenter().x, wnd.kbd );
-            const int collResult = balls[ i ].DoWallCollision( walls.GetInnerBounds() );
-            if( 1 == collResult )
-            {
-                // only reset cooldown if not still coliding with ball
-                // (helps prevent weird shit when ball is trapped against wall)
-                if( !pad.GetRect().IsOverlappingWith( balls[ i ].GetRect() ) )
-                {
-                }
-            }
-            else if( 2 == collResult )
+            const int collResult = balls[ i ].DoWallCollision( walls.GetInnerBounds(), pad.GetRect() );
+            if( 2 == collResult )
             {
                 if( multiBalls )
                 {

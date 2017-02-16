@@ -64,36 +64,38 @@ void Ball::Update( float dt, const float paddleCenterX, const Keyboard& kbd )
     }
 }
 
-int Ball::DoWallCollision( const RectF& walls )
+int Ball::DoWallCollision( const RectF& walls, const RectF& paddle )
 {
     if( INACTIVE == ballState )
     {
         return 0;
     }
+    bool padBounce = paddle.IsOverlappingWith( GetRect() );
+
     int collisionResult = 0;
     const RectF rect = GetRect();
     if( rect.left < walls.left )
     {
         pos.x += walls.left - rect.left;
-        ReboundX();
+        ReboundX( padBounce );
         collisionResult = 1;
     }
     else if( rect.right > walls.right )
     {
         pos.x -= rect.right - walls.right;
-        ReboundX();
+        ReboundX( padBounce );
         collisionResult = 1;
     }
     if( rect.top < walls.top )
     {
         pos.y += walls.top - rect.top;
-        ReboundY();
+        ReboundY( padBounce );
         collisionResult = 1;
     }
     else if( rect.bottom > walls.bottom )
     {
         pos.y -=  rect.bottom - walls.bottom;
-        ReboundY();
+        ReboundY( padBounce );
         collisionResult = 2;
     }    
 

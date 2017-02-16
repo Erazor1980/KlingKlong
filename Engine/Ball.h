@@ -30,7 +30,7 @@ public:
     void Draw( Graphics& gfx ) const;
     void Update( float dt, const float paddleCenterX, const Keyboard& kbd );
     /* return 0 = nothing, 1 = hit wall, 2 = hit bottom */
-    int DoWallCollision( const RectF& walls );
+    int DoWallCollision( const RectF& walls, const RectF& paddle );
     void ReboundX( bool paddleBounce = false );
     void ReboundY( bool paddleBounce = false );
     RectF GetRect() const;
@@ -47,7 +47,7 @@ private:
 #if EASY_MODE
     float speed = 200;
 #else
-    float speed  = 50;
+    float speed  = 600;
 #endif
     eBallState ballState = INACTIVE;
     float offsetToPaddleCenter = 0;     /* for STICKING state, to move with the paddle */
