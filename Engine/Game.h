@@ -84,6 +84,7 @@ private:
     Brick bricks[ nBricks ];
     Sound soundPad;
     Sound soundBrick;
+    Sound soundBrick2;
     Sound soundGameOver;
     Sound soundLifeLoss;
     Sound soundVictory;

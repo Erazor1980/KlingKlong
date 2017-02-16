@@ -55,10 +55,11 @@ void PowerUp::Draw( Graphics& gfx )
     if( INCR_PADDLE_SIZE == type )
     {
         gfx.DrawRect( rect, { 200, 20, 20 } );
-        gfx.DrawIsoRightTriUL( left, top, halfHeight, Colors::Black );
-        gfx.DrawIsoRightTriBL( left, bottom - halfHeight, halfHeight, Colors::Black );
-        gfx.DrawIsoRightTriUR( right - halfHeight, top, halfHeight, Colors::Black );
-        gfx.DrawIsoRightTriBR( right - halfHeight, bottom - halfHeight, halfHeight, Colors::Black );
+        gfx.DrawIsoRightTriUL( left, top, halfHeight, Colors::White );
+        gfx.DrawIsoRightTriBL( left, bottom - halfHeight, halfHeight, Colors::White );
+        gfx.DrawIsoRightTriUR( right - halfHeight, top, halfHeight, Colors::White );
+        gfx.DrawIsoRightTriBR( right - halfHeight, bottom - halfHeight, halfHeight, Colors::White );
+        gfx.DrawRectBorder( rect, 1, Colors::White );
     }
     else if( EXTRA_LIFE == type )
     {

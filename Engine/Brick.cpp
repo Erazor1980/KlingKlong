@@ -99,3 +99,8 @@ Vec2 Brick::GetCenter() const
 {
     return rect.GetCenter();
 }
+
+eBrickType Brick::GetType() const
+{
+    return type;
+}

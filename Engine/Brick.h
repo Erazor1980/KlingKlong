@@ -24,6 +24,7 @@ public:
     bool CheckLaserCollision( LaserShot& laser );   /* returns true, if brick has been destroyed */
     bool IsDestroyed() const;
     Vec2 GetCenter() const;
+    eBrickType GetType() const;
 private:
     static constexpr float padding = 0.5f;
     static constexpr int bevelSize = 3;

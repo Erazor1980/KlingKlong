@@ -28,6 +28,7 @@ Game::Game( MainWindow& wnd )
     gfx( wnd ),
     soundPad( L"Sounds\\arkpad.wav" ),
     soundBrick( L"Sounds\\arkbrick.wav" ),
+    soundBrick2( L"Sounds\\arkbrick2.wav" ),
     soundLifeLoss( L"Sounds\\fart1.wav" ),
     soundGameOver( L"Sounds\\gameover.wav" ),
     soundVictory( L"Sounds\\victory.wav" ),
@@ -398,7 +399,6 @@ void Game::UpdateModel( float dt )
                 {
                     nBricksLeft--;
                     CreatePowerUp( i );
-                    //TODO add sound for collision
                 }
             }
         }
@@ -411,7 +411,14 @@ void Game::UpdateModel( float dt )
                 CreatePowerUp( curColIdx );
             }
             
-            soundBrick.Play();
+            if( UNDESTROYABLE == bricks[ curColIdx ].GetType() )
+            {
+                soundBrick2.Play( 1.0f, 1.5f );
+            }
+            else
+            {
+                soundBrick.Play();
+            }            
         }
         if( nBricksLeft <= 0 )
         {
