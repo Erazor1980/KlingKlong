@@ -38,7 +38,7 @@ Game::Game( MainWindow& wnd )
     powerUps[ 0 ] = PowerUp( brickWidth, brickHeight, INCR_PADDLE_SIZE, 5, walls.GetInnerBounds().bottom );
     powerUps[ 1 ] = PowerUp( brickWidth, brickHeight, EXTRA_LIFE, 0, walls.GetInnerBounds().bottom );
     powerUps[ 2 ] = PowerUp( brickWidth, brickHeight, LASER_GUN, 4, walls.GetInnerBounds().bottom );
-    powerUps[ 3 ] = PowerUp( brickWidth, brickHeight, MULTI_BALL, 7, walls.GetInnerBounds().bottom );
+    powerUps[ 3 ] = PowerUp( brickWidth, brickHeight, MULTI_BALL, 0, walls.GetInnerBounds().bottom );
 
     powerUpSounds[ 0 ] = Sound( L"Sounds\\grow.wav" );
     powerUpSounds[ 1 ] = Sound( L"Sounds\\extraLife.wav" );
@@ -76,7 +76,7 @@ void Game::ResetGame()
     /////////////////
     //powerUps[ 0 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 400 ) );
     //powerUps[ 2 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 300 ) );
-    powerUps[ 3 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ) );
+    //powerUps[ 3 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ) );
     //laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );
 
     /*balls[ 1 ] = Ball( Vec2( 120, 70 ), Vec2( 0.5f, -1 ) );
@@ -183,17 +183,21 @@ void Game::CreatePowerUp( int curColIdx )
         powerUps[ 1 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
     }
 #else
-    if( rand() % 6 == 1 )  /* increased size */
+    if( rand() % 9 == 1 )  /* increased size */
     {
         powerUps[ 0 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
     }
-    else if( lifes < MAX_LIFES && rand() % 6 == 1 )    /* extra life */
+    else if( lifes < MAX_LIFES && rand() % 9 == 1 )    /* extra life */
     {
         powerUps[ 1 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
     }
-    else if( rand() % 6 == 1 )  /* laser gun */
+    else if( rand() % 9 == 1 )  /* laser gun */
     {
         powerUps[ 2 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+    }
+    else if( rand() % 9 == 1 )  /* laser gun */
+    {
+        powerUps[ 3 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
     }
 #endif
 }

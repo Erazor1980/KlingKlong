@@ -35,7 +35,7 @@ private:
 #if EASY_MODE
     static constexpr float speed = 300.0f;
 #else
-    static constexpr float speed = 500.0f;
+    static constexpr float speed = 550.0f;
 #endif
     // control the paddle rebound behavior here
     static constexpr float fixedZoneWidthRatio = 0.1f;
