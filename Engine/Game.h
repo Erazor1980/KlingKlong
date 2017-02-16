@@ -56,7 +56,7 @@ private:
     void ApplyPowerUp( const PowerUp& pu );
     void Shoot();
     void CreatePowerUp( int curColIdx );
-    void CreateLevel( int lvl );
+    void CreateNextLevel();
 	/********************************/
 private:
 	MainWindow& wnd;
@@ -96,11 +96,13 @@ private:
     static constexpr float timeBetweenShots = 0.35f;     /* in seconds */
     int shotIdx = 0;                                    /* idx to add next shot */
 
-
     static constexpr int nPowerUps = 3;             /* maximal number of powerups */
     PowerUp powerUps[ nPowerUps ];
     Sound powerUpSounds[ nPowerUps ];
     int lifes = MAX_LIFES;
     int level = 0;
+
+    float timeBetweenLevels = 3;    /* in seconds */
+    std::chrono::steady_clock::time_point startTime_levelFinished;
 	/********************************/
 };

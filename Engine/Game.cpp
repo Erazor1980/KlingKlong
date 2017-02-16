@@ -56,7 +56,7 @@ void Game::ResetGame()
     ResetBall();
     
     // reset bricks
-    CreateLevel( level );
+    CreateNextLevel();
 
     // reset life
     lifes = MAX_LIFES;
@@ -183,15 +183,21 @@ void Game::CreatePowerUp( int curColIdx )
 #endif
 }
 
-void Game::CreateLevel( int lvl )
+void Game::CreateNextLevel()
 {
     if( level > 2 )
     {
         level = 0;
     }
 
+    /* clear all bricks first */
+    for( int i = 0; i < nBricks; ++i )
+    {
+        bricks[ i ] = Brick();
+    }
+
     const Vec2 topLeft( walls.GetInnerBounds().left + distWallBricks, walls.GetInnerBounds().top + 50 );
-    if( 0 == lvl )
+    if( 0 == level )
     {
         nBricksLeft = 0;
         for( int y = 0; y < nBricksDown; ++y )
@@ -221,7 +227,7 @@ void Game::CreateLevel( int lvl )
             }
         }
     }
-    else if( 1 == lvl )
+    else if( 1 == level )
     {
         nBricksLeft = 0;
         for( int y = 0; y < nBricksDown; ++y )
@@ -251,7 +257,7 @@ void Game::CreateLevel( int lvl )
             }
         }
     }
-    else if( 2 == lvl )
+    else if( 2 == level )
     {
         nBricksLeft = 0;
         for( int y = 0; y < nBricksDown; ++y )
@@ -410,7 +416,7 @@ void Game::UpdateModel( float dt )
         if( nBricksLeft <= 0 )
         {
             soundVictory.Play();
-            level++;
+            startTime_levelFinished = std::chrono::steady_clock::now();
         }
 
         //////////////////////
@@ -447,14 +453,15 @@ void Game::UpdateModel( float dt )
     else if( nBricksLeft <= 0 )
     {
         // next level
-        if( wnd.kbd.KeyIsPressed( VK_SPACE ) )
+        const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime_levelFinished;
+        if( timeElapsed.count() > timeBetweenLevels )
         {
             level++;
             ResetPaddle();
             ResetBall();
             ResetPowerUps();
             ResetShots();
-            CreateLevel( level );
+            CreateNextLevel();
         }
     }
 }
