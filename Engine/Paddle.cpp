@@ -77,7 +77,7 @@ bool Paddle::DoBallCollision( Ball& ball )
                 {
                     dir = Vec2( xDifference * exitXFactor, -1.0f );
                 }
-                ball.SetDirection( dir );
+                ball.SetDirection( dir, true );
             }
             else
             {
@@ -160,6 +160,7 @@ void Paddle::IncreaseSize( const float duration )
         halfWidth *= 1.5f;
         powerUpDuration_incrSize = duration;
         sizeIncreased = true;
+        CalcLaserPositions();
     }
 }
 

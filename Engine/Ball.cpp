@@ -20,7 +20,11 @@ void Ball::Draw( Graphics& gfx ) const
     if( ballState != MOVING )
     {
         Vec2 dirLine = pos + dir.GetNormalized();
+#if EASY_MODE
+        for( int i = 1; i <= 55; ++i )
+#else
         for( int i = 1; i <= 15; ++i )
+#endif
         {
             gfx.PutPixel( ( int )dirLine.x, ( int )dirLine.y, Colors::Gray );
             dirLine += dir.GetNormalized() * 7;
@@ -134,9 +138,10 @@ eBallState Ball::GetState() const
     return ballState;
 }
 
-void Ball::SetDirection( const Vec2& dir_in )
+void Ball::SetDirection( const Vec2& dir_in, bool padCooldown )
 {
     dir = dir_in;
+    paddleCooldown = padCooldown;
 }
 
 void Ball::Start()

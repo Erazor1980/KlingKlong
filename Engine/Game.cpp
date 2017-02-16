@@ -35,9 +35,14 @@ Game::Game( MainWindow& wnd )
     soundLaserShot( L"Sounds\\laserShot.wav" ),
     walls( RectF::FromCenter( Graphics::GetScreenRect().GetCenter(), fieldWidth / 2.0f, fieldHeight / 2.0f ), wallThickness, wallColor )
 {
+#if EASY_MODE
+    powerUps[ 0 ] = PowerUp( brickWidth, brickHeight, INCR_PADDLE_SIZE, 10, walls.GetInnerBounds().bottom );
+    powerUps[ 2 ] = PowerUp( brickWidth, brickHeight, LASER_GUN, 5, walls.GetInnerBounds().bottom );
+#else
     powerUps[ 0 ] = PowerUp( brickWidth, brickHeight, INCR_PADDLE_SIZE, 5, walls.GetInnerBounds().bottom );
-    powerUps[ 1 ] = PowerUp( brickWidth, brickHeight, EXTRA_LIFE, 0, walls.GetInnerBounds().bottom );
     powerUps[ 2 ] = PowerUp( brickWidth, brickHeight, LASER_GUN, 4, walls.GetInnerBounds().bottom );
+#endif
+    powerUps[ 1 ] = PowerUp( brickWidth, brickHeight, EXTRA_LIFE, 0, walls.GetInnerBounds().bottom );
     powerUps[ 3 ] = PowerUp( brickWidth, brickHeight, MULTI_BALL, 0, walls.GetInnerBounds().bottom );
 
     powerUpSounds[ 0 ] = Sound( L"Sounds\\grow.wav" );
@@ -75,11 +80,13 @@ void Game::ResetGame()
     //// TESTING ////
     /////////////////
     //powerUps[ 0 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 400 ) );
-    //powerUps[ 2 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 300 ) );
+    //powerUps[ 2 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 500 ) );
     //powerUps[ 3 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ) );
     //laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );
 
-    //balls[ 1 ] = Ball( Vec2( walls.GetInnerBounds().left + 20, walls.GetInnerBounds().bottom - 10 ), Vec2( 1, -0.1 ) );
+    /*balls[ 1 ] = Ball( Vec2( walls.GetInnerBounds().right - 20, walls.GetInnerBounds().bottom - 20 ), Vec2( -1, -0.1 ) );
+    balls[ 1 ].Start();*/
+    //balls[ 1 ] = Ball( walls.GetInnerBounds().GetCenter(), Vec2( -0.1, 1 ) );
     //balls[ 1 ].Start();
     //multiBalls = true;
 }
@@ -137,6 +144,7 @@ void Game::ApplyPowerUp( const PowerUp& pu )
         break;
     case MULTI_BALL:
         CreateMultiBalls();
+        break;
     default:
         break;
     }
@@ -242,7 +250,7 @@ void Game::CreateNextLevel()
                     if( 0 == y && x % 2 )
                     {
                         bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
-                                                                        brickWidth, brickHeight ), Colors::MakeRGB( 205, 102, 29 ), SOLID, 2 );
+                                                                        brickWidth, brickHeight ), c, SOLID, 2 );
                         nBricksLeft++;
                     }
                     else

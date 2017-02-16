@@ -37,17 +37,18 @@ public:
     Vec2 GetDirection() const;
     Vec2 GetPosition() const;
     eBallState GetState() const;
-    void SetDirection( const Vec2& dir_in );
+    void SetDirection( const Vec2& dir_in, bool padCooldown = false );
     void Start();
     void Stop();
     void StickToPaddle( const float paddleCenterX );
     bool HasPaddleCooldown() const;     /* to avoid weird paddle/ball things */
+    
 private:
     static constexpr float radius = 7.0f;
 #if EASY_MODE
     float speed = 200;
 #else
-    float speed  = 600;
+    float speed  = 550;
 #endif
     eBallState ballState = INACTIVE;
     float offsetToPaddleCenter = 0;     /* for STICKING state, to move with the paddle */
