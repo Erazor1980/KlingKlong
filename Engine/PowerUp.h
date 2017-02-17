@@ -36,7 +36,7 @@ private:
     float levelBottom;      /* will be deactivated when this y-position is reached */
     bool activated = false;
 
-    int IdxSurfSeq = 0;   /* which image of the sequence will be displayed */
+    int idxSurfSeq = 0;   /* which image of the sequence will be displayed */
     int nSeqImages;       /* amount of subimages the sequence consists of */
     std::chrono::steady_clock::time_point startTime;    /* to measure time between sequence images */
 };
