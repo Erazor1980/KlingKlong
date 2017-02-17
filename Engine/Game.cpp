@@ -105,7 +105,7 @@ void Game::ResetBall()
 
 void Game::ResetPaddle()
 {
-    pad = Paddle( Vec2( gfx.ScreenWidth / 2, gfx.ScreenHeight - 80 ), 70, 15 );
+    pad = Paddle( Vec2( gfx.ScreenWidth / 2, gfx.ScreenHeight - 80 ) );
 }
 
 void Game::ResetPowerUps()

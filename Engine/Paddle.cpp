@@ -1,34 +1,42 @@
 #include "Paddle.h"
 
-Paddle::Paddle( const Vec2 & pos_in, float halfWidth_in, float halfHeight_in )
+Paddle::Paddle( const Vec2& pos_in )
     :
     pos( pos_in ),
-    halfWidth( halfWidth_in ),
-    halfHeight( halfHeight_in ),
     exitXFactor( maximumExitRatio / halfWidth ),
     fixedZoneHalfWidth( halfWidth * fixedZoneWidthRatio ),
     fixedZoneExitX( fixedZoneHalfWidth * exitXFactor ),
     hasLaserGun( false ),
     sizeIncreased( false )
 {
-    halfWidthOriginal = halfWidth;
-
     CalcLaserPositions();
 }
 
 void Paddle::Draw( Graphics& gfx ) const
 {
-    RectF rect = GetRect();
-    gfx.DrawRect( rect, wingColor );
-    rect.left += wingWidth;
-    rect.right -= wingWidth;
-    gfx.DrawRect( rect, color );
+    //RectF rect = GetRect();
+    //gfx.DrawRect( rect, wingColor );
+    //rect.left += wingWidth;
+    //rect.right -= wingWidth;
+    //gfx.DrawRect( rect, color );
 
     if( hasLaserGun )
     {
         gfx.DrawRect( leftGun, Colors::Gray );
         gfx.DrawRect( rightGun, Colors::Gray );
     }
+
+    if( sizeIncreased )
+    {
+        gfx.DrawSpriteKey( ( int )pos.x - surfBig.GetWidth() / 2, ( int )pos.y - surfBig.GetHeight() / 2, surfBig, surfBig.GetPixel( 0, 0 ) );
+    }
+    else
+    {
+        gfx.DrawSpriteKey( ( int )pos.x - surf.GetWidth() / 2, ( int )pos.y - surf.GetHeight() / 2, surf, surf.GetPixel( 0, 0 ) );
+    }
+
+    //TODO test, remove later!
+    //gfx.DrawRectBorder( GetRect(), 1, Colors::White );
 }
 
 void Paddle::DrawAsLifesRemaining( Graphics &gfx, const int lifesRemaining, const Vec2& pos, const float sizeRatio ) const
@@ -50,7 +58,6 @@ void Paddle::DrawAsLifesRemaining( Graphics &gfx, const int lifesRemaining, cons
 
 bool Paddle::DoBallCollision( Ball& ball )
 {
-    //TODO multi ball does not work, when cooldown is used! think about another solution!
     if( !ball.HasPaddleCooldown() && ball.GetState() == MOVING )
     {
         const RectF rect = GetRect();
@@ -157,7 +164,7 @@ void Paddle::IncreaseSize( const float duration )
 
     if( !sizeIncreased )
     {
-        halfWidth *= 1.5f;
+        halfWidth = surfBig.GetWidth() / 2.0f;
         powerUpDuration_incrSize = duration;
         sizeIncreased = true;
         CalcLaserPositions();

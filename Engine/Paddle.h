@@ -12,7 +12,7 @@ class Paddle
 {
 public:
     Paddle() = default;
-    Paddle( const Vec2& pos_in, float halfWidth_in, float halfHeight_in );
+    Paddle( const Vec2& pos_in );
     void Draw( Graphics& gfx ) const;
     void DrawAsLifesRemaining( Graphics& gfx, const int lifesRemaining, const Vec2& pos, const float sizeRatio = 0.5f ) const;
     bool DoBallCollision( Ball& ball );
@@ -41,9 +41,11 @@ private:
 public:
     static constexpr float maximumExitRatio = 2.6f; // made it public to be able to use it in multiBallCreation
 private:
-    // ----------------------------------------
-    float halfWidth;
-    float halfHeight;
+    Surface surf = Surface::FromFile( L"Images\\paddle.png" );
+    Surface surfBig = Surface::FromFile( L"Images\\paddleBig.png" );
+    float halfWidth = surf.GetWidth() / 2.0f;
+    float halfHeight = surf.GetHeight() / 2.0f;
+
     // these are derived from above controls
     float exitXFactor;
     float fixedZoneHalfWidth;
@@ -61,7 +63,7 @@ private:
     RectF leftGun;
     RectF rightGun;
 
-    float halfWidthOriginal;    /* for reducing size after power up duration */
+    float halfWidthOriginal = halfWidth;    /* for reducing size after power up duration */
 };
 
 
