@@ -37,15 +37,17 @@ Game::Game( MainWindow& wnd )
 {
     const float widthPU     = ( float )PowerUpSequences[ 0 ].GetWidth() / nSubImagesInSequence;
     const float heightPU    = ( float )PowerUpSequences[ 0 ].GetHeight();
+
+    float boostTimeIncrSize = 5;
+    float boostTimeLaserGun = 4;
 #if EASY_MODE
-    powerUps[ 0 ] = PowerUp( widthPU, heightPU, INCR_PADDLE_SIZE, 10, walls.GetInnerBounds().bottom, nSubImagesInSequence );
-    powerUps[ 2 ] = PowerUp( widthPU, heightPU, LASER_GUN, 5, walls.GetInnerBounds().bottom, nSubImagesInSequence );
-#else
-    powerUps[ 0 ] = PowerUp( widthPU, heightPU, INCR_PADDLE_SIZE, 5, walls.GetInnerBounds().bottom, nSubImagesInSequence );
-    powerUps[ 2 ] = PowerUp( widthPU, heightPU, LASER_GUN, 4, walls.GetInnerBounds().bottom, nSubImagesInSequence );
+    boostTimeIncrSize *= 2;
+    boostTimeLaserGun *= 2;
 #endif
-    powerUps[ 1 ] = PowerUp( widthPU, heightPU, EXTRA_LIFE, 0, walls.GetInnerBounds().bottom, nSubImagesInSequence );
-    powerUps[ 3 ] = PowerUp( widthPU, heightPU, MULTI_BALL, 0, walls.GetInnerBounds().bottom, nSubImagesInSequence );
+    powerUps[ 0 ] = PowerUp( widthPU, heightPU, INCR_PADDLE_SIZE, boostTimeIncrSize, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1 );
+    powerUps[ 1 ] = PowerUp( widthPU, heightPU, EXTRA_LIFE, 0, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1 );
+    powerUps[ 2 ] = PowerUp( widthPU, heightPU, LASER_GUN, boostTimeLaserGun, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1 );
+    powerUps[ 3 ] = PowerUp( widthPU, heightPU, MULTI_BALL, 0, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1 );
 
     powerUpSounds[ 0 ] = Sound( L"Sounds\\grow.wav" );
     powerUpSounds[ 1 ] = Sound( L"Sounds\\extraLife.wav" );
@@ -615,10 +617,6 @@ void Game::DrawVictory()
 
 void Game::ComposeFrame()
 {
-    /*static const Surface bg = Surface::FromFile( L"Images\\background.png" );
-    gfx.DrawSprite( 0, 0, bg );*/
-    
-    //gfx.DrawSpriteKeyFromSequence( 400, 300, extraLifes, extraLifes.GetPixel( 0, 0 ), 2, extraLifes.GetWidth() / 8 );
 
     for( const Brick& b : bricks )
     {

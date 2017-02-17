@@ -1,7 +1,7 @@
 #include "PowerUp.h"
 
 PowerUp::PowerUp( const float width_in, const float height_in, ePowerUpType type_in, 
-                  const float boost_time, const float level_bottom, int seqImagesNumber )
+                  const float boost_time, const float level_bottom, int rowImagesSeq_in, int colImagesSeq_in )
     :
     width( width_in ),
     height( height_in ),
@@ -9,7 +9,8 @@ PowerUp::PowerUp( const float width_in, const float height_in, ePowerUpType type
     boostTime( boost_time ),
     activated( false ),
     levelBottom( level_bottom ),
-    nSeqImages( seqImagesNumber )
+    rowImagesSeq( rowImagesSeq_in ),
+    colImagesSeq( colImagesSeq_in )
 {
 }
 
@@ -32,7 +33,7 @@ bool PowerUp::Update( const RectF& paddleRect, const float dt )
     if( timeElapsed.count() > 0.05 )
     {
         idxSurfSeq++;
-        if( idxSurfSeq >= nSeqImages )
+        if( idxSurfSeq >= rowImagesSeq * colImagesSeq )
         {
             idxSurfSeq = 0;
         }
@@ -56,7 +57,7 @@ void PowerUp::Draw( Graphics& gfx, const Surface& surfSeq )
         return;
     }
 
-    gfx.DrawSpriteKeyFromSequence( ( int )pos.x, ( int )pos.y, surfSeq, surfSeq.GetPixel( 0, 0 ), idxSurfSeq, nSeqImages );
+    gfx.DrawSpriteKeyFromSequence( ( int )pos.x, ( int )pos.y, surfSeq, surfSeq.GetPixel( 0, 0 ), idxSurfSeq, rowImagesSeq, colImagesSeq );
     return;
 }
 

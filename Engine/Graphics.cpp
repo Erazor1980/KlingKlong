@@ -535,23 +535,25 @@ void Graphics::DrawSpriteKey( int x, int y, const Surface &src, Color key )
     }
 }
 
-void Graphics::DrawSpriteKeyFromSequence( int x, int y, const Surface& src, Color key, unsigned int idx, unsigned int numSubImages )
+void Graphics::DrawSpriteKeyFromSequence( int x, int y, const Surface& src, Color key, unsigned int idx, unsigned int imagesPerRow, unsigned int imagesPerColumn )
 {
     // some checks
-    assert( idx < numSubImages );
-    const int subImgWidth = src.GetWidth() / numSubImages;
+    assert( idx < imagesPerRow * imagesPerColumn );
+    const int subImgWidth = src.GetWidth() / imagesPerRow;
+    const int subImgHeight = src.GetHeight() / imagesPerColumn;
     assert( src.GetWidth() % subImgWidth == 0 );
+    assert( src.GetHeight() % subImgHeight== 0 );
 
     // src rect
-    int src_left = idx * subImgWidth;
+    int src_left = ( idx % imagesPerRow ) * subImgWidth;
     int src_right = src_left + subImgWidth;
-    int src_top = 0;
-    int src_bottom = src.GetHeight();
+    int src_top = idx / imagesPerRow * subImgHeight;
+    int src_bottom = src_top + subImgHeight;
     // dst rect
     int dst_left = x;
     int dst_right = x + subImgWidth;
     int dst_top = y;
-    int dst_bottom = y + src_bottom;
+    int dst_bottom = y + subImgHeight;
     // clip to screen (left/right)
     if( dst_left < 0 )
     {

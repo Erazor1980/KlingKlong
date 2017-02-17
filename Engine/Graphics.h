@@ -78,7 +78,7 @@ public:
     void DrawSpriteKey( int x, int y, const Surface& src, Color key );
 
     // for animations. image consists of all animations steps in row
-    void DrawSpriteKeyFromSequence( int x, int y, const Surface& src, Color key, unsigned int idx, unsigned int numSubImages );
+    void DrawSpriteKeyFromSequence( int x, int y, const Surface& src, Color key, unsigned int idx, unsigned int imagesPerRow, unsigned int imagesPerColumn );
 	~Graphics();
     static RectF GetScreenRect();
 private:

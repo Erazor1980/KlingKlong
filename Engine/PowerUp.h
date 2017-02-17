@@ -17,7 +17,7 @@ class PowerUp
 public:
     PowerUp() = default;
     PowerUp( const float width_in, const float height_in, ePowerUpType type_in, const float boost_time, /* boost time in seconds */
-             const float level_bottom, int seqImagesNumber );    
+             const float level_bottom, int rowImagesSeq_in, int colImagesSeq_in );
     bool Update( const RectF& paddleRect, const float dt );         /* returns true, when hit paddle */
     void Draw( Graphics& gfx, const Surface& surfSeq );
     void Activate( const Vec2& pos_in, float brickWidth );  /* passing brickWidth to spawn centered (because width != brickWidth!) */
@@ -37,6 +37,7 @@ private:
     bool activated = false;
 
     int idxSurfSeq = 0;   /* which image of the sequence will be displayed */
-    int nSeqImages;       /* amount of subimages the sequence consists of */
+    int rowImagesSeq;       /* amount of subimages per row in the sequence image*/
+    int colImagesSeq;       /* amount of subimages per column in the sequence image */
     std::chrono::steady_clock::time_point startTime;    /* to measure time between sequence images */
 };
