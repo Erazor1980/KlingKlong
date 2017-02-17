@@ -29,7 +29,7 @@ bool PowerUp::Update( const RectF& paddleRect, const float dt )
     }
 
     const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime;
-    if( timeElapsed.count() > 0.08 )
+    if( timeElapsed.count() > 0.05 )
     {
         IdxSurfSeq++;
         if( IdxSurfSeq >= nSeqImages )

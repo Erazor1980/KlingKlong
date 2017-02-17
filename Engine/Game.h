@@ -117,6 +117,14 @@ private:
                                               Surface::FromFile( L"Images\\Sequences\\extraLife.png" ),
                                               Surface::FromFile( L"Images\\Sequences\\extraLife.png" ) };
 
+    Surface GameOverSurf = Surface::FromFile( L"Images\\gameover.png" );
+    Surface PadExplosion[ 4 ] = { Surface::FromFile( L"Images\\padExpl1.png" ),
+                                  Surface::FromFile( L"Images\\padExpl2.png" ),
+                                  Surface::FromFile( L"Images\\padExpl3.png" ),
+                                  Surface::FromFile( L"Images\\padExpl4.png" ) };
+    std::chrono::steady_clock::time_point startTime_explosion;
+    int explSeqIdx = 0;
+
     int lifes = MAX_LIFES;
     int level = 0;
     float timeBetweenLevels = 3;    /* in seconds */

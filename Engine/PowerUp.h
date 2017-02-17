@@ -26,7 +26,7 @@ public:
     float GetBoostTime() const;
     bool IsActivated() const;
 private:
-    static constexpr float speed = 300;
+    static constexpr float speed = 250;
     Vec2 pos;
     float width;
     float height;

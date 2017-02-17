@@ -30,7 +30,7 @@ Game::Game( MainWindow& wnd )
     soundBrick( L"Sounds\\arkbrick.wav" ),
     soundBrick2( L"Sounds\\arkbrick2.wav" ),
     soundLifeLoss( L"Sounds\\fart1.wav" ),
-    soundGameOver( L"Sounds\\gameover.wav" ),
+    soundGameOver( L"Sounds\\explosion.wav" ),
     soundVictory( L"Sounds\\victory.wav" ),
     soundLaserShot( L"Sounds\\laserShot.wav" ),
     walls( RectF::FromCenter( Graphics::GetScreenRect().GetCenter(), fieldWidth / 2.0f, fieldHeight / 2.0f ), wallThickness, wallColor )
@@ -78,11 +78,14 @@ void Game::ResetGame()
     // reset shots
     ResetShots();
 
+    // explosion sequence
+    explSeqIdx = 0;
+
     /////////////////
     //// TESTING ////
     /////////////////
     //powerUps[ 0 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 400 ), brickWidth );
-    powerUps[ 2 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x + 201, 100 ), brickWidth );
+    //powerUps[ 2 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ), brickWidth );
     //powerUps[ 3 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ), brickWidth );
     //laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );
 
@@ -542,6 +545,7 @@ void Game::UpdateModel( float dt )
                     if( 0 == lifes )
                     {
                         soundGameOver.Play();
+                        startTime_shot = std::chrono::steady_clock::now();
                     }
                     else
                     {
@@ -573,15 +577,25 @@ void Game::UpdateModel( float dt )
 
 void Game::DrawGameOver()
 {
-    Vec2 topLeft( 80, 80 );
-    float rectWidth = gfx.ScreenWidth - 2 * topLeft.x;
-
-    while( rectWidth > 250 )
+    
+    if( explSeqIdx > 3 )
     {
-        Vec2 bottomRight( gfx.ScreenWidth - topLeft.x, gfx.ScreenHeight - topLeft.y );
-        gfx.DrawRectBorder( RectF( topLeft, bottomRight ), 4, Colors::Cyan );
-        topLeft += Vec2( 60, 60 );
-        rectWidth = bottomRight.x - topLeft.x;
+        const int x = ( Graphics::ScreenWidth - GameOverSurf.GetWidth() ) / 2;
+        const int y = ( Graphics::ScreenHeight - GameOverSurf.GetHeight() ) / 2;
+        gfx.DrawSpriteKey( x, y, GameOverSurf, GameOverSurf.GetPixel( 0, 0 ) );
+    }
+    else
+    {
+        const float x = pad.GetRect().GetCenter().x - PadExplosion[ explSeqIdx ].GetWidth() / 2;
+        const float y = pad.GetRect().GetCenter().y - PadExplosion[ explSeqIdx ].GetHeight() / 2;
+        gfx.DrawSpriteKey( ( int )x, ( int )y, PadExplosion[ explSeqIdx ], PadExplosion[ explSeqIdx ].GetPixel( 0, 0 ) );
+    }
+    
+    const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime_explosion;
+    if( timeElapsed.count() > 0.15 )
+    {
+        explSeqIdx++;
+        startTime_explosion = std::chrono::steady_clock::now();
     }
 }
 
@@ -610,17 +624,17 @@ void Game::ComposeFrame()
     {
         b.Draw( gfx );
     }
-
-    pad.Draw( gfx );
     walls.Draw( gfx );
-    pad.DrawAsLifesRemaining( gfx, lifes, Vec2( walls.GetInnerBounds().left, 15 ), 0.3f );
-
+    
     if( 0 == lifes )
     {
         DrawGameOver();
     }
     else
     {
+        pad.Draw( gfx );
+        pad.DrawAsLifesRemaining( gfx, lifes, Vec2( walls.GetInnerBounds().left, 15 ), 0.3f );
+
         for( int i = 0; i < nMaxBalls; ++i )
         {
             balls[ i ].Draw( gfx );
