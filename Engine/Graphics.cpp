@@ -549,7 +549,7 @@ void Graphics::DrawSpriteKeyFromSequence( int x, int y, const Surface& src, Colo
     int src_bottom = src.GetHeight();
     // dst rect
     int dst_left = x;
-    int dst_right = x + src_right;
+    int dst_right = x + subImgWidth;
     int dst_top = y;
     int dst_bottom = y + src_bottom;
     // clip to screen (left/right)
