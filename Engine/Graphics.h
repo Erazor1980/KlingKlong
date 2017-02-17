@@ -19,6 +19,8 @@
 *	along with The Chili DirectX Framework.  If not, see <http://www.gnu.org/licenses/>.  *
 ******************************************************************************************/
 #pragma once
+#include "GDIPlusManager.h"
+#include "Surface.h"
 #include <d3d11.h>
 #include <wrl.h>
 #include "ChiliException.h"
@@ -72,9 +74,12 @@ public:
     void DrawIsoRightTriUR( int x, int y, int size, Color c );
     void DrawIsoRightTriBL( int x, int y, int size, Color c );
     void DrawIsoRightTriBR( int x, int y, int size, Color c );
+    void DrawSprite( int x, int y, const Surface& src );
+    void DrawSpriteKey( int x, int y, const Surface& src, Color key );
 	~Graphics();
     static RectF GetScreenRect();
 private:
+    GDIPlusManager										gdipManager;
 	Microsoft::WRL::ComPtr<IDXGISwapChain>				pSwapChain;
 	Microsoft::WRL::ComPtr<ID3D11Device>				pDevice;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext>			pImmediateContext;

@@ -145,6 +145,7 @@
     <ClInclude Include="DXErr.h" />
     <ClInclude Include="FrameTimer.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GDIPlusManager.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Laser.h" />
@@ -157,6 +158,7 @@
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SoundEffect.h" />
     <ClInclude Include="SpriteCodex.h" />
+    <ClInclude Include="Surface.h" />
     <ClInclude Include="Vec2.h" />
     <ClInclude Include="Walls.h" />
   </ItemGroup>
@@ -167,6 +169,7 @@
     <ClCompile Include="DXErr.cpp" />
     <ClCompile Include="FrameTimer.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GDIPlusManager.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Laser.cpp" />
@@ -178,6 +181,7 @@
     <ClCompile Include="RectF.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SpriteCodex.cpp" />
+    <ClCompile Include="Surface.cpp" />
     <ClCompile Include="Vec2.cpp" />
     <ClCompile Include="Walls.cpp" />
   </ItemGroup>

@@ -421,6 +421,120 @@ void Graphics::DrawIsoRightTriBR( int x, int y, int size, Color c )
     }
 }
 
+void Graphics::DrawSprite( int x, int y, const Surface& src )
+{
+    // src rect
+    int src_left = 0;
+    int src_right = src.GetWidth();
+    int src_top = 0;
+    int src_bottom = src.GetHeight();
+    // dst rect
+    int dst_left = x;
+    int dst_right = x + src_right;
+    int dst_top = y;
+    int dst_bottom = y + src_bottom;
+    // clip to screen (left/right)
+    if( dst_left < 0 )
+    {
+        const int diff = -dst_left;
+        src_left += diff;
+        dst_left += diff;
+    }
+    if( dst_right > Graphics::ScreenWidth )
+    {
+        const int diff = dst_right - Graphics::ScreenWidth;
+        src_right -= diff;
+        dst_right -= diff;
+    }
+    // early rejection test (left/right)
+    if( dst_left >= dst_right )
+    {
+        return;
+    }
+    // clip to screen (top/bottom)
+    if( dst_top < 0 )
+    {
+        const int diff = -dst_top;
+        src_top += diff;
+        dst_top += diff;
+    }
+    if( dst_bottom > Graphics::ScreenHeight )
+    {
+        const int diff = dst_bottom - Graphics::ScreenHeight;
+        src_bottom -= diff;
+        dst_bottom -= diff;
+    }
+    // copy the clipped sprite pixel block
+    for( int y_src = src_top, y_dst = dst_top;
+         y_src < src_bottom; y_src++, y_dst++ )
+    {
+        for( int x_src = src_left, x_dst = dst_left;
+             x_src < src_right; x_src++, x_dst++ )
+        {
+            PutPixel( x_dst, y_dst, src.GetPixel( x_src, y_src ) );
+        }
+    }
+}
+
+void Graphics::DrawSpriteKey( int x, int y, const Surface & src, Color key )
+{
+    // src rect
+    int src_left = 0;
+    int src_right = src.GetWidth();
+    int src_top = 0;
+    int src_bottom = src.GetHeight();
+    // dst rect
+    int dst_left = x;
+    int dst_right = x + src_right;
+    int dst_top = y;
+    int dst_bottom = y + src_bottom;
+    // clip to screen (left/right)
+    if( dst_left < 0 )
+    {
+        const int diff = -dst_left;
+        src_left += diff;
+        dst_left += diff;
+    }
+    if( dst_right > Graphics::ScreenWidth )
+    {
+        const int diff = dst_right - Graphics::ScreenWidth;
+        src_right -= diff;
+        dst_right -= diff;
+    }
+    // early rejection test (left/right)
+    if( dst_left >= dst_right )
+    {
+        return;
+    }
+    // clip to screen (top/bottom)
+    if( dst_top < 0 )
+    {
+        const int diff = -dst_top;
+        src_top += diff;
+        dst_top += diff;
+    }
+    if( dst_bottom > Graphics::ScreenHeight )
+    {
+        const int diff = dst_bottom - Graphics::ScreenHeight;
+        src_bottom -= diff;
+        dst_bottom -= diff;
+    }
+    // copy the clipped sprite pixel block
+    for( int y_src = src_top, y_dst = dst_top;
+         y_src < src_bottom; y_src++, y_dst++ )
+    {
+        for( int x_src = src_left, x_dst = dst_left;
+             x_src < src_right; x_src++, x_dst++ )
+        {
+            const Color srcPixel = src.GetPixel( x_src, y_src );
+            if( srcPixel != key )
+            {
+                PutPixel( x_dst, y_dst, srcPixel );
+            }
+        }
+    }
+}
+
 //////////////////////////////////////////////////
 //           Graphics Exception
 Graphics::Exception::Exception( HRESULT hr,const std::wstring& note,const wchar_t* file,unsigned int line )
