@@ -84,7 +84,7 @@ void Game::ResetGame()
     /////////////////
     //// TESTING ////
     /////////////////
-    //powerUps[ 0 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 400 ), brickWidth );
+    //powerUps[ 0 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ), brickWidth );
     //powerUps[ 2 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ), brickWidth );
     //powerUps[ 3 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ), brickWidth );
     //laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );

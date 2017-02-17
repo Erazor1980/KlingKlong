@@ -112,10 +112,10 @@ private:
 
     //TODO add other seq images!
     static constexpr int nSubImagesInSequence = 8;  /* all sequences will consist of 8 images */
-    Surface PowerUpSequences[ nPowerUps ] = { Surface::FromFile( L"Images\\Sequences\\extraLife.png" ),
+    Surface PowerUpSequences[ nPowerUps ] = { Surface::FromFile( L"Images\\Sequences\\incrSize.png" ),
                                               Surface::FromFile( L"Images\\Sequences\\extraLife.png" ),
-                                              Surface::FromFile( L"Images\\Sequences\\extraLife.png" ),
-                                              Surface::FromFile( L"Images\\Sequences\\extraLife.png" ) };
+                                              Surface::FromFile( L"Images\\Sequences\\laserGun.png" ),
+                                              Surface::FromFile( L"Images\\Sequences\\multiBall.png" ) };
 
     Surface GameOverSurf = Surface::FromFile( L"Images\\gameover.png" );
     Surface PadExplosion[ 4 ] = { Surface::FromFile( L"Images\\padExpl1.png" ),
