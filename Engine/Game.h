@@ -110,6 +110,12 @@ private:
     bool multiBalls = false;
     int lastBallIdx = 0;
 
+    //TODO add other seq images!
+    static constexpr int nSubImagesInSequence = 8;  /* all sequences will consist of 8 images */
+    Surface PowerUpSequences[ nPowerUps ] = { Surface::FromFile( L"Images\\Sequences\\extraLife.png" ),
+                                              Surface::FromFile( L"Images\\Sequences\\extraLife.png" ),
+                                              Surface::FromFile( L"Images\\Sequences\\extraLife.png" ),
+                                              Surface::FromFile( L"Images\\Sequences\\extraLife.png" ) };
 
     int lifes = MAX_LIFES;
     int level = 0;

@@ -14,12 +14,6 @@ Paddle::Paddle( const Vec2& pos_in )
 
 void Paddle::Draw( Graphics& gfx ) const
 {
-    //RectF rect = GetRect();
-    //gfx.DrawRect( rect, wingColor );
-    //rect.left += wingWidth;
-    //rect.right -= wingWidth;
-    //gfx.DrawRect( rect, color );
-
     if( hasLaserGun )
     {
         gfx.DrawRect( leftGun, Colors::Gray );
@@ -34,9 +28,6 @@ void Paddle::Draw( Graphics& gfx ) const
     {
         gfx.DrawSpriteKey( ( int )pos.x - surf.GetWidth() / 2, ( int )pos.y - surf.GetHeight() / 2, surf, surf.GetPixel( 0, 0 ) );
     }
-
-    //TODO test, remove later!
-    //gfx.DrawRectBorder( GetRect(), 1, Colors::White );
 }
 
 void Paddle::DrawAsLifesRemaining( Graphics &gfx, const int lifesRemaining, const Vec2& pos, const float sizeRatio ) const

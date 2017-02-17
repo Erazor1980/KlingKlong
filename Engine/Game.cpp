@@ -35,15 +35,17 @@ Game::Game( MainWindow& wnd )
     soundLaserShot( L"Sounds\\laserShot.wav" ),
     walls( RectF::FromCenter( Graphics::GetScreenRect().GetCenter(), fieldWidth / 2.0f, fieldHeight / 2.0f ), wallThickness, wallColor )
 {
+    const float widthPU     = ( float )PowerUpSequences[ 0 ].GetWidth() / nSubImagesInSequence;
+    const float heightPU    = ( float )PowerUpSequences[ 0 ].GetHeight();
 #if EASY_MODE
-    powerUps[ 0 ] = PowerUp( brickWidth, brickHeight, INCR_PADDLE_SIZE, 10, walls.GetInnerBounds().bottom );
-    powerUps[ 2 ] = PowerUp( brickWidth, brickHeight, LASER_GUN, 5, walls.GetInnerBounds().bottom );
+    powerUps[ 0 ] = PowerUp( widthPU, heightPU, INCR_PADDLE_SIZE, 10, walls.GetInnerBounds().bottom, nSubImagesInSequence );
+    powerUps[ 2 ] = PowerUp( widthPU, heightPU, LASER_GUN, 5, walls.GetInnerBounds().bottom, nSubImagesInSequence );
 #else
-    powerUps[ 0 ] = PowerUp( brickWidth, brickHeight, INCR_PADDLE_SIZE, 5, walls.GetInnerBounds().bottom );
-    powerUps[ 2 ] = PowerUp( brickWidth, brickHeight, LASER_GUN, 4, walls.GetInnerBounds().bottom );
+    powerUps[ 0 ] = PowerUp( widthPU, heightPU, INCR_PADDLE_SIZE, 5, walls.GetInnerBounds().bottom, nSubImagesInSequence );
+    powerUps[ 2 ] = PowerUp( widthPU, heightPU, LASER_GUN, 4, walls.GetInnerBounds().bottom, nSubImagesInSequence );
 #endif
-    powerUps[ 1 ] = PowerUp( brickWidth, brickHeight, EXTRA_LIFE, 0, walls.GetInnerBounds().bottom );
-    powerUps[ 3 ] = PowerUp( brickWidth, brickHeight, MULTI_BALL, 0, walls.GetInnerBounds().bottom );
+    powerUps[ 1 ] = PowerUp( widthPU, heightPU, EXTRA_LIFE, 0, walls.GetInnerBounds().bottom, nSubImagesInSequence );
+    powerUps[ 3 ] = PowerUp( widthPU, heightPU, MULTI_BALL, 0, walls.GetInnerBounds().bottom, nSubImagesInSequence );
 
     powerUpSounds[ 0 ] = Sound( L"Sounds\\grow.wav" );
     powerUpSounds[ 1 ] = Sound( L"Sounds\\extraLife.wav" );
@@ -79,9 +81,9 @@ void Game::ResetGame()
     /////////////////
     //// TESTING ////
     /////////////////
-    //powerUps[ 0 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 400 ) );
-    //powerUps[ 2 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 500 ) );
-    //powerUps[ 3 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ) );
+    //powerUps[ 0 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 400 ), brickWidth );
+    powerUps[ 2 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x + 201, 100 ), brickWidth );
+    //powerUps[ 3 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ), brickWidth );
     //laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );
 
     /*balls[ 1 ] = Ball( Vec2( walls.GetInnerBounds().right - 20, walls.GetInnerBounds().bottom - 20 ), Vec2( -1, -0.1 ) );
@@ -184,36 +186,36 @@ void Game::CreatePowerUp( int curColIdx )
 #if EASY_MODE
     if( rand() % 3 == 1 )
     {
-        powerUps[ 0 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+        powerUps[ 0 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
     }
     else if( lifes < MAX_LIFES && rand() % 3 == 1 )
     {
-        powerUps[ 1 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+        powerUps[ 1 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
     }
     else if( rand() % 4 == 1 )  /* laser gun */
     {
-        powerUps[ 2 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+        powerUps[ 2 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
     }
     else if( !multiBalls && rand() % 4 == 1 )  /* multi ball */
     {
-        powerUps[ 3 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+        powerUps[ 3 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
     }
 #else
     if( rand() % 9 == 1 )  /* increased size */
     {
-        powerUps[ 0 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+        powerUps[ 0 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
     }
     else if( lifes < MAX_LIFES && rand() % 9 == 1 )    /* extra life */
     {
-        powerUps[ 1 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+        powerUps[ 1 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
     }
     else if( rand() % 9 == 1 )  /* laser gun */
     {
-        powerUps[ 2 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+        powerUps[ 2 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
     }
     else if( !multiBalls && rand() % 9 == 1 )  /* multi ball */
     {
-        powerUps[ 3 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ) );
+        powerUps[ 3 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
     }
 #endif
 }
@@ -599,6 +601,11 @@ void Game::DrawVictory()
 
 void Game::ComposeFrame()
 {
+    /*static const Surface bg = Surface::FromFile( L"Images\\background.png" );
+    gfx.DrawSprite( 0, 0, bg );*/
+    
+    //gfx.DrawSpriteKeyFromSequence( 400, 300, extraLifes, extraLifes.GetPixel( 0, 0 ), 2, extraLifes.GetWidth() / 8 );
+
     for( const Brick& b : bricks )
     {
         b.Draw( gfx );
@@ -621,7 +628,7 @@ void Game::ComposeFrame()
 
         for( int i = 0; i < nPowerUps; ++i )
         {
-            powerUps[ i ].Draw( gfx );
+            powerUps[ i ].Draw( gfx, PowerUpSequences[ i ] );
         }
 
         for( int i = 0; i < nMaxLaserShots; ++i )

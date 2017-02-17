@@ -1,14 +1,15 @@
 #include "PowerUp.h"
 
 PowerUp::PowerUp( const float width_in, const float height_in, ePowerUpType type_in, 
-                  const float boost_time, const float level_bottom )
+                  const float boost_time, const float level_bottom, int seqImagesNumber )
     :
     width( width_in ),
     height( height_in ),
     type( type_in ),
     boostTime( boost_time ),
     activated( false ),
-    levelBottom( level_bottom )
+    levelBottom( level_bottom ),
+    nSeqImages( seqImagesNumber )
 {
 }
 
@@ -27,6 +28,18 @@ bool PowerUp::Update( const RectF& paddleRect, const float dt )
         return false;
     }
 
+    const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime;
+    if( timeElapsed.count() > 0.08 )
+    {
+        IdxSurfSeq++;
+        if( IdxSurfSeq >= nSeqImages )
+        {
+            IdxSurfSeq = 0;
+        }
+        startTime = std::chrono::steady_clock::now();
+    }
+
+
     if( paddleRect.IsOverlappingWith( RectF( pos, width, height ) ) )
     {
         activated = false;
@@ -36,12 +49,17 @@ bool PowerUp::Update( const RectF& paddleRect, const float dt )
     return false;
 }
 
-void PowerUp::Draw( Graphics& gfx )
+void PowerUp::Draw( Graphics& gfx, const Surface& surfSeq )
 {
     if( !activated )
     {
         return;
     }
+
+    gfx.DrawSpriteKeyFromSequence( ( int )pos.x, ( int )pos.y, surfSeq, surfSeq.GetPixel( 0, 0 ), IdxSurfSeq, nSeqImages );
+    return;
+
+    //TODO remove later, if sprites work!
 
     RectF rect( pos, width, height );
 
@@ -85,13 +103,14 @@ void PowerUp::Draw( Graphics& gfx )
     }
 }
 
-void PowerUp::Activate( const Vec2& pos_in )
+void PowerUp::Activate( const Vec2& pos_in, float brickWidth )
 {
     if( activated )
     {
         return;
     }
     pos = pos_in;
+    pos.x += ( brickWidth - width ) / 2;
     activated = true;
 }
 

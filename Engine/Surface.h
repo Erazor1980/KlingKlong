@@ -26,7 +26,6 @@
 #include <assert.h>
 #include <memory>
 
-
 class Surface
 {
 public:

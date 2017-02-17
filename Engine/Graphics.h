@@ -76,6 +76,9 @@ public:
     void DrawIsoRightTriBR( int x, int y, int size, Color c );
     void DrawSprite( int x, int y, const Surface& src );
     void DrawSpriteKey( int x, int y, const Surface& src, Color key );
+
+    // for animations. image consists of all animations steps in row
+    void DrawSpriteKeyFromSequence( int x, int y, const Surface& src, Color key, unsigned int idx, unsigned int numSubImages );
 	~Graphics();
     static RectF GetScreenRect();
 private:
