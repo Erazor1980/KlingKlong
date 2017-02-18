@@ -69,7 +69,10 @@ Vec2 Enemy::GetPos() const
 void Enemy::Activate( const Vec2& pos_in )
 {
     pos = pos_in;
-    dir = Vec2( rand() % 100 - 50 + 10, rand() % 100 - 50 + 10 );  /* "+10" to avoid 0,0 direction */
+    do
+    {
+        dir = Vec2( rand() % 100 - 50 + 10.0f, rand() % 100 - 50 + 10.0f );
+    } while( abs( dir.x ) < 10 && abs( dir.y ) < 10 );
     activated = true;
 }
 

@@ -96,9 +96,10 @@ void Game::ResetGame()
     /////////////////
     //// TESTING ////
     /////////////////
-    //powerUps[ 0 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ), brickWidth );
-    //powerUps[ 2 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ), brickWidth );
-    //powerUps[ 3 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 400 ), brickWidth );
+    //powerUps[ INCR_PADDLE_SIZE ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ), brickWidth );
+    //powerUps[ EXTRA_LIFE ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x + 30, 100 ), brickWidth );
+    //powerUps[ LASER_GUN ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x - 30, 100 ), brickWidth );
+    //powerUps[ MULTI_BALL ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x + 60, 100 ), brickWidth );
     //laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );
 
     /*balls[ 1 ] = Ball( Vec2( walls.GetInnerBounds().right - 20, walls.GetInnerBounds().bottom - 20 ), Vec2( -1, -0.1 ) );
@@ -108,6 +109,7 @@ void Game::ResetGame()
     //multiBalls = true;
     //enemies[ 0 ] = Enemy( seqEnemy.GetWidth() / 5.0f, seqEnemy.GetHeight() / 5.0f, walls.GetInnerBounds(), 5, 5 );
     //enemies[ 0 ].Activate( Vec2( 400, 300 ) );
+    //CreateMultiBalls();
 }
 
 void Game::ResetBall()
@@ -239,24 +241,33 @@ void Game::CreatePowerUp( int curColIdx )
 
 void Game::CreatePowerUp( const Vec2& pos )
 {
-    bool freePU = false;
+    /* check first, if there is at least one "free" power ups, so one, which is not falling */
+    int freePowerUps[ nPowerUps ];
+    int cntFreePU = 0;
     for( int i = 0; i < nPowerUps; ++i )
     {
         if( !powerUps[ i ].IsActivated() )
         {
-            freePU = true;
+            /* check, if activation makes sense (e.g. if lifes == MAX_LIFES -> no extra life PU!) */
+            if( ( multiBalls && i == MULTI_BALL ) || ( i == EXTRA_LIFE && lifes == MAX_LIFES ) )
+            {
+                continue;
+            }
+            freePowerUps[ cntFreePU ] = i;
+            cntFreePU++;
         }
     }
-    if( !freePU )
+    if( 0 == cntFreePU )
     {
         // all power ups on screen (should be really rare!)
         return;
     }
     
-    int typePU = rand() % NUMBER_POWER_UPS;
+    /* randomly choose one of the free power ups */
+    int typePU = freePowerUps[ rand() % cntFreePU ];
     while( powerUps[ typePU ].IsActivated() )
     {
-        typePU = rand() % NUMBER_POWER_UPS;
+        typePU = freePowerUps[ rand() % cntFreePU ];
     }
 
     powerUps[ typePU ].Activate( pos, brickWidth );
