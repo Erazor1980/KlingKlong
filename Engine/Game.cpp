@@ -99,7 +99,7 @@ void Game::ResetGame()
     //powerUps[ EXTRA_LIFE ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x + 30, 100 ), brickWidth );
     //powerUps[ LASER_GUN ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x - 30, 100 ), brickWidth );
     //powerUps[ MULTI_BALL ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x + 60, 100 ), brickWidth );
-    powerUps[ SUPER_BALL ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x + 60, 100 ), brickWidth );
+    //powerUps[ SUPER_BALL ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x + 60, 100 ), brickWidth );
     //laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );
 
     /*balls[ 1 ] = Ball( Vec2( walls.GetInnerBounds().right - 20, walls.GetInnerBounds().bottom - 20 ), Vec2( -1, -0.1 ) );
@@ -232,6 +232,10 @@ void Game::CreatePowerUp( int curColIdx )
     {
         powerUps[ 3 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
     }
+    else if( !multiBalls && rand() % 5 == 1 )  /* super ball */
+    {
+        powerUps[ 4 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
+    }
 #else
     if( rand() % 9 == 1 )  /* increased size */
     {
@@ -248,6 +252,10 @@ void Game::CreatePowerUp( int curColIdx )
     else if( !multiBalls && rand() % 9 == 1 )  /* multi ball */
     {
         powerUps[ 3 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
+    }
+    else if( !multiBalls && rand() % 20 == 1 )  /* super ball */    /* super ball has to be very rare! its just too powerfull */
+    {
+        powerUps[ 4 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
     }
 #endif
 }
@@ -281,6 +289,14 @@ void Game::CreatePowerUp( const Vec2& pos )
     while( powerUps[ typePU ].IsActivated() )
     {
         typePU = freePowerUps[ rand() % cntFreePU ];
+    }
+
+    if( SUPER_BALL == typePU )      /* super ball has to be very rare! its just too powerfull */
+    {
+        if( rand() % 6 > 1 )
+        {
+            return;
+        }
     }
 
     powerUps[ typePU ].Activate( pos, brickWidth );
@@ -642,8 +658,11 @@ void Game::UpdateModel( float dt )
             //pad.ResetCooldown();
             if( bricks[ curColIdx ].ExecuteBallCollision( balls[ ballIdx ] ) )
             {
-                nBricksLeft--;
-                CreatePowerUp( curColIdx );
+                if( bricks[ curColIdx ].GetType() != UNDESTROYABLE )
+                {
+                    nBricksLeft--;
+                    CreatePowerUp( curColIdx );
+                }
             }
             
             if( UNDESTROYABLE == bricks[ curColIdx ].GetType() )

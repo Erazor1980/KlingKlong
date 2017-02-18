@@ -41,6 +41,13 @@ bool Brick::ExecuteBallCollision( Ball& ball )
 {
     assert( CheckBallCollision( ball ) );
 
+    if( ball.IsSuperBall() )
+    {
+        life = 0;
+        return destroyed = true;
+    }
+
+
     const Vec2 ballPos = ball.GetPosition();
 
     /* test for "inside" bouncer... */

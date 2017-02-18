@@ -36,6 +36,7 @@ public:
     bool HasPaddleCooldown() const;     /* to avoid weird paddle/ball things */
     void ActivateSuperBall( const float duration, float newRadius );
     void DeActivateSuperBall();
+    bool IsSuperBall() const;
 private:
     float radius = 7.0f;
 #if EASY_MODE

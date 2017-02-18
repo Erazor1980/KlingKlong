@@ -231,3 +231,8 @@ void Ball::DeActivateSuperBall()
     superBallActive = false;
     radius = 7;
 }
+
+bool Ball::IsSuperBall() const
+{
+    return superBallActive;
+}
