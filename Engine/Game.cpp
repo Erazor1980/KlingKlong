@@ -88,7 +88,7 @@ void Game::ResetGame()
     /////////////////
     //powerUps[ 0 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ), brickWidth );
     //powerUps[ 2 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ), brickWidth );
-    //powerUps[ 3 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ), brickWidth );
+    powerUps[ 3 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 400 ), brickWidth );
     //laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );
 
     /*balls[ 1 ] = Ball( Vec2( walls.GetInnerBounds().right - 20, walls.GetInnerBounds().bottom - 20 ), Vec2( -1, -0.1 ) );
@@ -355,7 +355,7 @@ void Game::CreateMultiBalls()
             {
                 xDir = ( float )( rand() % 200 - 100 );
                 yDir = ( float )( -rand() % 100 );
-            } while( Paddle::maximumExitRatio * yDir > xDir );
+            } while( abs( Paddle::maximumExitRatio * xDir ) / 2 > abs( yDir ) );
             balls[ i ].SetDirection( Vec2( xDir, yDir ) );
             balls[ i ].Start();
         }
