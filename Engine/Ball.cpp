@@ -1,15 +1,17 @@
 #include "Ball.h"
 #include "SpriteCodex.h"
 
-Ball::Ball( const Vec2& pos_in, const Vec2& dir_in )
+Ball::Ball( const Vec2& pos_in, const Vec2& dir_in, int rowImagesSeq_in, int colImagesSeq_in )
     :
     pos( pos_in ),
-    ballState( WAITING )
+    ballState( WAITING ),
+    rowImagesSeq( rowImagesSeq_in ),
+    colImagesSeq( colImagesSeq_in )
 {
     SetDirection( dir_in );
 }
 
-void Ball::Draw( Graphics& gfx ) const
+void Ball::Draw( Graphics& gfx, const Surface& surfSeq ) const
 {
     if( INACTIVE == ballState )
     {
@@ -32,7 +34,16 @@ void Ball::Draw( Graphics& gfx ) const
     }
 
     // draw ball
-    SpriteCodex::DrawBall( pos, gfx );
+    if( superBallActive )
+    {
+        const float halfWidth = ( surfSeq.GetWidth() / rowImagesSeq ) / 2.0;
+        const float halfHeight = ( surfSeq.GetHeight() / colImagesSeq ) / 2.0;
+        gfx.DrawSpriteKeyFromSequence( pos.x - halfWidth, pos.y - halfHeight, surfSeq, surfSeq.GetPixel( 0, 0 ), idxSurfSeq, rowImagesSeq, colImagesSeq );
+    }
+    else
+    {
+        SpriteCodex::DrawBall( pos, gfx );
+    }
 }
 
 void Ball::Update( float dt, const float paddleCenterX, const Keyboard& kbd )
@@ -45,6 +56,16 @@ void Ball::Update( float dt, const float paddleCenterX, const Keyboard& kbd )
     if( MOVING == ballState )
     {
         pos += dir.GetNormalized() * dt * speed;
+        const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime;
+        if( timeElapsed.count() > 0.085 )
+        {
+            idxSurfSeq++;
+            if( idxSurfSeq >= rowImagesSeq * colImagesSeq )
+            {
+                idxSurfSeq = 0;
+            }
+            startTime = std::chrono::steady_clock::now();
+        }
     }
     else if( WAITING == ballState )
     {        
@@ -175,4 +196,20 @@ void Ball::StickToPaddle( const float paddleCenterX )
 bool Ball::HasPaddleCooldown() const
 {
     return paddleCooldown;
+}
+
+void Ball::ActivateSuperBall()
+{
+    if( INACTIVE == ballState )
+    {
+        return;
+    }
+    superBallActive = true;
+    //TODO adjust position for edges?!? have to be tested! also near the paddle
+}
+
+void Ball::DeActivateSuperBall()
+{
+    superBallActive = false;
+    //TODO adjust position for edges?!? have to be tested! also near the paddle
 }

@@ -99,7 +99,7 @@ private:
     ////////////////////
     //// POWER UPS /////
     ////////////////////
-    static constexpr int nPowerUps = 4;             /* maximal number of powerups */
+    static constexpr int nPowerUps = 5;             /* maximal number of powerups */
     PowerUp powerUps[ nPowerUps ];
     Sound powerUpSounds[ nPowerUps ];
     /* laser */
@@ -120,7 +120,8 @@ private:
     Surface PowerUpSequences[ nPowerUps ] = { Surface::FromFile( L"Images\\Sequences\\incrSize.png" ),
                                               Surface::FromFile( L"Images\\Sequences\\extraLife.png" ),
                                               Surface::FromFile( L"Images\\Sequences\\laserGun.png" ),
-                                              Surface::FromFile( L"Images\\Sequences\\multiBall.png" ) };
+                                              Surface::FromFile( L"Images\\Sequences\\multiBall.png" ),
+                                              Surface::FromFile( L"Images\\Sequences\\superBall.png" ) };
 
     Surface GameOverSurf = Surface::FromFile( L"Images\\gameover.png" );
     Surface PadExplosion[ 4 ] = { Surface::FromFile( L"Images\\padExpl1.png" ),

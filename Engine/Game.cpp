@@ -50,11 +50,14 @@ Game::Game( MainWindow& wnd )
     powerUps[ 1 ] = PowerUp( widthPU, heightPU, EXTRA_LIFE, 0, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1 );
     powerUps[ 2 ] = PowerUp( widthPU, heightPU, LASER_GUN, boostTimeLaserGun, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1 );
     powerUps[ 3 ] = PowerUp( widthPU, heightPU, MULTI_BALL, 0, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1 );
+    powerUps[ 4 ] = PowerUp( ( float )PowerUpSequences[ 4 ].GetWidth() / 5.0f, ( float )PowerUpSequences[ 4 ].GetHeight() / 5.0f,
+                             SUPER_BALL, 5, walls.GetInnerBounds().bottom, 5, 5 );
 
     powerUpSounds[ 0 ] = Sound( L"Sounds\\grow.wav" );
     powerUpSounds[ 1 ] = Sound( L"Sounds\\extraLife.wav" );
     // no sound for gun, because it directly starts to shoot
     powerUpSounds[ 3 ] = Sound( L"Sounds\\multiBall.wav" );
+    powerUpSounds[ 4 ] = Sound( L"Sounds\\superBall.wav" );
 
     ResetGame();
 }
@@ -96,6 +99,7 @@ void Game::ResetGame()
     //powerUps[ EXTRA_LIFE ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x + 30, 100 ), brickWidth );
     //powerUps[ LASER_GUN ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x - 30, 100 ), brickWidth );
     //powerUps[ MULTI_BALL ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x + 60, 100 ), brickWidth );
+    powerUps[ SUPER_BALL ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x + 60, 100 ), brickWidth );
     //laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );
 
     /*balls[ 1 ] = Ball( Vec2( walls.GetInnerBounds().right - 20, walls.GetInnerBounds().bottom - 20 ), Vec2( -1, -0.1 ) );
@@ -116,7 +120,7 @@ void Game::ResetBall()
         balls[ i ] = Ball();
     }
     lastBallIdx = 0;
-    balls[ 0 ] = Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ) , Vec2( -0.2f, -1 ) );
+    balls[ 0 ] = Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ) , Vec2( -0.2f, -1 ), 5, 5 );
     balls[ 0 ].Stop();
 }
 
@@ -171,6 +175,9 @@ void Game::ApplyPowerUp( const PowerUp& pu )
         break;
     case MULTI_BALL:
         CreateMultiBalls();
+        break;
+    case SUPER_BALL:
+        balls[ lastBallIdx ].ActivateSuperBall();
         break;
     default:
         break;
@@ -403,7 +410,7 @@ void Game::CreateMultiBalls()
     {
         if( i != lastBallIdx )
         {
-            balls[ i ] = Ball( balls[ lastBallIdx ].GetPosition(), Vec2() );
+            balls[ i ] = Ball( balls[ lastBallIdx ].GetPosition(), Vec2(), 5, 5 );
             float xDir;
             float yDir;
             do
@@ -763,7 +770,7 @@ void Game::ComposeFrame()
 
         for( int i = 0; i < nMaxBalls; ++i )
         {
-            balls[ i ].Draw( gfx );
+            balls[ i ].Draw( gfx, PowerUpSequences[ SUPER_BALL ] );
         }
 
         for( int i = 0; i < nPowerUps; ++i )

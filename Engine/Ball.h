@@ -4,6 +4,7 @@
 #include "Keyboard.h"
 #include "Defines.h"
 #include <cmath>
+#include <chrono>
 
 enum eBallState
 {
@@ -17,8 +18,8 @@ class Ball
 {
 public:
     Ball() = default;
-    Ball( const Vec2& pos_in, const Vec2& dir_in );
-    void Draw( Graphics& gfx ) const;
+    Ball( const Vec2& pos_in, const Vec2& dir_in, int rowImagesSeq_in, int colImagesSeq_in );   /* sequence parameter for the super ball sequence! */
+    void Draw( Graphics& gfx, const Surface& surfSeq ) const;
     void Update( float dt, const float paddleCenterX, const Keyboard& kbd );
     /* return 0 = nothing, 1 = hit wall, 2 = hit bottom */
     int DoWallCollision( const RectF& walls, const RectF& paddle );
@@ -33,7 +34,8 @@ public:
     void Stop();
     void StickToPaddle( const float paddleCenterX );
     bool HasPaddleCooldown() const;     /* to avoid weird paddle/ball things */
-    
+    void ActivateSuperBall();
+    void DeActivateSuperBall();
 private:
     static constexpr float radius = 7.0f;
 #if EASY_MODE
@@ -47,4 +49,11 @@ private:
     Vec2 dir;
 
     bool paddleCooldown = false;
+
+    // super ball
+    bool superBallActive = false;
+    int rowImagesSeq;
+    int colImagesSeq;
+    int idxSurfSeq = 0;
+    std::chrono::steady_clock::time_point startTime;    /* to measure time between sequence images */
 };
