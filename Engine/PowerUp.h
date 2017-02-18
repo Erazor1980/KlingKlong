@@ -11,6 +11,7 @@ enum ePowerUpType
     EXTRA_LIFE,
     LASER_GUN,
     MULTI_BALL,
+    SUPER_BALL,
     NUMBER_POWER_UPS
 };
 
@@ -21,7 +22,7 @@ public:
     PowerUp( const float width_in, const float height_in, ePowerUpType type_in, const float boost_time, /* boost time in seconds */
              const float level_bottom, int rowImagesSeq_in, int colImagesSeq_in );
     bool Update( const RectF& paddleRect, const float dt );         /* returns true, when hit paddle */
-    void Draw( Graphics& gfx, const Surface& surfSeq );
+    void Draw( Graphics& gfx, const Surface& surfSeq ) const;
     void Activate( const Vec2& pos_in, float brickWidth );  /* passing brickWidth to spawn centered (because width != brickWidth!) */
     void DeActivate();
     ePowerUpType GetType() const;

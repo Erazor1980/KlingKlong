@@ -50,7 +50,7 @@ bool PowerUp::Update( const RectF& paddleRect, const float dt )
     return false;
 }
 
-void PowerUp::Draw( Graphics& gfx, const Surface& surfSeq )
+void PowerUp::Draw( Graphics& gfx, const Surface& surfSeq ) const
 {
     if( !activated )
     {
