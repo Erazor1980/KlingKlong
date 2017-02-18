@@ -498,6 +498,7 @@ void Game::UpdateModel( float dt )
                 {
                     soundEnemyHit.Play();
                 }
+                numEnemies--;
             }
         }
         const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime_enemySpawn;
