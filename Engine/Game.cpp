@@ -771,6 +771,10 @@ void Game::DrawVictory()
 
 void Game::ComposeFrame()
 {
+    // background
+#if !_DEBUG
+    gfx.DrawSprite( 0, 0, Background );
+#endif
 
     for( const Brick& b : bricks )
     {

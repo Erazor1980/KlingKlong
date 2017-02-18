@@ -28,8 +28,9 @@ void Ball::Draw( Graphics& gfx, const Surface& surfSeq ) const
         for( int i = 1; i <= 15; ++i )
 #endif
         {
-            gfx.PutPixel( ( int )dirLine.x, ( int )dirLine.y, Colors::Gray );
-            dirLine += dir.GetNormalized() * 7;
+            //gfx.PutPixel( ( int )dirLine.x, ( int )dirLine.y, Colors::Gray );
+            gfx.DrawCircle( ( int )dirLine.x, ( int )dirLine.y, 2, Colors::Blue );
+            dirLine += dir.GetNormalized() * 9;
         }
     }
 
