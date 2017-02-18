@@ -34,6 +34,7 @@
 #include "Enemy.h"
 
 #define MAX_LIFES 3
+#define MAX_ENEMIES 3
 
 class Game
 {
@@ -57,6 +58,7 @@ private:
     void ApplyPowerUp( const PowerUp& pu );
     void Shoot();
     void CreatePowerUp( int curColIdx );
+    void CreatePowerUp( const Vec2& pos );  /* for 100% power up after killing an enemy */
     void CreateNextLevel();
     void CreateMultiBalls();
     void UpdateMultiBalls( int idxBallToDeactivate );
@@ -127,7 +129,8 @@ private:
     int explSeqIdx = 0;
 
     Surface seqEnemy = Surface::FromFile( L"Images\\Sequences\\funnyEnemy.png" );
-    Enemy testEnemy;
+    Enemy enemies[ MAX_ENEMIES ];
+    int numEnemies = 0;
 
     int lifes = MAX_LIFES;
     int level = 0;

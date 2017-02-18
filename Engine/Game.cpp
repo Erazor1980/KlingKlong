@@ -96,7 +96,8 @@ void Game::ResetGame()
     //balls[ 1 ] = Ball( walls.GetInnerBounds().GetCenter(), Vec2( -0.1, 1 ) );
     //balls[ 1 ].Start();
     //multiBalls = true;
-    testEnemy = Enemy( Vec2( 400, 300 ), seqEnemy.GetWidth() / 5, seqEnemy.GetHeight() / 5, walls.GetInnerBounds(), 5, 5 );
+    enemies[ 0 ] = Enemy( seqEnemy.GetWidth() / 5.0f, seqEnemy.GetHeight() / 5.0f, walls.GetInnerBounds(), 5, 5 );
+    enemies[ 0 ].Activate( Vec2( 400, 300 ) );
 }
 
 void Game::ResetBall()
@@ -224,6 +225,31 @@ void Game::CreatePowerUp( int curColIdx )
         powerUps[ 3 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
     }
 #endif
+}
+
+void Game::CreatePowerUp( const Vec2& pos )
+{
+    bool freePU = false;
+    for( int i = 0; i < nPowerUps; ++i )
+    {
+        if( !powerUps[ i ].IsActivated() )
+        {
+            freePU = true;
+        }
+    }
+    if( !freePU )
+    {
+        // all power ups on screen (should be really rare!)
+        return;
+    }
+    
+    int typePU = rand() % NUMBER_POWER_UPS;
+    while( powerUps[ typePU ].IsActivated() )
+    {
+        typePU = rand() % NUMBER_POWER_UPS;
+    }
+
+    powerUps[ typePU ].Activate( pos, brickWidth );
 }
 
 void Game::CreateNextLevel()
@@ -400,7 +426,6 @@ void Game::Go()
 
 void Game::UpdateModel( float dt )
 {
-    testEnemy.Update( dt );
     if( wnd.kbd.KeyIsPressed( VK_SPACE ) )
     {
         for( int i = 0; i < nMaxBalls; ++i )
@@ -418,6 +443,22 @@ void Game::UpdateModel( float dt )
 
     if( lifes > 0 && nBricksLeft > 0 )
     {
+        //////////////////
+        //// ENEMIES /////
+        //////////////////
+        for( int e = 0; e < MAX_ENEMIES; ++e )
+        {
+            enemies[ e ].Update( dt );
+            for( int b = 0; b < nMaxBalls; ++b )
+            {
+                if( enemies[ e ].CheckForCollision( balls[ b ].GetRect() ) )
+                {
+                    CreatePowerUp( enemies[ e ].GetPos() );
+                }
+            }
+        }
+
+
         /////////////////
         //// PADDLE /////
         /////////////////
@@ -655,5 +696,8 @@ void Game::ComposeFrame()
         DrawVictory();
     }
 
-    testEnemy.Draw( gfx, seqEnemy );
+    for( int e = 0; e < MAX_ENEMIES; ++e )
+    {
+        enemies[ e ].Draw( gfx, seqEnemy );
+    }
 }
