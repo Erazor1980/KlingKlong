@@ -85,12 +85,7 @@ void Game::ResetGame()
     explSeqIdx = 0;
 
     // reset enemies
-    for( int i = 0; i < MAX_ENEMIES; ++i )
-    {
-        enemies[ i ] = Enemy();
-    }
-    startTime_enemySpawn = std::chrono::steady_clock::now();
-    numEnemies = 0;
+    ResetEnemies();
 
 
     /////////////////
@@ -144,6 +139,16 @@ void Game::ResetShots()
         laserShots[ i ] = LaserShot();
     }
     startedShooting = false;
+}
+
+void Game::ResetEnemies()
+{
+    for( int i = 0; i < MAX_ENEMIES; ++i )
+    {
+        enemies[ i ] = Enemy();
+    }
+    startTime_enemySpawn = std::chrono::steady_clock::now();
+    numEnemies = 0;
 }
 
 void Game::ApplyPowerUp( const PowerUp& pu )
@@ -487,6 +492,10 @@ void Game::UpdateModel( float dt )
         //////////////////
         for( int e = 0; e < MAX_ENEMIES; ++e )
         {
+            if( !enemies[ e ].IsActivated() )
+            {
+                continue;
+            }
             enemies[ e ].Update( dt );
             for( int b = 0; b < nMaxBalls; ++b )
             {
@@ -677,6 +686,7 @@ void Game::UpdateModel( float dt )
             ResetBall();
             ResetPowerUps();
             ResetShots();
+            ResetEnemies();
             CreateNextLevel();
         }
     }

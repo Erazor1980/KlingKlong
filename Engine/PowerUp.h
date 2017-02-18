@@ -2,6 +2,7 @@
 #include "Graphics.h"
 #include "RectF.h"
 #include "Vec2.h"
+#include "Defines.h"
 #include <chrono>
 
 enum ePowerUpType
@@ -27,7 +28,11 @@ public:
     float GetBoostTime() const;
     bool IsActivated() const;
 private:
+#if EASY_MODE
+    static constexpr float speed = 150;
+#else
     static constexpr float speed = 250;
+#endif
     Vec2 pos;
     float width;
     float height;

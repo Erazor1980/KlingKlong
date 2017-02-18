@@ -32,9 +32,7 @@
 #include "PowerUp.h"
 #include "Laser.h"
 #include "Enemy.h"
-
-#define MAX_LIFES 3
-#define MAX_ENEMIES 3
+#include "Defines.h"
 
 class Game
 {
@@ -55,6 +53,7 @@ private:
     void ResetPaddle();
     void ResetPowerUps();
     void ResetShots();
+    void ResetEnemies();
     void ApplyPowerUp( const PowerUp& pu );
     void Shoot();
     void CreatePowerUp( int curColIdx );
@@ -132,7 +131,12 @@ private:
 
     Surface seqEnemy = Surface::FromFile( L"Images\\Sequences\\funnyEnemy.png" );
     Enemy enemies[ MAX_ENEMIES ];
+#if EASY_MODE
+    float timeBetweenEnemies = 15;  /* in seconds */
+#else
     float timeBetweenEnemies = 10;  /* in seconds */
+#endif
+    
     std::chrono::steady_clock::time_point startTime_enemySpawn;
     int numEnemies = 0;
 

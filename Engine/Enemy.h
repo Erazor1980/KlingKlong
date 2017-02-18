@@ -1,6 +1,7 @@
 #pragma once
 #include "Vec2.h"
 #include "Graphics.h"
+#include "Defines.h"
 #include <chrono>
 
 class Enemy
@@ -22,7 +23,11 @@ private:
     Vec2 dir;
     float width;
     float height;
+#if EASY_MODE
+    float speed = 100;
+#else
     float speed = 200;
+#endif
     bool activated = false;
 
     RectF walls;
