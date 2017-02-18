@@ -34,6 +34,7 @@ Game::Game( MainWindow& wnd )
     soundVictory( L"Sounds\\victory.wav" ),
     soundLaserShot( L"Sounds\\laserShot.wav" ),
     soundEnemyHit( L"Sounds\\hitEnemy.wav" ),
+    soundKillEnemy( L"Sounds\\killEnemy.wav" ),
     walls( RectF::FromCenter( Graphics::GetScreenRect().GetCenter(), fieldWidth / 2.0f, fieldHeight / 2.0f ), wallThickness, wallColor )
 {
     const float widthPU     = ( float )PowerUpSequences[ 0 ].GetWidth() / nSubImagesInSequence;
@@ -502,6 +503,7 @@ void Game::UpdateModel( float dt )
             {
                 if( enemies[ e ].CheckForCollision( balls[ b ].GetRect() ) )
                 {
+                    soundKillEnemy.Play();
                     CreatePowerUp( enemies[ e ].GetPos() );
                     numEnemies--;
                 }
@@ -560,6 +562,16 @@ void Game::UpdateModel( float dt )
         for( int i = 0; i < nMaxLaserShots; ++i )
         {
             laserShots[ i ].Update( dt );
+
+            for( int e = 0; e < MAX_ENEMIES; ++e )
+            {
+                if( enemies[ e ].CheckForCollision( laserShots[ i ].GetRect() ) )
+                {
+                    soundKillEnemy.Play();
+                    CreatePowerUp( enemies[ e ].GetPos() );
+                    numEnemies--;
+                }
+            }
         }
         
         ////////////////////
