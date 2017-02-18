@@ -90,6 +90,7 @@ void Game::ResetGame()
         enemies[ i ] = Enemy();
     }
     startTime_enemySpawn = std::chrono::steady_clock::now();
+    numEnemies = 0;
 
 
     /////////////////
@@ -487,6 +488,7 @@ void Game::UpdateModel( float dt )
             if( enemies[ e ].CheckForCollision( pad.GetRect() ) )
             {
                 lifes--;
+                startTime_enemySpawn = std::chrono::steady_clock::now();
                 if( 0 == lifes )
                 {
                     soundGameOver.Play();
@@ -634,6 +636,7 @@ void Game::UpdateModel( float dt )
                 else
                 {
                     lifes--;
+                    startTime_enemySpawn = std::chrono::steady_clock::now();
                     if( 0 == lifes )
                     {
                         soundGameOver.Play();
