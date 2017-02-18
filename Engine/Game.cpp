@@ -330,6 +330,40 @@ void Game::CreateNextLevel()
             const Color c = brickColors[ 3 - y ];
             for( int x = 0; x < nBricksAcross; ++x )
             {
+                if( y % 2 - 1 && x % 2 - 1 )
+                {
+                    // empty space
+                }
+                else
+                {
+                    if( ( 0 == y || 2 == y ) && x % 2 )
+                    {
+                        bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
+                                                                        brickWidth, brickHeight ), c, SOLID, 2 );
+                        nBricksLeft++;
+                    }
+                    else
+                    {
+                        bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c );
+                        nBricksLeft++;
+                    }
+                }
+            }
+        }
+
+        bricks[ 0 ] = Brick( RectF( topLeft + Vec2( -brickWidth, ( nBricksDown - 1 ) * brickHeight ),
+                                    brickWidth, brickHeight ), Colors::LightGray, UNDESTROYABLE );
+        bricks[ 2 ] = Brick( RectF( topLeft + Vec2( nBricksAcross * brickWidth, ( nBricksDown - 1 ) * brickHeight ),
+                                    brickWidth, brickHeight ), Colors::LightGray, UNDESTROYABLE );
+    }
+    else if( 2 == level )
+    {
+        nBricksLeft = 0;
+        for( int y = 0; y < nBricksDown; ++y )
+        {
+            const Color c = brickColors[ 3 - y ];
+            for( int x = 0; x < nBricksAcross; ++x )
+            {
                 if( 3 == y && ( x < 3 || x > 9 ) )
                 {
                     bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
@@ -351,39 +385,6 @@ void Game::CreateNextLevel()
                 }
             }
         }
-    }
-    else if( 2 == level )
-    {
-        nBricksLeft = 0;
-        for( int y = 0; y < nBricksDown; ++y )
-        {
-            const Color c = brickColors[ 3 - y ];
-            for( int x = 0; x < nBricksAcross; ++x )
-            {
-                if( y % 2 - 1 && x % 2 - 1 )
-                {
-                  // empty space
-                }
-                else
-                {
-                    if( ( 0 == y || 2 == y ) && x % 2 )
-                    {
-                        bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
-                                                                        brickWidth, brickHeight ), c, SOLID, 2 );
-                        nBricksLeft++;
-                    }
-                    else
-                    {
-                        bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c );
-                        nBricksLeft++;
-                    }
-                }
-            }
-        }
-        bricks[ 0 ] = Brick( RectF( topLeft + Vec2( -brickWidth, ( nBricksDown - 1 ) * brickHeight ),
-                                    brickWidth, brickHeight ), Colors::LightGray, UNDESTROYABLE );
-        bricks[ 2 ] = Brick( RectF( topLeft + Vec2( nBricksAcross * brickWidth, ( nBricksDown - 1 ) * brickHeight ),
-                                    brickWidth, brickHeight ), Colors::LightGray, UNDESTROYABLE );
     }
 }
 
