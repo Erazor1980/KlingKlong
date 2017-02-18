@@ -94,6 +94,7 @@ private:
     Sound soundLifeLoss;
     Sound soundVictory;
     Sound soundLaserShot;
+    Sound soundEnemyHit;
 
     ////////////////////
     //// POWER UPS /////

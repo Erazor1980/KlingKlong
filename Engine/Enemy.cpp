@@ -42,13 +42,13 @@ void Enemy::Update( float dt )
     }
 }
 
-bool Enemy::CheckForCollision( const RectF& ballRect )
+bool Enemy::CheckForCollision( const RectF& otherRect )
 {
     if( !activated )
     {
         return false;
     }
-    if( GetRect().IsOverlappingWith( ballRect ) )
+    if( GetRect().IsOverlappingWith( otherRect ) )
     {
         activated = false;
         return true;

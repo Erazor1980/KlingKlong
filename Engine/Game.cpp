@@ -33,6 +33,7 @@ Game::Game( MainWindow& wnd )
     soundGameOver( L"Sounds\\explosion.wav" ),
     soundVictory( L"Sounds\\victory.wav" ),
     soundLaserShot( L"Sounds\\laserShot.wav" ),
+    soundEnemyHit( L"Sounds\\hitEnemy.wav" ),
     walls( RectF::FromCenter( Graphics::GetScreenRect().GetCenter(), fieldWidth / 2.0f, fieldHeight / 2.0f ), wallThickness, wallColor )
 {
     const float widthPU     = ( float )PowerUpSequences[ 0 ].GetWidth() / nSubImagesInSequence;
@@ -481,6 +482,19 @@ void Game::UpdateModel( float dt )
                 {
                     CreatePowerUp( enemies[ e ].GetPos() );
                     numEnemies--;
+                }
+            }
+            if( enemies[ e ].CheckForCollision( pad.GetRect() ) )
+            {
+                lifes--;
+                if( 0 == lifes )
+                {
+                    soundGameOver.Play();
+                    startTime_shot = std::chrono::steady_clock::now();
+                }
+                else
+                {
+                    soundEnemyHit.Play();
                 }
             }
         }
