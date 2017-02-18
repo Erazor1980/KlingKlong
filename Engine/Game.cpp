@@ -177,7 +177,7 @@ void Game::ApplyPowerUp( const PowerUp& pu )
         CreateMultiBalls();
         break;
     case SUPER_BALL:
-        balls[ lastBallIdx ].ActivateSuperBall();
+        balls[ lastBallIdx ].ActivateSuperBall( pu.GetBoostTime(), ( PowerUpSequences[ SUPER_BALL ].GetWidth() / 5 ) / 2.0f );
         break;
     default:
         break;
@@ -508,7 +508,7 @@ void Game::UpdateModel( float dt )
             enemies[ e ].Update( dt );
             for( int b = 0; b < nMaxBalls; ++b )
             {
-                if( enemies[ e ].CheckForCollision( balls[ b ].GetRect() ) )
+                if( balls[ b ].GetState() == MOVING && enemies[ e ].CheckForCollision( balls[ b ].GetRect() ) )
                 {
                     soundKillEnemy.Play();
                     CreatePowerUp( enemies[ e ].GetPos() );
@@ -759,6 +759,11 @@ void Game::ComposeFrame()
     }
     walls.Draw( gfx );
     
+    for( int e = 0; e < MAX_ENEMIES; ++e )
+    {
+        enemies[ e ].Draw( gfx, seqEnemy );
+    }
+
     if( 0 == lifes )
     {
         DrawGameOver();
@@ -786,10 +791,5 @@ void Game::ComposeFrame()
     if( 0 == nBricksLeft )
     {
         DrawVictory();
-    }
-
-    for( int e = 0; e < MAX_ENEMIES; ++e )
-    {
-        enemies[ e ].Draw( gfx, seqEnemy );
     }
 }

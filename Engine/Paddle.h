@@ -57,7 +57,7 @@ private:
     bool sizeIncreased = false;
     bool hasLaserGun = false;
     float powerUpDuration_incrSize;      /* in seconds */
-    float powerUpDuration_laserGun;    /* in seconds */
+    float powerUpDuration_laserGun;      /* in seconds */
     std::chrono::steady_clock::time_point startTime_incrSize;
     std::chrono::steady_clock::time_point startTime_laserGun;
     RectF leftGun;

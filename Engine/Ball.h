@@ -34,10 +34,10 @@ public:
     void Stop();
     void StickToPaddle( const float paddleCenterX );
     bool HasPaddleCooldown() const;     /* to avoid weird paddle/ball things */
-    void ActivateSuperBall();
+    void ActivateSuperBall( const float duration, float newRadius );
     void DeActivateSuperBall();
 private:
-    static constexpr float radius = 7.0f;
+    float radius = 7.0f;
 #if EASY_MODE
     float speed = 200;
 #else
@@ -56,4 +56,7 @@ private:
     int colImagesSeq;
     int idxSurfSeq = 0;
     std::chrono::steady_clock::time_point startTime;    /* to measure time between sequence images */
+
+    float powerUpDuration_superBall;      /* in seconds */
+    std::chrono::steady_clock::time_point startTime_superBall;
 };

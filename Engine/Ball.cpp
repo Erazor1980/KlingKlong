@@ -36,9 +36,10 @@ void Ball::Draw( Graphics& gfx, const Surface& surfSeq ) const
     // draw ball
     if( superBallActive )
     {
-        const float halfWidth = ( surfSeq.GetWidth() / rowImagesSeq ) / 2.0;
-        const float halfHeight = ( surfSeq.GetHeight() / colImagesSeq ) / 2.0;
-        gfx.DrawSpriteKeyFromSequence( pos.x - halfWidth, pos.y - halfHeight, surfSeq, surfSeq.GetPixel( 0, 0 ), idxSurfSeq, rowImagesSeq, colImagesSeq );
+        const float halfWidth = ( surfSeq.GetWidth() / rowImagesSeq ) / 2.0f;
+        const float halfHeight = ( surfSeq.GetHeight() / colImagesSeq ) / 2.0f;
+        gfx.DrawSpriteKeyFromSequence( ( int )( pos.x - halfWidth ), ( int )( pos.y - halfHeight ),
+                                       surfSeq, surfSeq.GetPixel( 0, 0 ), idxSurfSeq, rowImagesSeq, colImagesSeq );
     }
     else
     {
@@ -57,7 +58,7 @@ void Ball::Update( float dt, const float paddleCenterX, const Keyboard& kbd )
     {
         pos += dir.GetNormalized() * dt * speed;
         const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime;
-        if( timeElapsed.count() > 0.085 )
+        if( timeElapsed.count() > 0.055 )
         {
             idxSurfSeq++;
             if( idxSurfSeq >= rowImagesSeq * colImagesSeq )
@@ -86,6 +87,15 @@ void Ball::Update( float dt, const float paddleCenterX, const Keyboard& kbd )
     else if( STICKING == ballState )
     {
         pos.x = paddleCenterX + offsetToPaddleCenter;
+    }
+
+    if( superBallActive )
+    {
+        const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime_superBall;
+        if( timeElapsed.count() > powerUpDuration_superBall )
+        {
+            DeActivateSuperBall();
+        }
     }
 }
 
@@ -198,18 +208,26 @@ bool Ball::HasPaddleCooldown() const
     return paddleCooldown;
 }
 
-void Ball::ActivateSuperBall()
+void Ball::ActivateSuperBall( const float duration, float newRadius )
 {
     if( INACTIVE == ballState )
     {
         return;
     }
     superBallActive = true;
-    //TODO adjust position for edges?!? have to be tested! also near the paddle
+
+    if( WAITING == ballState )
+    {
+        pos.y -= newRadius - radius;
+    }
+    radius = newRadius;
+
+    startTime_superBall = std::chrono::steady_clock::now();
+    powerUpDuration_superBall = duration;
 }
 
 void Ball::DeActivateSuperBall()
 {
     superBallActive = false;
-    //TODO adjust position for edges?!? have to be tested! also near the paddle
+    radius = 7;
 }
