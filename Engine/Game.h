@@ -58,10 +58,11 @@ private:
     void ApplyPowerUp( const PowerUp& pu );
     void Shoot();
     void CreatePowerUp( int curColIdx );
-    void CreatePowerUp( const Vec2& pos );  /* for 100% power up after killing an enemy */
+    void CreatePowerUp( const Vec2& pos );  /* for 100% power up after killing an enemy (when there is a free PU spot) */
     void CreateNextLevel();
     void CreateMultiBalls();
     void UpdateMultiBalls( int idxBallToDeactivate );
+    void SpawnEnemy( const Vec2& pos = Vec2( Graphics::ScreenWidth / 2, Graphics::ScreenHeight / 2 ) );
 	/********************************/
 private:
 	MainWindow& wnd;
@@ -130,6 +131,8 @@ private:
 
     Surface seqEnemy = Surface::FromFile( L"Images\\Sequences\\funnyEnemy.png" );
     Enemy enemies[ MAX_ENEMIES ];
+    float timeBetweenEnemies = 10;  /* in seconds */
+    std::chrono::steady_clock::time_point startTime_enemySpawn;
     int numEnemies = 0;
 
     int lifes = MAX_LIFES;

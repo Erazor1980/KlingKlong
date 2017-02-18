@@ -7,7 +7,7 @@ Enemy::Enemy( const float width_in, const float height_in, const RectF& walls_in
     colImagesSeq( colImagesSeq_in ),
     width( width_in ),
     height( height_in ),
-    activated( true )
+    activated( false )
 {
 }
 
@@ -71,6 +71,11 @@ void Enemy::Activate( const Vec2& pos_in )
     pos = pos_in;
     dir = Vec2( rand() % 100 - 50 + 10, rand() % 100 - 50 + 10 );  /* "+10" to avoid 0,0 direction */
     activated = true;
+}
+
+bool Enemy::IsActivated() const
+{
+    return activated;
 }
 
 void Enemy::DoWallCollision()

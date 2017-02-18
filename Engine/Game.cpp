@@ -83,6 +83,14 @@ void Game::ResetGame()
     // explosion sequence
     explSeqIdx = 0;
 
+    // reset enemies
+    for( int i = 0; i < MAX_ENEMIES; ++i )
+    {
+        enemies[ i ] = Enemy();
+    }
+    startTime_enemySpawn = std::chrono::steady_clock::now();
+
+
     /////////////////
     //// TESTING ////
     /////////////////
@@ -96,8 +104,8 @@ void Game::ResetGame()
     //balls[ 1 ] = Ball( walls.GetInnerBounds().GetCenter(), Vec2( -0.1, 1 ) );
     //balls[ 1 ].Start();
     //multiBalls = true;
-    enemies[ 0 ] = Enemy( seqEnemy.GetWidth() / 5.0f, seqEnemy.GetHeight() / 5.0f, walls.GetInnerBounds(), 5, 5 );
-    enemies[ 0 ].Activate( Vec2( 400, 300 ) );
+    //enemies[ 0 ] = Enemy( seqEnemy.GetWidth() / 5.0f, seqEnemy.GetHeight() / 5.0f, walls.GetInnerBounds(), 5, 5 );
+    //enemies[ 0 ].Activate( Vec2( 400, 300 ) );
 }
 
 void Game::ResetBall()
@@ -410,6 +418,24 @@ void Game::UpdateMultiBalls( int idxBallToDeactivate )
     }
 }
 
+void Game::SpawnEnemy( const Vec2& pos )
+{
+    if( numEnemies >= MAX_ENEMIES )
+    {
+        return;
+    }
+    numEnemies++;
+    for( int e = 0; e < MAX_ENEMIES; ++e )
+    {
+        if( !enemies[ e ].IsActivated() )
+        {
+            enemies[ e ] = Enemy( seqEnemy.GetWidth() / 5.0f, seqEnemy.GetHeight() / 5.0f, walls.GetInnerBounds(), 5, 5 );
+            enemies[ e ].Activate( walls.GetInnerBounds().GetCenter() );
+            return;
+        }
+    }
+}
+
 void Game::Go()
 {
     gfx.BeginFrame();
@@ -454,8 +480,15 @@ void Game::UpdateModel( float dt )
                 if( enemies[ e ].CheckForCollision( balls[ b ].GetRect() ) )
                 {
                     CreatePowerUp( enemies[ e ].GetPos() );
+                    numEnemies--;
                 }
             }
+        }
+        const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime_enemySpawn;
+        if( timeElapsed.count() > timeBetweenEnemies )
+        {
+            SpawnEnemy();
+            startTime_enemySpawn = std::chrono::steady_clock::now();
         }
 
 

@@ -14,6 +14,7 @@ public:
     RectF GetRect() const;
     Vec2 GetPos() const;
     void Activate( const Vec2& pos_in );
+    bool IsActivated() const;
 private:
     void DoWallCollision();
 
