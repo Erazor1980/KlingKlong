@@ -88,7 +88,7 @@ void Game::ResetGame()
     /////////////////
     //powerUps[ 0 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ), brickWidth );
     //powerUps[ 2 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ), brickWidth );
-    powerUps[ 3 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 400 ), brickWidth );
+    //powerUps[ 3 ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 400 ), brickWidth );
     //laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );
 
     /*balls[ 1 ] = Ball( Vec2( walls.GetInnerBounds().right - 20, walls.GetInnerBounds().bottom - 20 ), Vec2( -1, -0.1 ) );
@@ -96,6 +96,7 @@ void Game::ResetGame()
     //balls[ 1 ] = Ball( walls.GetInnerBounds().GetCenter(), Vec2( -0.1, 1 ) );
     //balls[ 1 ].Start();
     //multiBalls = true;
+    testEnemy = Enemy( Vec2( 400, 300 ), seqEnemy.GetWidth() / 5, seqEnemy.GetHeight() / 5, walls.GetInnerBounds(), 5, 5 );
 }
 
 void Game::ResetBall()
@@ -399,6 +400,7 @@ void Game::Go()
 
 void Game::UpdateModel( float dt )
 {
+    testEnemy.Update( dt );
     if( wnd.kbd.KeyIsPressed( VK_SPACE ) )
     {
         for( int i = 0; i < nMaxBalls; ++i )
@@ -652,4 +654,6 @@ void Game::ComposeFrame()
     {
         DrawVictory();
     }
+
+    testEnemy.Draw( gfx, seqEnemy );
 }

@@ -31,6 +31,7 @@
 #include "Walls.h"
 #include "PowerUp.h"
 #include "Laser.h"
+#include "Enemy.h"
 
 #define MAX_LIFES 3
 
@@ -110,7 +111,7 @@ private:
     bool multiBalls = false;
     int lastBallIdx = 0;
 
-    //TODO add other seq images!
+    // surfaces
     static constexpr int nSubImagesInSequence = 8;  /* all sequences will consist of 8 images */
     Surface PowerUpSequences[ nPowerUps ] = { Surface::FromFile( L"Images\\Sequences\\incrSize.png" ),
                                               Surface::FromFile( L"Images\\Sequences\\extraLife.png" ),
@@ -124,6 +125,9 @@ private:
                                   Surface::FromFile( L"Images\\padExpl4.png" ) };
     std::chrono::steady_clock::time_point startTime_explosion;
     int explSeqIdx = 0;
+
+    Surface seqEnemy = Surface::FromFile( L"Images\\Sequences\\funnyEnemy.png" );
+    Enemy testEnemy;
 
     int lifes = MAX_LIFES;
     int level = 0;
