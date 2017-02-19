@@ -26,6 +26,7 @@ Game::Game( MainWindow& wnd )
     :
     wnd( wnd ),
     gfx( wnd ),
+    klingKlong( gfx, state ),
     soundPad( L"Sounds\\arkpad.wav" ),
     soundBrick( L"Sounds\\arkbrick.wav" ),
     soundBrick2( L"Sounds\\arkbrick2.wav" ),
@@ -586,6 +587,10 @@ void Game::UpdateModel( float dt )
         {
             laserShots[ i ].Update( dt );
 
+            if( !laserShots[ i ].IsActivated() )
+            {
+                continue;
+            }
             for( int e = 0; e < MAX_ENEMIES; ++e )
             {
                 if( enemies[ e ].CheckForCollision( laserShots[ i ].GetRect() ) )
@@ -771,6 +776,7 @@ void Game::DrawVictory()
 
 void Game::ComposeFrame()
 {
+    klingKlong.DrawScene();
     // background
 #if !_DEBUG
     gfx.DrawSprite( 0, 0, Background );
@@ -815,5 +821,5 @@ void Game::ComposeFrame()
     {
         DrawVictory();
     }
-    gfx.DrawString( "bla bla bla", 200, 200, font, fontSurface, Colors::White );
+    //gfx.DrawString( "bla bla bla", 200, 200, font, fontSurface, Colors::White );
 }

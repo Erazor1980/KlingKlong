@@ -20,6 +20,7 @@
  ******************************************************************************************/
 #pragma once
 
+#include "KlingKlongManager.h"
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Graphics.h"
@@ -41,13 +42,6 @@ public:
 	Game( const Game& ) = delete;
 	Game& operator=( const Game& ) = delete;
 	void Go();
-    
-    enum class GameState
-    {
-        MAIN_MENU,
-        PLAYING,
-        GAME_OVER
-    };
 private:
 	void ComposeFrame();
 	void UpdateModel( float dt );
@@ -70,11 +64,13 @@ private:
     void UpdateMultiBalls( int idxBallToDeactivate );
     void SpawnEnemy( const Vec2& pos = Vec2( Graphics::ScreenWidth / 2, Graphics::ScreenHeight / 2 ) );
 	/********************************/
+    GameState state = GameState::START_SCREEN;
 private:
 	MainWindow& wnd;
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
+    
     static constexpr float brickWidth = 56.0f;
     static constexpr float brickHeight = 22.0f;
     static constexpr int nBricksAcross = 13;
@@ -158,4 +154,6 @@ private:
     float timeBetweenLevels = 3;    /* in seconds */
     std::chrono::steady_clock::time_point startTime_levelFinished;
 	/********************************/
+
+    KlingKlongManager klingKlong;
 };

@@ -28,7 +28,7 @@ void LaserShot::Draw( Graphics& gfx )
 {
     if( !activated )
     {
-        return;
+       return;
     }
 
     gfx.DrawRect( RectF::FromCenter( pos, halfWidth, halfHeight ), color );
