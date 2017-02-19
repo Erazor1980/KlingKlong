@@ -89,6 +89,7 @@ private:
     Paddle pad;
     Walls walls;
     Brick bricks[ nBricks ];
+    std::vector< Brick > vBricks;
     Sound soundPad;
     Sound soundBrick;
     Sound soundBrick2;

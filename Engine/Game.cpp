@@ -311,6 +311,7 @@ void Game::CreateNextLevel()
     }
 
     /* clear all bricks first */
+    vBricks.clear();
     for( int i = 0; i < nBricks; ++i )
     {
         bricks[ i ] = Brick();
@@ -344,6 +345,7 @@ void Game::CreateNextLevel()
                         nBricksLeft++;
                     }
                 }
+                vBricks.push_back( bricks[ y * nBricksAcross + x ] );
             }
         }
     }
@@ -496,11 +498,13 @@ void Game::Go()
 
 void Game::UpdateModel( float dt )
 {
+#if !_DEBUG
     klingKlong.Update( wnd.kbd );
     if( GameState::EXIT_GAME == state )
     {
         wnd.Kill();
     }
+#endif
 
     if( wnd.kbd.KeyIsPressed( VK_SPACE ) )
     {
@@ -627,14 +631,17 @@ void Game::UpdateModel( float dt )
         float curColDistSq;
         int curColIdx;
         int ballIdx;
-        for( int i = 0; i < nBricks; ++i )
+        //for( int i = 0; i < nBricks; ++i )
+        for( int i = 0; i < vBricks.size(); ++i )
         {
             // ball collision
             for( int b = 0; b < nMaxBalls; ++b )
             {
-                if( MOVING == balls[ b ].GetState() && bricks[ i ].CheckBallCollision( balls[ b ] ) )
+                //if( MOVING == balls[ b ].GetState() && bricks[ i ].CheckBallCollision( balls[ b ] ) )
+                if( MOVING == balls[ b ].GetState() && vBricks[ i ].CheckBallCollision( balls[ b ] ) )
                 {
-                    const float newColDistSq = ( balls[ b ].GetPosition() - bricks[ i ].GetCenter() ).GetLengthSq();
+                    //const float newColDistSq = ( balls[ b ].GetPosition() - bricks[ i ].GetCenter() ).GetLengthSq();
+                    const float newColDistSq = ( balls[ b ].GetPosition() - vBricks[ i ].GetCenter() ).GetLengthSq();
                     if( collisionHappened )
                     {
                         if( newColDistSq < curColDistSq )
@@ -782,14 +789,14 @@ void Game::DrawVictory()
 
 void Game::ComposeFrame()
 {
+    // background
+#if !_DEBUG
+    gfx.DrawSprite( 0, 0, Background );
     klingKlong.DrawScene();
     if( state != GameState::PLAYING )
     {
         return;
     }
-    // background
-#if !_DEBUG
-    gfx.DrawSprite( 0, 0, Background );
 #endif
 
     for( const Brick& b : bricks )

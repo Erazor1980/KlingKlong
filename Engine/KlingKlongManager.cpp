@@ -63,6 +63,11 @@ void KlingKlongManager::DrawScene() const
         }
     }
     break;
+    case GameState::PLAYING:
+    {
+
+    }
+    break;
     default:
         break;
     }
