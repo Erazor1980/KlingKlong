@@ -496,6 +496,12 @@ void Game::Go()
 
 void Game::UpdateModel( float dt )
 {
+    klingKlong.Update( wnd.kbd );
+    if( GameState::EXIT_GAME == state )
+    {
+        wnd.Kill();
+    }
+
     if( wnd.kbd.KeyIsPressed( VK_SPACE ) )
     {
         for( int i = 0; i < nMaxBalls; ++i )
@@ -777,6 +783,10 @@ void Game::DrawVictory()
 void Game::ComposeFrame()
 {
     klingKlong.DrawScene();
+    if( state != GameState::PLAYING )
+    {
+        return;
+    }
     // background
 #if !_DEBUG
     gfx.DrawSprite( 0, 0, Background );

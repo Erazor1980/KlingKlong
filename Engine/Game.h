@@ -127,7 +127,7 @@ private:
                                               Surface::FromFile( L"Images\\Sequences\\multiBall.png" ),
                                               Surface::FromFile( L"Images\\Sequences\\superBall.png" ) };
 
-    Surface GameOverSurf = Surface::FromFile( L"Images\\gameover.png" );
+    Surface GameOverSurf = Surface::FromFile( L"Images\\Text\\gameover.png" );
     Surface PadExplosion[ 4 ] = { Surface::FromFile( L"Images\\padExpl1.png" ),
                                   Surface::FromFile( L"Images\\padExpl2.png" ),
                                   Surface::FromFile( L"Images\\padExpl3.png" ),
@@ -136,7 +136,7 @@ private:
     int explSeqIdx = 0;
 
     Font font;
-    Surface fontSurface = Surface::FromFile( L"Images\\Fixedsys16x28.bmp" );
+    Surface fontSurface = Surface::FromFile( L"Images\\Text\\Fixedsys16x28.bmp" );
 
     Surface seqEnemy = Surface::FromFile( L"Images\\Sequences\\funnyEnemy.png" );
     Enemy enemies[ MAX_ENEMIES ];
