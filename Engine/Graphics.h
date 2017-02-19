@@ -27,6 +27,13 @@
 #include "Colors.h"
 #include "RectF.h"
 
+struct Font
+{
+    int charWidth = 16;
+    int charHeight = 28;
+    int nCharsPerRow = 32;
+};
+
 class Graphics
 {
 public:
@@ -76,7 +83,10 @@ public:
     void DrawIsoRightTriBR( int x, int y, int size, Color c );
     void DrawSprite( int x, int y, const Surface& src );
     void DrawSpriteKey( int x, int y, const Surface& src, Color key );
-
+    // for printing text
+    void DrawString( const char* text, int x, int y, Font& font, const Surface& fontSurf, Color color );
+    void DrawChar( char c, int xOff, int yOff, Font& font, const Surface& fontSurf, Color color );
+    
     // for animations. image consists of all animations steps in row
     void DrawSpriteKeyFromSequence( int x, int y, const Surface& src, Color key, unsigned int idx, unsigned int imagesPerRow, unsigned int imagesPerColumn );
 	~Graphics();

@@ -815,4 +815,5 @@ void Game::ComposeFrame()
     {
         DrawVictory();
     }
+    gfx.DrawString( "bla bla bla", 200, 200, font, fontSurface, Colors::White );
 }

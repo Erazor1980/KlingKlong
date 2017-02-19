@@ -41,6 +41,13 @@ public:
 	Game( const Game& ) = delete;
 	Game& operator=( const Game& ) = delete;
 	void Go();
+    
+    enum class GameState
+    {
+        MAIN_MENU,
+        PLAYING,
+        GAME_OVER
+    };
 private:
 	void ComposeFrame();
 	void UpdateModel( float dt );
@@ -131,6 +138,9 @@ private:
                                   Surface::FromFile( L"Images\\padExpl4.png" ) };
     std::chrono::steady_clock::time_point startTime_explosion;
     int explSeqIdx = 0;
+
+    Font font;
+    Surface fontSurface = Surface::FromFile( L"Images\\Fixedsys16x28.bmp" );
 
     Surface seqEnemy = Surface::FromFile( L"Images\\Sequences\\funnyEnemy.png" );
     Enemy enemies[ MAX_ENEMIES ];

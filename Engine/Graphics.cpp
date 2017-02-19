@@ -535,6 +535,45 @@ void Graphics::DrawSpriteKey( int x, int y, const Surface &src, Color key )
     }
 }
 
+void Graphics::DrawString( const char* text, int x, int y, Font& font, const Surface& fontSurf, Color color )
+{
+    for( int i = 0; text[ i ] != '\0'; ++i )
+    {
+        DrawChar( text[ i ], x + i * font.charWidth, y, font, fontSurf, color );
+    }
+}
+void Graphics::DrawChar( char c, int xOff, int yOff, Font& font, const Surface& fontSurf, Color color )
+{
+    if( c < ' ' || c > '~' ) return;
+
+    if( xOff + font.charWidth > ScreenWidth - 1 || yOff + font.charHeight > ScreenHeight - 1 )
+        return;
+
+    const int sheetIndex = c - ' ';
+    const int sheetCol = sheetIndex % font.nCharsPerRow;
+    const int sheetRow = sheetIndex / font.nCharsPerRow;
+    const int xStart = sheetCol * font.charWidth;
+    const int yStart = sheetRow * font.charHeight;
+    const int xEnd = xStart + font.charWidth;
+    const int yEnd = yStart + font.charHeight;
+    const int surfWidth = font.charWidth * font.nCharsPerRow;
+
+    //DrawSpriteKeyFromSequence( xOff, yOff, font.surface, font.surface.GetPixel( 0, 0 ), sheetIndex, 32, 3 );
+    for( int y = yStart; y < yEnd; ++y )
+    {
+        for( int x = xStart; x < xEnd; ++x )
+        {
+            if( fontSurf.GetPixel( x, y ).GetB() == 0 ) //Colors::Black <- didnt work! dont know why... all channels are 0
+            {
+                if( x >= 0 && y >= 0 && x < ScreenWidth && y < ScreenHeight )
+                {
+                    PutPixel( xOff + x - xStart, yOff + y - yStart, color );
+                }
+            }
+        }
+    }
+}
+
 void Graphics::DrawSpriteKeyFromSequence( int x, int y, const Surface& src, Color key, unsigned int idx, unsigned int imagesPerRow, unsigned int imagesPerColumn )
 {
     // some checks
