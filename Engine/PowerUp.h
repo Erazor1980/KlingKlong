@@ -3,6 +3,7 @@
 #include "RectF.h"
 #include "Vec2.h"
 #include "Defines.h"
+#include "Sound.h"
 #include <chrono>
 
 enum ePowerUpType
@@ -19,15 +20,15 @@ class PowerUp
 {
 public:
     PowerUp() = default;
-    PowerUp( const float width_in, const float height_in, ePowerUpType type_in, const float boost_time, /* boost time in seconds */
-             const float level_bottom, int rowImagesSeq_in, int colImagesSeq_in );
-    bool Update( const RectF& paddleRect, const float dt );         /* returns true, when hit paddle */
+    PowerUp( const Vec2& centerPos_in, const float brickWidth, const float width_in, const float height_in, ePowerUpType type_in,
+             const float boost_time /* boost time in seconds */, const float level_bottom, int rowImagesSeq_in, int colImagesSeq_in, Sound& sound_in );
+    bool Update( const RectF& paddleRect, const float dt );         /* returns true, when hit paddle or the ground */
     void Draw( Graphics& gfx, const Surface& surfSeq ) const;
-    void Activate( const Vec2& pos_in, float brickWidth );  /* passing brickWidth to spawn centered (because width != brickWidth!) */
-    void DeActivate();
+    //void Activate( const Vec2& pos_in, float brickWidth );  
+    //void DeActivate();
     ePowerUpType GetType() const;
     float GetBoostTime() const;
-    bool IsActivated() const;
+    //bool IsActivated() const;
 private:
 #if EASY_MODE
     static constexpr float speed = 150;
@@ -39,9 +40,10 @@ private:
     float height;
     float boostTime;        /* how long does the effect last in seconds */
     ePowerUpType type;
+    Sound& sound;
 
     float levelBottom;      /* will be deactivated when this y-position is reached */
-    bool activated = false;
+    //bool activated = false;
 
     int idxSurfSeq = 0;   /* which image of the sequence will be displayed */
     int rowImagesSeq;       /* amount of subimages per row in the sequence image*/

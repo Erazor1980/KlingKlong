@@ -1,32 +1,34 @@
 #include "PowerUp.h"
 
-PowerUp::PowerUp( const float width_in, const float height_in, ePowerUpType type_in, 
-                  const float boost_time, const float level_bottom, int rowImagesSeq_in, int colImagesSeq_in )
+PowerUp::PowerUp( const Vec2& centerPos_in, const float brickWidth, const float width_in, const float height_in, ePowerUpType type_in,
+                  const float boost_time /* boost time in seconds */, const float level_bottom, int rowImagesSeq_in, int colImagesSeq_in, Sound& sound_in )
     :
     width( width_in ),
     height( height_in ),
     type( type_in ),
     boostTime( boost_time ),
-    activated( false ),
+    //activated( false ),
     levelBottom( level_bottom ),
     rowImagesSeq( rowImagesSeq_in ),
-    colImagesSeq( colImagesSeq_in )
+    colImagesSeq( colImagesSeq_in ),
+    sound( sound_in )
 {
+    pos.x = centerPos_in.x - width / 2.0f;
 }
 
 bool PowerUp::Update( const RectF& paddleRect, const float dt )
 {
-    if( !activated )
-    {
-        return false;
-    }
+    //if( !activated )
+    //{
+    //    return false;
+    //}
 
     pos.y += speed * dt;
 
     if( pos.y + height > levelBottom )
     {
-        activated = false;
-        return false;
+        //activated = false;
+        return true;
     }
 
     const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime;
@@ -43,7 +45,8 @@ bool PowerUp::Update( const RectF& paddleRect, const float dt )
 
     if( paddleRect.IsOverlappingWith( RectF( pos, width, height ) ) )
     {
-        activated = false;
+        //activated = false;
+        sound.Play( 1, 1.5f );
         return true;
     }
 
@@ -52,31 +55,31 @@ bool PowerUp::Update( const RectF& paddleRect, const float dt )
 
 void PowerUp::Draw( Graphics& gfx, const Surface& surfSeq ) const
 {
-    if( !activated )
-    {
-        return;
-    }
+    //if( !activated )
+    //{
+    //    return;
+    //}
 
     gfx.DrawSpriteKeyFromSequence( ( int )pos.x, ( int )pos.y, surfSeq, surfSeq.GetPixel( 0, 0 ), idxSurfSeq, rowImagesSeq, colImagesSeq );
     return;
 }
 
-void PowerUp::Activate( const Vec2& pos_in, float brickWidth )
-{
-    if( activated )
-    {
-        return;
-    }
-    pos = pos_in;
-    pos.x += ( brickWidth - width ) / 2;
-    activated = true;
-}
+//void PowerUp::Activate( const Vec2& pos_in, float brickWidth )
+//{
+//    if( activated )
+//    {
+//        return;
+//    }
+//    pos = pos_in;
+//    pos.x += ( brickWidth - width ) / 2;
+//    activated = true;
+//}
 
-void PowerUp::DeActivate()
-{
-    activated = false;
-    idxSurfSeq = 0;
-}
+//void PowerUp::DeActivate()
+//{
+//    activated = false;
+//    idxSurfSeq = 0;
+//}
 
 ePowerUpType PowerUp::GetType() const
 {
@@ -88,7 +91,7 @@ float PowerUp::GetBoostTime() const
     return boostTime;
 }
 
-bool PowerUp::IsActivated() const
-{
-    return activated;
-}
+//bool PowerUp::IsActivated() const
+//{
+//    return activated;
+//}
