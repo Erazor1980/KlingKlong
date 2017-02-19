@@ -8,10 +8,10 @@ public:
     LaserShot() = default;
     LaserShot( const Vec2& pos_in, float level_top );
 
-    void Update( float dt );
-    void Draw( Graphics& gfx );
-    void DeActivate();
-    bool IsActivated() const;
+    bool Update( float dt );    /* return true when left the game field */
+    void Draw( Graphics& gfx ) const;
+    //void DeActivate();
+    //bool IsActivated() const;
     RectF GetRect() const;
 private:
     static constexpr float speed = 700;
@@ -21,5 +21,5 @@ private:
     float halfHeight = 3;
 
     float levelTop;
-    bool activated = false;
+    //bool activated = false;
 };

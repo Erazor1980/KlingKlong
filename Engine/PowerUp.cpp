@@ -1,8 +1,8 @@
 #include "PowerUp.h"
 
-PowerUp::PowerUp( const Vec2& centerPos_in, const float brickWidth, const float width_in, const float height_in, ePowerUpType type_in,
-                  const float boost_time /* boost time in seconds */, const float level_bottom, int rowImagesSeq_in, int colImagesSeq_in, Sound& sound_in )
-    :
+PowerUp::PowerUp( const Vec2& centerPos_in, const float width_in, const float height_in, ePowerUpType type_in, const float boost_time /* boost time in seconds */,
+                  const float level_bottom, int rowImagesSeq_in, int colImagesSeq_in, Sound* const sound_in )
+    :    
     width( width_in ),
     height( height_in ),
     type( type_in ),
@@ -13,21 +13,17 @@ PowerUp::PowerUp( const Vec2& centerPos_in, const float brickWidth, const float 
     colImagesSeq( colImagesSeq_in ),
     sound( sound_in )
 {
+    pos = centerPos_in;
     pos.x = centerPos_in.x - width / 2.0f;
 }
 
-bool PowerUp::Update( const RectF& paddleRect, const float dt )
+bool PowerUp::Update( const RectF& paddleRect, const float dt, bool &paddleHit )
 {
-    //if( !activated )
-    //{
-    //    return false;
-    //}
-
     pos.y += speed * dt;
 
     if( pos.y + height > levelBottom )
     {
-        //activated = false;
+        paddleHit = false;
         return true;
     }
 
@@ -45,8 +41,12 @@ bool PowerUp::Update( const RectF& paddleRect, const float dt )
 
     if( paddleRect.IsOverlappingWith( RectF( pos, width, height ) ) )
     {
-        //activated = false;
-        sound.Play( 1, 1.5f );
+        if( sound )
+        {
+            sound->Play( 1, 1.5f );
+        }
+        
+        paddleHit = true;
         return true;
     }
 

@@ -64,7 +64,7 @@ private:
     void UpdateMultiBalls( int idxBallToDeactivate );
     void SpawnEnemy( const Vec2& pos = Vec2( Graphics::ScreenWidth / 2, Graphics::ScreenHeight / 2 ) );
 	/********************************/
-    GameState state = GameState::START_SCREEN;
+    GameState state = GameState::PLAYING;
 private:
 	MainWindow& wnd;
 	Graphics gfx;
@@ -104,7 +104,8 @@ private:
     //// POWER UPS /////
     ////////////////////
     static constexpr int nPowerUps = 5;             /* maximal number of powerups */
-    PowerUp powerUps[ nPowerUps ];
+    //PowerUp powerUps[ nPowerUps ];
+    std::vector< PowerUp > vPowerUps;
     Sound powerUpSounds[ nPowerUps ];
     /* laser */
     static constexpr int nMaxLaserShots = 20;           /* maximal number of laser shots */
@@ -116,6 +117,7 @@ private:
     /* multi ball */
     static constexpr int nMaxBalls = 3;           /* maximal number of balls */
     Ball balls[ nMaxBalls ];
+    std::vector< Ball > vBalls;
     bool multiBalls = false;
     int lastBallIdx = 0;
 

@@ -20,15 +20,12 @@ class PowerUp
 {
 public:
     PowerUp() = default;
-    PowerUp( const Vec2& centerPos_in, const float brickWidth, const float width_in, const float height_in, ePowerUpType type_in,
-             const float boost_time /* boost time in seconds */, const float level_bottom, int rowImagesSeq_in, int colImagesSeq_in, Sound& sound_in );
-    bool Update( const RectF& paddleRect, const float dt );         /* returns true, when hit paddle or the ground */
+    PowerUp( const Vec2& centerPos_in, const float width_in, const float height_in, ePowerUpType type_in, const float boost_time /* boost time in seconds */,
+             const float level_bottom, int rowImagesSeq_in, int colImagesSeq_in, Sound* const sound_in );
+    bool Update( const RectF& paddleRect, const float dt, bool &paddleHit );         /* returns true, when hit paddle or the ground */
     void Draw( Graphics& gfx, const Surface& surfSeq ) const;
-    //void Activate( const Vec2& pos_in, float brickWidth );  
-    //void DeActivate();
     ePowerUpType GetType() const;
     float GetBoostTime() const;
-    //bool IsActivated() const;
 private:
 #if EASY_MODE
     static constexpr float speed = 150;
@@ -40,7 +37,7 @@ private:
     float height;
     float boostTime;        /* how long does the effect last in seconds */
     ePowerUpType type;
-    Sound& sound;
+    Sound* sound;
 
     float levelBottom;      /* will be deactivated when this y-position is reached */
     //bool activated = false;

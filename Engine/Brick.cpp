@@ -83,7 +83,7 @@ bool Brick::CheckLaserCollision( LaserShot& laser )
         return false;
     }
 
-    laser.DeActivate();
+    //laser.DeActivate();
 
     if( type != UNDESTROYABLE )
     {

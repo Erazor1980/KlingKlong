@@ -3,45 +3,25 @@
 LaserShot::LaserShot( const Vec2& pos_in, float level_top )
     :
     pos( pos_in ),
-    levelTop( level_top ),
-    activated( true )
+    levelTop( level_top )
 {
 }
 
-void LaserShot::Update( float dt )
+bool LaserShot::Update( float dt )
 {
-    if( !activated )
-    {
-        return;
-    }
-
     pos.y -= speed * dt;
 
     if( pos.y - halfHeight <= levelTop )
     {
-        activated = false;
-        return;
+        return true;
     }
+    
+    return false;
 }
 
-void LaserShot::Draw( Graphics& gfx )
+void LaserShot::Draw( Graphics& gfx ) const
 {
-    if( !activated )
-    {
-       return;
-    }
-
     gfx.DrawRect( RectF::FromCenter( pos, halfWidth, halfHeight ), color );
-}
-
-void LaserShot::DeActivate()
-{
-    activated = false;
-}
-
-bool LaserShot::IsActivated() const
-{
-    return activated;
 }
 
 RectF LaserShot::GetRect() const

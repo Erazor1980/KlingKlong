@@ -26,7 +26,7 @@ Game::Game( MainWindow& wnd )
     :
     wnd( wnd ),
     gfx( wnd ),
-    klingKlong( gfx, state ),
+    klingKlong( gfx, state, walls, pad ), //, vBalls, vBricks, vPowerUps ),
     soundPad( L"Sounds\\arkpad.wav" ),
     soundBrick( L"Sounds\\arkbrick.wav" ),
     soundBrick2( L"Sounds\\arkbrick2.wav" ),
@@ -47,13 +47,13 @@ Game::Game( MainWindow& wnd )
     boostTimeIncrSize *= 2;
     boostTimeLaserGun *= 2;
 #endif
-    powerUps[ 0 ] = PowerUp( widthPU, heightPU, INCR_PADDLE_SIZE, boostTimeIncrSize, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1 );
-    powerUps[ 1 ] = PowerUp( widthPU, heightPU, EXTRA_LIFE, 0, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1 );
-    powerUps[ 2 ] = PowerUp( widthPU, heightPU, LASER_GUN, boostTimeLaserGun, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1 );
-    powerUps[ 3 ] = PowerUp( widthPU, heightPU, MULTI_BALL, 0, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1 );
-    powerUps[ 4 ] = PowerUp( ( float )PowerUpSequences[ 4 ].GetWidth() / 5.0f, ( float )PowerUpSequences[ 4 ].GetHeight() / 5.0f,
-                             SUPER_BALL, 5, walls.GetInnerBounds().bottom, 5, 5 );
-
+    //powerUps[ 0 ] = PowerUp( widthPU, heightPU, INCR_PADDLE_SIZE, boostTimeIncrSize, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1 );
+    //powerUps[ 1 ] = PowerUp( widthPU, heightPU, EXTRA_LIFE, 0, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1 );
+    //powerUps[ 2 ] = PowerUp( widthPU, heightPU, LASER_GUN, boostTimeLaserGun, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1 );
+    //powerUps[ 3 ] = PowerUp( widthPU, heightPU, MULTI_BALL, 0, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1 );
+    //powerUps[ 4 ] = PowerUp( ( float )PowerUpSequences[ 4 ].GetWidth() / 5.0f, ( float )PowerUpSequences[ 4 ].GetHeight() / 5.0f,
+    //                         SUPER_BALL, 5, walls.GetInnerBounds().bottom, 5, 5 );
+    
     powerUpSounds[ 0 ] = Sound( L"Sounds\\grow.wav" );
     powerUpSounds[ 1 ] = Sound( L"Sounds\\extraLife.wav" );
     // no sound for gun, because it directly starts to shoot
@@ -98,7 +98,7 @@ void Game::ResetGame()
     /////////////////
     //powerUps[ INCR_PADDLE_SIZE ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x, 100 ), brickWidth );
     //powerUps[ EXTRA_LIFE ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x + 30, 100 ), brickWidth );
-    //powerUps[ LASER_GUN ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x - 30, 100 ), brickWidth );
+    //powerUps[ LASER_GUN ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x - 30, 400 ), brickWidth );
     //powerUps[ MULTI_BALL ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x + 60, 100 ), brickWidth );
     //powerUps[ SUPER_BALL ].Activate( Vec2( walls.GetInnerBounds().GetCenter().x + 60, 100 ), brickWidth );
     //laserShots[ 0 ] = LaserShot( Vec2( 400, 500 ), walls.GetInnerBounds().top );
@@ -123,6 +123,9 @@ void Game::ResetBall()
     lastBallIdx = 0;
     balls[ 0 ] = Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ) , Vec2( -0.2f, -1 ), 5, 5 );
     balls[ 0 ].Stop();
+
+    vBalls.clear();
+    vBalls.push_back( balls[ 0 ] );
 }
 
 void Game::ResetPaddle()
@@ -134,7 +137,7 @@ void Game::ResetPowerUps()
 {
     for( int i = 0; i < nPowerUps; ++i )
     {
-        powerUps[ i ].DeActivate();
+        //powerUps[ i ].DeActivate();
     }
 }
 
@@ -238,31 +241,32 @@ void Game::CreatePowerUp( int curColIdx )
         powerUps[ 4 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
     }
 #else
-    if( rand() % 9 == 1 )  /* increased size */
-    {
-        powerUps[ 0 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
-    }
-    else if( lifes < MAX_LIFES && rand() % 9 == 1 )    /* extra life */
-    {
-        powerUps[ 1 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
-    }
-    else if( rand() % 9 == 1 )  /* laser gun */
-    {
-        powerUps[ 2 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
-    }
-    else if( !multiBalls && rand() % 9 == 1 )  /* multi ball */
-    {
-        powerUps[ 3 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
-    }
-    else if( !multiBalls && rand() % 20 == 1 )  /* super ball */    /* super ball has to be very rare! its just too powerfull */
-    {
-        powerUps[ 4 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
-    }
+    //if( rand() % 9 == 1 )  /* increased size */
+    //{
+    //    powerUps[ 0 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
+    //}
+    //else if( lifes < MAX_LIFES && rand() % 9 == 1 )    /* extra life */
+    //{
+    //    powerUps[ 1 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
+    //}
+    //else if( rand() % 9 == 1 )  /* laser gun */
+    //{
+    //    powerUps[ 2 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
+    //}
+    //else if( !multiBalls && rand() % 9 == 1 )  /* multi ball */
+    //{
+    //    powerUps[ 3 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
+    //}
+    //else if( !multiBalls && rand() % 20 == 1 )  /* super ball */    /* super ball has to be very rare! its just too powerfull */
+    //{
+    //    powerUps[ 4 ].Activate( bricks[ curColIdx ].GetCenter() - Vec2( brickWidth / 2, 0 ), brickWidth );
+    //}
 #endif
 }
 
 void Game::CreatePowerUp( const Vec2& pos )
 {
+#if 0
     /* check first, if there is at least one "free" power ups, so one, which is not falling */
     int freePowerUps[ nPowerUps ];
     int cntFreePU = 0;
@@ -301,6 +305,7 @@ void Game::CreatePowerUp( const Vec2& pos )
     }
 
     powerUps[ typePU ].Activate( pos, brickWidth );
+#endif
 }
 
 void Game::CreateNextLevel()
@@ -498,13 +503,13 @@ void Game::Go()
 
 void Game::UpdateModel( float dt )
 {
-#if !_DEBUG
-    klingKlong.Update( wnd.kbd );
+    klingKlong.Update( dt, wnd.kbd );
     if( GameState::EXIT_GAME == state )
     {
         wnd.Kill();
     }
-#endif
+    return;
+
 
     if( wnd.kbd.KeyIsPressed( VK_SPACE ) )
     {
@@ -569,7 +574,7 @@ void Game::UpdateModel( float dt )
         /////////////////
         //// PADDLE /////
         /////////////////
-        if( balls[ lastBallIdx ].GetState() != WAITING )
+        /*if( balls[ lastBallIdx ].GetState() != WAITING )
         {
             pad.Update( wnd.kbd, dt );
         }
@@ -580,12 +585,12 @@ void Game::UpdateModel( float dt )
             {
                 soundPad.Play();
             }
-        }        
+        }*/        
 
         //////////////////////
         //// LASER SHOTS /////
         //////////////////////
-        if( pad.HasLaserGun() )
+        /*if( pad.HasLaserGun() )
         {
             Shoot();
         }
@@ -610,88 +615,91 @@ void Game::UpdateModel( float dt )
                     numEnemies--;
                 }
             }
-        }
+        }*/
         
         ////////////////////
         //// POWER UPS /////
         ////////////////////
-        for( int i = 0; i < nPowerUps; ++i )
-        {
-            if( true == powerUps[ i ].Update( pad.GetRect(), dt ) )
-            {
-                powerUpSounds[ i ].Play( 1, 1.5F );
-                ApplyPowerUp( powerUps[ i ] );
-            }
-        }
+        //for( int i = 0; i < nPowerUps; ++i )
+        //{
+        //    if( true == powerUps[ i ].Update( pad.GetRect(), dt ) )
+        //    {
+        //        powerUpSounds[ i ].Play( 1, 1.5F );
+        //        ApplyPowerUp( powerUps[ i ] );
+        //    }
+        //}
 
         /////////////////
         //// BRICKS /////
         /////////////////
-        bool collisionHappened = false;
+       /* bool collisionHappened = false;
         float curColDistSq;
         int curColIdx;
-        int ballIdx;
+        int ballIdx;*/
         //for( int i = 0; i < nBricks; ++i )
-        for( int i = 0; i < vBricks.size(); ++i )
-        {
-            // ball collision
-            for( int b = 0; b < nMaxBalls; ++b )
-            {
-                //if( MOVING == balls[ b ].GetState() && bricks[ i ].CheckBallCollision( balls[ b ] ) )
-                if( MOVING == balls[ b ].GetState() && vBricks[ i ].CheckBallCollision( balls[ b ] ) )
-                {
-                    //const float newColDistSq = ( balls[ b ].GetPosition() - bricks[ i ].GetCenter() ).GetLengthSq();
-                    const float newColDistSq = ( balls[ b ].GetPosition() - vBricks[ i ].GetCenter() ).GetLengthSq();
-                    if( collisionHappened )
-                    {
-                        if( newColDistSq < curColDistSq )
-                        {
-                            curColDistSq = newColDistSq;
-                            curColIdx = i;
-                            ballIdx = b;
-                        }
-                    }
-                    else
-                    {
-                        curColDistSq = newColDistSq;
-                        curColIdx = i;
-                        ballIdx = b;
-                        collisionHappened = true;
-                    }
-                }
-            }
+        //for( int i = 0; i < vBricks.size(); ++i )
+        //{
+        //    // ball collision
+        //    for( int b = 0; b < nMaxBalls; ++b )
+        //    {
+        //        //if( MOVING == balls[ b ].GetState() && bricks[ i ].CheckBallCollision( balls[ b ] ) )
+        //        if( MOVING == balls[ b ].GetState() && vBricks[ i ].CheckBallCollision( balls[ b ] ) )
+        //        {
+        //            //const float newColDistSq = ( balls[ b ].GetPosition() - bricks[ i ].GetCenter() ).GetLengthSq();
+        //            const float newColDistSq = ( balls[ b ].GetPosition() - vBricks[ i ].GetCenter() ).GetLengthSq();
+        //            if( collisionHappened )
+        //            {
+        //                if( newColDistSq < curColDistSq )
+        //                {
+        //                    curColDistSq = newColDistSq;
+        //                    curColIdx = i;
+        //                    ballIdx = b;
+        //                }
+        //            }
+        //            else
+        //            {
+        //                curColDistSq = newColDistSq;
+        //                curColIdx = i;
+        //                ballIdx = b;
+        //                collisionHappened = true;
+        //            }
+        //        }
+        //    }
 
-            // laser collision
-            for( int ls = 0; ls < nMaxLaserShots; ++ls )
-            {
-                if( laserShots[ ls ].IsActivated() && bricks[ i ].CheckLaserCollision( laserShots[ ls ] ) )
-                {
-                    nBricksLeft--;
-                    CreatePowerUp( i );
-                }
-            }
-        }
-        if( collisionHappened )
-        {
-            //pad.ResetCooldown();
-            if( bricks[ curColIdx ].ExecuteBallCollision( balls[ ballIdx ] ) )
-            {
-                if( bricks[ curColIdx ].GetType() != UNDESTROYABLE )
-                {
-                    nBricksLeft--;
-                    CreatePowerUp( curColIdx );
-                }
-            }
-            
-            if( UNDESTROYABLE == bricks[ curColIdx ].GetType() )
-            {
-                soundBrick2.Play( 1.0f, 1.5f );
-            }
-            else
-            {
-                soundBrick.Play();
-            }            
-        }
+        //    // laser collision
+        //    for( int ls = 0; ls < nMaxLaserShots; ++ls )
+        //    {
+        //        //if( laserShots[ ls ].IsActivated() && bricks[ i ].CheckLaserCollision( laserShots[ ls ] ) )
+        //        if( laserShots[ ls ].IsActivated() && vBricks[ i ].CheckLaserCollision( laserShots[ ls ] ) )
+        //        {
+        //            nBricksLeft--;
+        //            CreatePowerUp( i );
+        //        }
+        //    }
+        //}
+        //if( collisionHappened )
+        //{
+        //    //if( bricks[ curColIdx ].ExecuteBallCollision( balls[ ballIdx ] ) )
+        //    if( vBricks[ curColIdx ].ExecuteBallCollision( balls[ ballIdx ] ) )
+        //    {
+        //        if( vBricks[ curColIdx ].GetType() != UNDESTROYABLE )
+        //        //if( bricks[ curColIdx ].GetType() != UNDESTROYABLE )
+        //        {
+        //            nBricksLeft--;
+        //            CreatePowerUp( curColIdx );
+        //        }
+        //    }
+        //    
+        //    //if( UNDESTROYABLE == bricks[ curColIdx ].GetType() )
+        //    if( UNDESTROYABLE == vBricks[ curColIdx ].GetType() )
+        //    {
+        //        soundBrick2.Play( 1.0f, 1.5f );
+        //    }
+        //    else
+        //    {
+        //        soundBrick.Play();
+        //    }            
+        //}
         if( nBricksLeft <= 0 )
         {
             soundVictory.Play();
@@ -789,17 +797,19 @@ void Game::DrawVictory()
 
 void Game::ComposeFrame()
 {
-    // background
-#if !_DEBUG
-    gfx.DrawSprite( 0, 0, Background );
     klingKlong.DrawScene();
     if( state != GameState::PLAYING )
     {
         return;
     }
+    return;
+    // background
+#if !_DEBUG
+    gfx.DrawSprite( 0, 0, Background );
 #endif
 
-    for( const Brick& b : bricks )
+    //for( const Brick& b : bricks )
+    for( const Brick& b : vBricks )
     {
         b.Draw( gfx );
     }
@@ -826,7 +836,7 @@ void Game::ComposeFrame()
 
         for( int i = 0; i < nPowerUps; ++i )
         {
-            powerUps[ i ].Draw( gfx, PowerUpSequences[ i ] );
+            //powerUps[ i ].Draw( gfx, PowerUpSequences[ i ] );
         }
 
         for( int i = 0; i < nMaxLaserShots; ++i )
@@ -838,5 +848,6 @@ void Game::ComposeFrame()
     {
         DrawVictory();
     }
-    //gfx.DrawString( "bla bla bla", 200, 200, font, fontSurface, Colors::White );
+        
+    gfx.DrawString( std::to_string( nBricksLeft ).c_str(), 800, 50, font, fontSurface, Colors::White );
 }
