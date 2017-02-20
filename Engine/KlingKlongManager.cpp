@@ -345,8 +345,7 @@ void KlingKlongManager::UpdateBricks( const float dt )
             if( vBricks[ bestCollisionIdx ].GetType() != UNDESTROYABLE )
             {
                 nBricksLeft--;
-                //TODO
-                //CreatePowerUp( curColIdx );
+                CreatePowerUp( vBricks[ bestCollisionIdx ].GetCenter(), false );
             }
             vBricks.erase( vBricks.begin() + bestCollisionIdx );
         }
@@ -405,7 +404,7 @@ void KlingKlongManager::UpdateLaserShots( const float dt )
     {
         auto e = vEnemies.begin();
         bool enemyKilled = false;   /* for the enemy iterator */
-        while( e != vEnemies.end() )
+        while( e != vEnemies.end() && it != vLaserShots.end() )
         {
             if( ( *e ).CheckForCollision( ( *it ).GetRect() ) )
             {
@@ -428,14 +427,12 @@ void KlingKlongManager::UpdateLaserShots( const float dt )
     }
 
     /* brick check */
-    //TODO hier weitermachen!!!
-    // kann sein, dass es hier crasht, wegen nem iterator
     it = vLaserShots.begin();
     while( it != vLaserShots.end() )
     {
         auto b = vBricks.begin();
         bool brickHit = false;
-        while( b != vBricks.end() )
+        while( b != vBricks.end() && it != vLaserShots.end() )
         {
             if( ( *b ).CheckLaserCollision( ( *it ) ) )
             {
@@ -456,17 +453,6 @@ void KlingKlongManager::UpdateLaserShots( const float dt )
             it++;
         }
     }
-    // laser collision
-    //for( int ls = 0; ls < nMaxLaserShots; ++ls )
-    //{
-    //    //if( laserShots[ ls ].IsActivated() && bricks[ i ].CheckLaserCollision( laserShots[ ls ] ) )
-    //    if( laserShots[ ls ].IsActivated() && vBricks[ i ].CheckLaserCollision( laserShots[ ls ] ) )
-    //    {
-    //        nBricksLeft--;
-    //        CreatePowerUp( i );
-    //    }
-    //}
-
 }
 
 void KlingKlongManager::ResetBall()
@@ -547,6 +533,8 @@ void KlingKlongManager::DrawScene()
         pad.Draw( gfx );
 
         gfx.DrawString( std::to_string( nBricksLeft ).c_str(), 800, 10, font, fontSurface, Colors::White );
+
+        gfx.DrawString( std::to_string( vLaserShots.size() ).c_str(), 600, 10, font, fontSurface, Colors::White );
     }
     break;
     case GameState::VICTORY_SCREEN:
