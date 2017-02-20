@@ -13,11 +13,6 @@ Ball::Ball( const Vec2& pos_in, const Vec2& dir_in, int rowImagesSeq_in, int col
 
 void Ball::Draw( Graphics& gfx, const Surface& surfSeq ) const
 {
-    if( INACTIVE == ballState )
-    {
-        return;
-    }
-
     // draw ball direction line when stopped
     if( ballState != MOVING )
     {
@@ -50,11 +45,6 @@ void Ball::Draw( Graphics& gfx, const Surface& surfSeq ) const
 
 void Ball::Update( float dt, const float paddleCenterX, const Keyboard& kbd )
 {
-    if( INACTIVE == ballState )
-    {
-        return;
-    }
-
     if( MOVING == ballState )
     {
         pos += dir.GetNormalized() * dt * speed;
@@ -100,39 +90,35 @@ void Ball::Update( float dt, const float paddleCenterX, const Keyboard& kbd )
     }
 }
 
-int Ball::DoWallCollision( const RectF& walls, const RectF& paddle )
+Ball::eBallWallColRes Ball::DoWallCollision( const RectF& walls, const RectF& paddle )
 {
-    if( INACTIVE == ballState )
-    {
-        return 0;
-    }
     bool padBounce = paddle.IsOverlappingWith( GetRect() );
 
-    int collisionResult = 0;
+    eBallWallColRes collisionResult = NOTHING;
     const RectF rect = GetRect();
     if( rect.left < walls.left )
     {
         pos.x += walls.left - rect.left;
         ReboundX( padBounce );
-        collisionResult = 1;
+        collisionResult = WALL_HIT;
     }
     else if( rect.right > walls.right )
     {
         pos.x -= rect.right - walls.right;
         ReboundX( padBounce );
-        collisionResult = 1;
+        collisionResult = WALL_HIT;
     }
     if( rect.top < walls.top )
     {
         pos.y += walls.top - rect.top;
         ReboundY( padBounce );
-        collisionResult = 1;
+        collisionResult = WALL_HIT;
     }
     else if( rect.bottom > walls.bottom )
     {
         pos.y -=  rect.bottom - walls.bottom;
         ReboundY( padBounce );
-        collisionResult = 2;
+        collisionResult = BOTTOM_HIT;
     }    
 
     return collisionResult;
@@ -178,28 +164,16 @@ void Ball::SetDirection( const Vec2& dir_in, bool padCooldown )
 
 void Ball::Start()
 {
-    if( INACTIVE == ballState )
-    {
-        return;
-    }
     ballState = MOVING;
 }
 
 void Ball::Stop()
 {
-    if( INACTIVE == ballState )
-    {
-        return;
-    }
     ballState = WAITING;
 }
 
 void Ball::StickToPaddle( const float paddleCenterX )
 {
-    if( INACTIVE == ballState )
-    {
-        return;
-    }
     offsetToPaddleCenter = pos.x - paddleCenterX;
     ballState = STICKING;
 }
@@ -211,10 +185,6 @@ bool Ball::HasPaddleCooldown() const
 
 void Ball::ActivateSuperBall( const float duration, float newRadius )
 {
-    if( INACTIVE == ballState )
-    {
-        return;
-    }
     superBallActive = true;
 
     if( WAITING == ballState )

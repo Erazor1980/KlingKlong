@@ -26,23 +26,24 @@ class KlingKlongManager
 {
 public:
     KlingKlongManager( Graphics& gfx_in, GameState& gameState_in, const Walls& walls_in, Paddle& pad_in );
-                       //,std::vector< Ball >& vBalls_in, std::vector< Brick >& vBricks_in, std::vector< PowerUp >& vPowerUps_in );
 
     void Update( const float dt, Keyboard& kbd );
     void DrawScene();
 private:
     void UpdateStartScreen( Keyboard& kbd );
-    void KeyHandling( Keyboard& kbd );      /* while playing */
+    void KeyHandling( Keyboard& kbd );
     void ApplyPowerUp( const PowerUp& pu );
     void CreateMultiBalls();
     void CreatePowerUp( const Vec2& pos, const bool enemyKilled );
     void AddPowerUp( const ePowerUpType& type, const Vec2& posToSpawn );
     void ShootLaser();
+    void SpawnEnemy( const Vec2& pos = Vec2( Graphics::ScreenWidth / 2, Graphics::ScreenHeight / 2 ) );
     void UpdateBalls( const float dt, Keyboard& kbd );
     void UpdatePaddle( const float dt, Keyboard& kbd );
     void UpdateBricks( const float dt );
     void UpdatePowerUps( const float dt );
     void UpdateLaserShots( const float dt );
+    void UpdateEnemies( const float dt );
 
     void ResetGame();
     void ResetBall();
@@ -112,11 +113,12 @@ private:
     float timeBetweenEnemies = 10;  /* in seconds */
 #endif
 
+    float timeBetweenLevels = 3;    /* in seconds */
     /* TIMER */
     std::chrono::steady_clock::time_point startTime_enemySpawn;
     std::chrono::steady_clock::time_point startTime_shot;
     std::chrono::steady_clock::time_point startTime_explosion;
-
+    std::chrono::steady_clock::time_point startTime_levelFinished;
 
     bool startedShooting = false;
     static constexpr float timeBetweenShots = 0.35f;     /* in seconds */

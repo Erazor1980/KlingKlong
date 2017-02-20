@@ -476,15 +476,15 @@ void Game::SpawnEnemy( const Vec2& pos )
         return;
     }
     numEnemies++;
-    for( int e = 0; e < MAX_ENEMIES; ++e )
-    {
-        if( !enemies[ e ].IsActivated() )
-        {
-            enemies[ e ] = Enemy( seqEnemy.GetWidth() / 5.0f, seqEnemy.GetHeight() / 5.0f, walls.GetInnerBounds(), 5, 5 );
-            enemies[ e ].Activate( walls.GetInnerBounds().GetCenter() );
-            return;
-        }
-    }
+    //for( int e = 0; e < MAX_ENEMIES; ++e )
+    //{
+    //    if( !enemies[ e ].IsActivated() )
+    //    {
+    //        enemies[ e ] = Enemy( seqEnemy.GetWidth() / 5.0f, seqEnemy.GetHeight() / 5.0f, walls.GetInnerBounds(), 5, 5 );
+    //        enemies[ e ].Activate( walls.GetInnerBounds().GetCenter() );
+    //        return;
+    //    }
+    //}
 }
 
 void Game::Go()
@@ -533,7 +533,7 @@ void Game::UpdateModel( float dt )
         //////////////////
         for( int e = 0; e < MAX_ENEMIES; ++e )
         {
-            if( !enemies[ e ].IsActivated() )
+            //if( !enemies[ e ].IsActivated() )
             {
                 continue;
             }

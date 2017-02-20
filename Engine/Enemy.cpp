@@ -1,31 +1,27 @@
 #include "Enemy.h"
 
-Enemy::Enemy( const float width_in, const float height_in, const RectF& walls_in, int rowImagesSeq_in, int colImagesSeq_in )
+Enemy::Enemy( const Vec2& pos_in, const float width_in, const float height_in, const RectF& walls_in, int rowImagesSeq_in, int colImagesSeq_in )
     :
     walls( walls_in ),
     rowImagesSeq( rowImagesSeq_in ),
     colImagesSeq( colImagesSeq_in ),
     width( width_in ),
     height( height_in ),
-    activated( false )
+    pos( pos_in )
 {
+    do
+    {
+        dir = Vec2( rand() % 100 - 50 + 10.0f, rand() % 100 - 50 + 10.0f );
+    } while( abs( dir.x ) < 10 && abs( dir.y ) < 10 );
 }
 
 void Enemy::Draw( Graphics& gfx, const Surface& surfSeq ) const
 {
-    if( !activated )
-    {
-        return;
-    }
     gfx.DrawSpriteKeyFromSequence( ( int )pos.x, ( int )pos.y, surfSeq, surfSeq.GetPixel( 0, 0 ), idxSurfSeq, rowImagesSeq, colImagesSeq );
 }
 
 void Enemy::Update( float dt )
 {
-    if( !activated )
-    {
-        return;
-    }
     pos += dir.GetNormalized() * dt * speed;
 
     DoWallCollision();
@@ -44,13 +40,8 @@ void Enemy::Update( float dt )
 
 bool Enemy::CheckForCollision( const RectF& otherRect )
 {
-    if( !activated )
-    {
-        return false;
-    }
     if( GetRect().IsOverlappingWith( otherRect ) )
     {
-        activated = false;
         return true;
     }
     return false;
@@ -64,21 +55,6 @@ RectF Enemy::GetRect() const
 Vec2 Enemy::GetPos() const
 {
     return pos;
-}
-
-void Enemy::Activate( const Vec2& pos_in )
-{
-    pos = pos_in;
-    do
-    {
-        dir = Vec2( rand() % 100 - 50 + 10.0f, rand() % 100 - 50 + 10.0f );
-    } while( abs( dir.x ) < 10 && abs( dir.y ) < 10 );
-    activated = true;
-}
-
-bool Enemy::IsActivated() const
-{
-    return activated;
 }
 
 void Enemy::DoWallCollision()

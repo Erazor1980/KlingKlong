@@ -2,15 +2,11 @@
 #include <ctime>
 
 KlingKlongManager::KlingKlongManager( Graphics& gfx_in, GameState& gameState_in, const Walls& walls_in, Paddle& pad_in )
-                                      //,std::vector< Ball >& vBalls_in, std::vector< Brick >& vBricks_in, std::vector< PowerUp >& vPowerUps_in )
     :
     gfx( gfx_in ),
     gameState( gameState_in ),
     walls( walls_in ),
     pad( pad_in )
-    /*,vBalls( vBalls_in ),
-    vBricks( vBricks_in ),
-    vPowerUps( vPowerUps_in )    */
 {
     startScreenCnt = 3;
 
@@ -46,16 +42,21 @@ void KlingKlongManager::ResetGame()
     // explosion sequence
     explSeqIdx = 0;
 
+    // reset timer
+    startTime_shot          = std::chrono::steady_clock::now();
+    startTime_enemySpawn    = std::chrono::steady_clock::now();
 
     /////////////////
     //// TESTING ////
     /////////////////
-    AddPowerUp( INCR_PADDLE_SIZE, Vec2( 450, 100 ) );
+    //AddPowerUp( INCR_PADDLE_SIZE, Vec2( 450, 100 ) );
     //AddPowerUp( EXTRA_LIFE, Vec2( 450, 100 ) );
     //AddPowerUp( LASER_GUN, Vec2( 450, 100 ) );
     //AddPowerUp( MULTI_BALL, Vec2( 450, 100 ) );
     //AddPowerUp( SUPER_BALL, Vec2( 450, 100 ) );
+    //vBalls[ 0 ].StickToPaddle( pad.GetRect().GetCenter().x );
 }
+
 void KlingKlongManager::Update( const float dt, Keyboard& kbd )
 {
     switch( gameState )
@@ -73,7 +74,51 @@ void KlingKlongManager::Update( const float dt, Keyboard& kbd )
         UpdatePowerUps( dt );
         UpdateBricks( dt );
         UpdateLaserShots( dt );
+        UpdateEnemies( dt );
+
+        if( 0 == lifes )
+        {
+            soundGameOver.Play();
+            gameState = GameState::GAME_OVER;
+        }
+        else if( 0 == nBricksLeft )
+        {
+            soundVictory.Play();
+            gameState = GameState::VICTORY_SCREEN;
+            startTime_levelFinished = std::chrono::steady_clock::now();
+        }
     }
+    break;
+    case GameState::GAME_OVER:
+    {
+        const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime_explosion;
+        if( timeElapsed.count() > 0.15 )
+        {
+            explSeqIdx++;
+            startTime_explosion = std::chrono::steady_clock::now();
+        }
+        if( explSeqIdx >= 4 )
+        {
+            KeyHandling( kbd );
+        }
+    }
+    break;
+    case GameState::VICTORY_SCREEN:
+    {
+        // next level
+        const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime_levelFinished;
+        if( timeElapsed.count() > timeBetweenLevels )
+        {
+            level++;
+            ResetPaddle();
+            ResetBall();
+            vPowerUps.clear();
+            vLaserShots.clear();
+            vEnemies.clear();
+            CreateNextLevel();
+        }        
+    }
+    break;
     default:
         break;
     }
@@ -160,22 +205,27 @@ void KlingKlongManager::KeyHandling( Keyboard& kbd )
         {
             if( e.GetCode() == VK_ESCAPE )
             {
+                if( GameState::GAME_OVER == gameState )
+                {
+                    ResetGame();
+                }
                 gameState = GameState::START_SCREEN;
             }
-        }
-    }
-
-    if( kbd.KeyIsPressed( VK_SPACE ) )
-    {
-        for( Ball& b : vBalls )
-        {
-            b.Start();
         }
     }
 
     if( kbd.KeyIsPressed( VK_RETURN ) )
     {
         ResetGame();
+        gameState = GameState::PLAYING;
+    }
+
+    if( GameState::PLAYING == gameState && kbd.KeyIsPressed( VK_SPACE ) )
+    {
+        for( Ball& b : vBalls )
+        {
+            b.Start();
+        }
     }
 }
 
@@ -314,31 +364,31 @@ void KlingKlongManager::CreatePowerUp( const Vec2& pos, const bool enemyKilled )
         switch( ( ePowerUpType ) typePU )
         {
         case INCR_PADDLE_SIZE:
-            if( rand() % 7 == 1 )
+            if( rand() % 5 == 1 )
             {
                 AddPowerUp( INCR_PADDLE_SIZE, posToSpawn );
             }
             break;
         case EXTRA_LIFE:
-            if( rand() % 7 == 1 )
+            if( rand() % 5 == 1 )
             {
                 AddPowerUp( EXTRA_LIFE, posToSpawn );
             }
             break;
         case LASER_GUN:
-            if( rand() % 7 == 1 )
+            if( rand() % 5 == 1 )
             {
                 AddPowerUp( LASER_GUN, posToSpawn );
             }
             break;
         case MULTI_BALL:
-            if( rand() % 7 == 1 )
+            if( rand() % 5 == 1 )
             {
                 AddPowerUp( MULTI_BALL, posToSpawn );
             }
             break;
         case SUPER_BALL:
-            if( rand() % 20 == 1 )
+            if( rand() % 15 == 1 )
             {
                 AddPowerUp( SUPER_BALL, posToSpawn );
             }
@@ -403,26 +453,74 @@ void KlingKlongManager::ShootLaser()
     }
 }
 
-void KlingKlongManager::UpdateBalls( const float dt, Keyboard & kbd )
+void KlingKlongManager::SpawnEnemy( const Vec2& pos )
 {
-    for( Ball& b : vBalls )
+    if( vEnemies.size() >= MAX_ENEMIES )
     {
-        b.Update( dt, 200, kbd );
-        b.DoWallCollision( walls.GetInnerBounds(), pad.GetRect() );
+        return;
+    }
 
-        //TODO
-        //enemy collision test!
+    vEnemies.push_back( Enemy( pos, seqEnemy.GetWidth() / 5.0f, seqEnemy.GetHeight() / 5.0f, walls.GetInnerBounds(), 5, 5 ) );
+}
+
+void KlingKlongManager::UpdateBalls( const float dt, Keyboard& kbd )
+{
+    auto b = vBalls.begin();
+    while( b != vBalls.end() )
+    {
+        ( *b ).Update( dt, pad.GetRect().GetCenter().x, kbd );
+        // check for enemy kills
+        auto e = vEnemies.begin();
+        while( e != vEnemies.end() )
+        {
+            if( ( *e ).CheckForCollision( ( *b ).GetRect() ) )
+            {
+                soundKillEnemy.Play();
+                CreatePowerUp( ( *e ).GetPos(), true );
+
+                e = vEnemies.erase( e );
+            }
+            else
+            {
+                e++;
+            }
+        }
+
+        // wall collision check
+        Ball::eBallWallColRes res = ( *b ).DoWallCollision( walls.GetInnerBounds(), pad.GetRect() );
+
+        if( Ball::eBallWallColRes::BOTTOM_HIT == res )
+        {
+            b = vBalls.erase( b );
+        }
+        else
+        {
+            b++;
+        }
+    }
+
+    if( vBalls.size() == 0 )
+    {
+        lifes--;
+        ResetPaddle();
+        vPowerUps.clear();
+        vLaserShots.clear();
+        soundLifeLoss.Play();
+
+        ResetBall();
     }
 }
 
 void KlingKlongManager::UpdatePaddle( const float dt, Keyboard & kbd )
 {
-    //if( balls[ lastBallIdx ].GetState() != WAITING )
     if( vBalls.size() > 0 )
     {
-        pad.Update( kbd, dt );
+        if( vBalls[ 0 ].GetState() != WAITING )
+        {
+            pad.Update( kbd, dt );
+        }
     }
-
+    
     pad.DoWallCollision( walls.GetInnerBounds() );
     for( Ball& b : vBalls )
     {
@@ -593,6 +691,37 @@ void KlingKlongManager::UpdateLaserShots( const float dt )
     }
 }
 
+void KlingKlongManager::UpdateEnemies( const float dt )
+{
+    const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime_enemySpawn;
+    if( timeElapsed.count() > timeBetweenEnemies )
+    {
+        SpawnEnemy();
+        startTime_enemySpawn = std::chrono::steady_clock::now();
+    }
+
+    auto e = vEnemies.begin();
+    while( e != vEnemies.end() )
+    {
+        ( *e ).Update( dt );
+
+        if( ( *e ).CheckForCollision( pad.GetRect() ) )
+        {
+            lifes--;
+            startTime_enemySpawn = std::chrono::steady_clock::now();
+            if( lifes > 0 )
+            {
+                soundEnemyHit.Play();
+            }
+            e = vEnemies.erase( e );
+        }
+        else
+        {
+            e++;
+        }
+    }
+}
+
 void KlingKlongManager::ResetBall()
 {
     vBalls.clear();
@@ -667,18 +796,46 @@ void KlingKlongManager::DrawScene()
         {
             l.Draw( gfx );
         }
+        for( const Enemy& e : vEnemies )
+        {
+            e.Draw( gfx, seqEnemy );
+        }
 
         pad.Draw( gfx );
+        pad.DrawAsLifesRemaining( gfx, lifes, Vec2( walls.GetInnerBounds().left, 15 ), 0.3f );
 
-        gfx.DrawString( std::to_string( nBricksLeft ).c_str(), 800, 10, font, fontSurface, Colors::White );
+        gfx.DrawString( std::to_string( vEnemies.size() ).c_str(), 400, gfx.ScreenHeight - 30, font, fontSurface, Colors::White );
+        gfx.DrawString( std::to_string( vLaserShots.size() ).c_str(), 600, gfx.ScreenHeight - 30, font, fontSurface, Colors::White );
+        gfx.DrawString( std::to_string( nBricksLeft ).c_str(), 800, gfx.ScreenHeight - 30, font, fontSurface, Colors::White );
 
-        gfx.DrawString( std::to_string( vLaserShots.size() ).c_str(), 600, 10, font, fontSurface, Colors::White );
+        std::string lvlTxt = "Level " + std::to_string( level + 1 );
+        gfx.DrawString( lvlTxt.c_str(), 700, 10, font, fontSurface, Colors::White );
     }
     break;
     case GameState::VICTORY_SCREEN:
-        break;
+    {
+    }
+    break;
     case GameState::GAME_OVER:
-        break;
+    {
+        for( const Brick& b : vBricks )
+        {
+            b.Draw( gfx );
+        }
+        if( explSeqIdx > 3 )
+        {
+            const int x = ( Graphics::ScreenWidth - sur_GameOver.GetWidth() ) / 2;
+            const int y = ( Graphics::ScreenHeight - sur_GameOver.GetHeight() ) / 2;
+            gfx.DrawSpriteKey( x, y, sur_GameOver, sur_GameOver.GetPixel( 0, 0 ) );
+        }
+        else
+        {
+            const float x = pad.GetRect().GetCenter().x - PadExplosion[ explSeqIdx ].GetWidth() / 2;
+            const float y = pad.GetRect().GetCenter().y - PadExplosion[ explSeqIdx ].GetHeight() / 2;
+            gfx.DrawSpriteKey( ( int )x, ( int )y, PadExplosion[ explSeqIdx ], PadExplosion[ explSeqIdx ].GetPixel( 0, 0 ) );
+        }
+    }
+    break;
 
     default:
         break;

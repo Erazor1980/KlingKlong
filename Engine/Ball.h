@@ -11,18 +11,26 @@ enum eBallState
     MOVING = 0, /* ball moving in game */
     WAITING,    /* starting game / after life loss -> direction can be changed */
     STICKING,   /* stuck to paddle -> moving with paddle */
-    INACTIVE    /* for multi ball power up */
+    INACTIVE
 };
 
 class Ball
 {
+public:
+    enum eBallWallColRes
+    {
+        NOTHING = 0,
+        WALL_HIT,
+        BOTTOM_HIT
+    };
 public:
     Ball() = default;
     Ball( const Vec2& pos_in, const Vec2& dir_in, int rowImagesSeq_in, int colImagesSeq_in );   /* sequence parameter for the super ball sequence! */
     void Draw( Graphics& gfx, const Surface& surfSeq ) const;
     void Update( float dt, const float paddleCenterX, const Keyboard& kbd );
     /* return 0 = nothing, 1 = hit wall, 2 = hit bottom */
-    int DoWallCollision( const RectF& walls, const RectF& paddle );
+   
+    eBallWallColRes DoWallCollision( const RectF& walls, const RectF& paddle );
     void ReboundX( bool paddleBounce = false );
     void ReboundY( bool paddleBounce = false );
     RectF GetRect() const;
