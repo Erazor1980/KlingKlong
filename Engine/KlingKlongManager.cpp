@@ -20,12 +20,11 @@ std::vector< std::string > LoadTextFile( std::string filename )
     return std::move( text );
 }
 
-KlingKlongManager::KlingKlongManager( Graphics& gfx_in, GameState& gameState_in, const Walls& walls_in, Paddle& pad_in )
+KlingKlongManager::KlingKlongManager( Graphics& gfx_in, GameState& gameState_in, const Walls& walls_in )
     :
     gfx( gfx_in ),
     gameState( gameState_in ),
-    walls( walls_in ),
-    pad( pad_in )
+    walls( walls_in )
 {
     //startScreenCnt = 3;
 

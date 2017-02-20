@@ -25,7 +25,7 @@ enum class GameState
 class KlingKlongManager
 {
 public:
-    KlingKlongManager( Graphics& gfx_in, GameState& gameState_in, const Walls& walls_in, Paddle& pad_in );
+    KlingKlongManager( Graphics& gfx_in, GameState& gameState_in, const Walls& walls_in );
 
     void Update( const float dt, Keyboard& kbd );
     void DrawScene();
@@ -136,7 +136,7 @@ private:
     int nBricksLeft = 0;
 
     //Font font;
-    Paddle& pad;
+    Paddle pad;
     GameState& gameState;
     Graphics& gfx;
     const Walls& walls;
