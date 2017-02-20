@@ -1,6 +1,25 @@
 #include "KlingKlongManager.h"
 #include <ctime>
 
+#include <fstream>
+// laoding level design from file
+std::vector< std::string > LoadTextFile( std::string filename )
+{
+    std::fstream txtfile( filename.c_str() );
+    assert( txtfile.good() );
+    std::vector<std::string> text;
+    if( txtfile.good() )
+    {
+        std::string str;
+        while( std::getline( txtfile, str ) )
+        {
+            text.push_back( str );
+        }
+        txtfile.close();
+    }
+    return std::move( text );
+}
+
 KlingKlongManager::KlingKlongManager( Graphics& gfx_in, GameState& gameState_in, const Walls& walls_in, Paddle& pad_in )
     :
     gfx( gfx_in ),
@@ -9,6 +28,8 @@ KlingKlongManager::KlingKlongManager( Graphics& gfx_in, GameState& gameState_in,
     pad( pad_in )
 {
     startScreenCnt = 3;
+
+    allLevels = LoadTextFile( "level.txt" );
 
     ResetGame();
 }
@@ -858,115 +879,88 @@ void KlingKlongManager::DrawScene()
 
 void KlingKlongManager::CreateNextLevel()
 {
-    if( level > 2 )
+    if( level > 4 )
     {
         level = 0;
     }
-
     /* clear all bricks first */
     vBricks.clear();
 
     float fieldWidth    = walls.GetInnerBounds().right - walls.GetInnerBounds().left;
-    int nBricksAcross   = 14;
-    int nBricksDown     = 4;
+    int nBricksAcross   = 12;
+    int nBricksDown     = 8;
 
     float brickWidth    = fieldWidth / nBricksAcross;
     float brickHeight   = 22.0f;
-
-    const Color brickColors[ 4 ] = { { 230, 0, 0 },{ 0, 230, 0 },{ 0, 0, 230 },{ 0, 230 ,230 } };
-
     const Vec2 topLeft( walls.GetInnerBounds().left + 1, walls.GetInnerBounds().top + 1 );
-    if( 0 == level )
-    {
-        nBricksLeft = 0;
-        for( int y = 0; y < nBricksDown; ++y )
-        {
-            const Color c = brickColors[ y ];
-            for( int x = 0; x < nBricksAcross; ++x )
-            {
-                if( 0 == x || nBricksAcross - 1 == x )
-                {
-                    vBricks.push_back( Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
-                                                                    brickWidth, brickHeight ), Colors::LightGray, UNDESTROYABLE ) );
-                }
-                else
-                {
-                    if( 0 == y && x % 2 )
-                    {
-                        vBricks.push_back( Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c, SOLID, 2 ) );
-                        nBricksLeft++;
-                    }
-                    else
-                    {
-                        vBricks.push_back( Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c ) );
-                        nBricksLeft++;
-                    }
-                }                
-            }
-        }
-        nBricksLeft = 1;
-    }
-    else if( 1 == level )
-    {
-        nBricksLeft = 0;
-        for( int y = 0; y < nBricksDown; ++y )
-        {
-            const Color c = brickColors[ 3 - y ];
-            for( int x = 0; x < nBricksAcross; ++x )
-            {
-                if( y % 2 - 1 && x % 2 - 1 )
-                {
-                    // empty space
-                }
-                else
-                {
-                    if( ( 0 == y || 2 == y ) && x % 2 )
-                    {
-                        vBricks.push_back( Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c, SOLID, 2 ) );
-                        nBricksLeft++;
-                    }
-                    else
-                    {
-                        vBricks.push_back( Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c ) );
-                        nBricksLeft++;
-                    }
-                }
-            }
-        }
 
-        /*vBricks.push_back( Brick( RectF( topLeft + Vec2( -brickWidth, ( nBricksDown - 1 ) * brickHeight ),
-                                    brickWidth, brickHeight ), Colors::LightGray, UNDESTROYABLE ) );
-        vBricks.push_back( Brick( RectF( topLeft + Vec2( nBricksAcross * brickWidth, ( nBricksDown - 1 ) * brickHeight ),
-                                    brickWidth, brickHeight ), Colors::LightGray, UNDESTROYABLE ) );*/
+    nBricksLeft = 0;
+    
+    const int startRow = level * ( nBricksDown + 1 ) + 1;
+    float y = 0;
+    for( size_t r = startRow; r < startRow + nBricksDown; r++ )
+    {
+        for( size_t c = 0; c < nBricksAcross; c++ )
+        {
+            switch( allLevels[ r ][ c ] )
+            {
+            case 'R':   // solid red brick (2 life)
+            {
+                vBricks.push_back( Brick( RectF( topLeft + Vec2( c * brickWidth, y * brickHeight ), brickWidth, brickHeight ), { 230, 0, 0 }, SOLID, 2 ) );
+                nBricksLeft++;
+            }
+            break;
+            case 'r':   // red brick
+            {
+                vBricks.push_back( Brick( RectF( topLeft + Vec2( c * brickWidth, y * brickHeight ), brickWidth, brickHeight ), { 230, 0, 0 } ) );
+                nBricksLeft++;
+            }
+            break;
+            case 'G':   // solid green brick (2 life)
+            {
+                vBricks.push_back( Brick( RectF( topLeft + Vec2( c * brickWidth, y * brickHeight ), brickWidth, brickHeight ), { 0, 230, 0 }, SOLID, 2 ) );
+                nBricksLeft++;
+            }
+            break;
+            case 'g':   // green brick
+            {
+                vBricks.push_back( Brick( RectF( topLeft + Vec2( c * brickWidth, y * brickHeight ), brickWidth, brickHeight ), { 0, 230, 0 } ) );
+                nBricksLeft++;
+            }
+            break;
+            case 'B':   // solid blue brick (2 life)
+            {
+                vBricks.push_back( Brick( RectF( topLeft + Vec2( c * brickWidth, y * brickHeight ), brickWidth, brickHeight ), { 0, 0, 230 }, SOLID, 2 ) );
+                nBricksLeft++;
+            }
+            break;
+            case 'b':   // blue brick
+            {
+                vBricks.push_back( Brick( RectF( topLeft + Vec2( c * brickWidth, y * brickHeight ), brickWidth, brickHeight ), { 0, 0, 230 } ) );
+                nBricksLeft++;
+            }
+            break;
+            case 'Y':   // solid yellow brick (2 life)
+            {
+                vBricks.push_back( Brick( RectF( topLeft + Vec2( c * brickWidth, y * brickHeight ), brickWidth, brickHeight ), { 0, 230, 230 }, SOLID, 2 ) );
+                nBricksLeft++;
+            }
+            break;
+            case 'y':   // yellow brick
+            {
+                vBricks.push_back( Brick( RectF( topLeft + Vec2( c * brickWidth, y * brickHeight ), brickWidth, brickHeight ), { 0, 230, 230 } ) );
+                nBricksLeft++;
+            }
+            break;
+            case 'U':   // undestroyable brick
+            {
+                vBricks.push_back( Brick( RectF( topLeft + Vec2( c * brickWidth, y * brickHeight ), brickWidth, brickHeight ), Colors::LightGray, UNDESTROYABLE ) );
+            }
+            break;
+            default:
+                break;
+            };
+        }
+        y++;
     }
-    //else if( 2 == level )
-    //{
-    //    nBricksLeft = 0;
-    //    for( int y = 0; y < nBricksDown; ++y )
-    //    {
-    //        const Color c = brickColors[ 3 - y ];
-    //        for( int x = 0; x < nBricksAcross; ++x )
-    //        {
-    //            if( 3 == y && ( x < 3 || x > 9 ) )
-    //            {
-    //                bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
-    //                                                                brickWidth, brickHeight ), Colors::LightGray, UNDESTROYABLE );
-    //            }
-    //            else
-    //            {
-    //                if( ( 0 == y || 2 == y ) && x % 2 )
-    //                {
-    //                    bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
-    //                                                                    brickWidth, brickHeight ), c, SOLID, 2 );
-    //                    nBricksLeft++;
-    //                }
-    //                else
-    //                {
-    //                    bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c );
-    //                    nBricksLeft++;
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
 }

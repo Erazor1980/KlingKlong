@@ -132,6 +132,7 @@ private:
 
     int lifes = MAX_LIFES;
     int level = 0;
+    std::vector< std::string > allLevels;
     int nBricksLeft = 0;
 
     //Font font;
