@@ -50,20 +50,11 @@ void KlingKlongManager::ResetGame()
     /////////////////
     //// TESTING ////
     /////////////////
-    const float widthPU     = ( float )PowerUpSequences[ 0 ].GetWidth() / nSubImagesInSequence;
-    const float heightPU    = ( float )PowerUpSequences[ 0 ].GetHeight();
-
-    float boostTimeIncrSize = 5;
-    float boostTimeLaserGun = 4;
-#if EASY_MODE
-    boostTimeIncrSize *= 2;
-    boostTimeLaserGun *= 2;
-#endif
-    //vPowerUps.push_back( PowerUp( Vec2( 300, 100 ), widthPU, heightPU, INCR_PADDLE_SIZE, boostTimeIncrSize, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1, &soundPU_incrSize ) );
-    //vPowerUps.push_back( PowerUp( Vec2( 450, 100 ), widthPU, heightPU, EXTRA_LIFE, 0, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1, &soundPU_extraLife ) );
-    vPowerUps.push_back( PowerUp( Vec2( 450, 100 ), widthPU, heightPU, LASER_GUN, boostTimeLaserGun, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1, NULL ) );
-    //vPowerUps.push_back( PowerUp( Vec2( 450, 100 ), widthPU, heightPU, MULTI_BALL, 0, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1, &soundPU_multiBall ) );
-    //vPowerUps.push_back( PowerUp( Vec2( 450, 100 ), ( float )PowerUpSequences[ 4 ].GetWidth() / 5.0f, ( float )PowerUpSequences[ 4 ].GetHeight() / 5.0f, SUPER_BALL, 5, walls.GetInnerBounds().bottom, 5, 5, &soundPU_superBall ) );
+    AddPowerUp( INCR_PADDLE_SIZE, Vec2( 450, 100 ) );
+    //AddPowerUp( EXTRA_LIFE, Vec2( 450, 100 ) );
+    //AddPowerUp( LASER_GUN, Vec2( 450, 100 ) );
+    //AddPowerUp( MULTI_BALL, Vec2( 450, 100 ) );
+    //AddPowerUp( SUPER_BALL, Vec2( 450, 100 ) );
 }
 void KlingKlongManager::Update( const float dt, Keyboard& kbd )
 {
@@ -243,6 +234,153 @@ void KlingKlongManager::CreateMultiBalls()
 
 void KlingKlongManager::CreatePowerUp( const Vec2& pos, const bool enemyKilled )
 {
+    /* if enemy -> pos is top left, if brick -> pos is center */
+    /* find free power ups -> which are currently not falling */
+    int freePUs[ nPowerUps ] = { 1, 1, 1, 1, 1 };
+    for( const PowerUp& p : vPowerUps )
+    {
+        freePUs[ p.GetType() ] = 0;
+    }
+
+    int cntFreePU = 0;
+    std::vector< int > vFreeIndices;
+    for( int i = 0; i < nPowerUps; ++i )
+    {
+        if( freePUs[ i ] )
+        {
+            /* check, if activation makes sense (e.g. if lifes == MAX_LIFES -> no extra life PU!) */
+            if( ( vBalls.size() >= 3 && i == MULTI_BALL ) || ( i == EXTRA_LIFE && lifes == MAX_LIFES ) )
+            {
+                continue;
+            }
+            vFreeIndices.push_back( i );
+            cntFreePU++;
+        }
+    }
+    if( 0 == cntFreePU )
+    {
+        /* all power ups on screen (should be really rare!) */
+        return;
+    }
+
+    Vec2 posToSpawn = pos;
+    if( enemyKilled )
+    {
+        posToSpawn += Vec2( 22, 22 ); /* current enemy size is 44x44, //TODO maybe this should be parametrized */
+    }
+
+    /* special case: only 1 free PU left and its the super ball -> 10% drop chance */
+    if( 1 == cntFreePU )
+    {
+        if( vFreeIndices[ 0 ] == SUPER_BALL )
+        {
+            if( rand() % 10 == 1 )
+            {
+                AddPowerUp( SUPER_BALL, posToSpawn );
+                return;
+            }
+        }
+    }
+
+    if( enemyKilled )   /* guaranteed drop */
+    {
+        int idx = rand() % cntFreePU;
+        int typePU = vFreeIndices[ idx ];
+        if( typePU == SUPER_BALL )
+        {
+            if( rand() % 10 == 1 )
+            {
+                AddPowerUp( SUPER_BALL, posToSpawn );
+                return;
+            }
+            else
+            {
+                vFreeIndices.erase( vFreeIndices.begin() + idx );
+                cntFreePU--;
+                AddPowerUp( ( ePowerUpType )( rand() % cntFreePU ), posToSpawn );
+                return;
+            }
+        }
+        else
+        {
+            AddPowerUp( ( ePowerUpType )typePU, posToSpawn );
+            return;
+        }
+    }
+    else    /* percentage drop */
+    {
+        int idx = rand() % cntFreePU;
+        int typePU = vFreeIndices[ idx ];
+        switch( ( ePowerUpType ) typePU )
+        {
+        case INCR_PADDLE_SIZE:
+            if( rand() % 7 == 1 )
+            {
+                AddPowerUp( INCR_PADDLE_SIZE, posToSpawn );
+            }
+            break;
+        case EXTRA_LIFE:
+            if( rand() % 7 == 1 )
+            {
+                AddPowerUp( EXTRA_LIFE, posToSpawn );
+            }
+            break;
+        case LASER_GUN:
+            if( rand() % 7 == 1 )
+            {
+                AddPowerUp( LASER_GUN, posToSpawn );
+            }
+            break;
+        case MULTI_BALL:
+            if( rand() % 7 == 1 )
+            {
+                AddPowerUp( MULTI_BALL, posToSpawn );
+            }
+            break;
+        case SUPER_BALL:
+            if( rand() % 20 == 1 )
+            {
+                AddPowerUp( SUPER_BALL, posToSpawn );
+            }
+            break;
+        }
+    }
+}
+
+void KlingKlongManager::AddPowerUp( const ePowerUpType &type, const Vec2& posToSpawn )
+{
+    const float widthPU     = ( float )PowerUpSequences[ 0 ].GetWidth() / nSubImagesInSequence;
+    const float heightPU    = ( float )PowerUpSequences[ 0 ].GetHeight();
+
+    float boostTimeIncrSize = 5;
+    float boostTimeLaserGun = 4;
+#if EASY_MODE
+    boostTimeIncrSize *= 2;
+    boostTimeLaserGun *= 2;
+#endif
+
+    PowerUp PUtoSpawn;
+    switch( type )
+    {
+    case INCR_PADDLE_SIZE:
+        PUtoSpawn = PowerUp( posToSpawn, widthPU, heightPU, INCR_PADDLE_SIZE, boostTimeIncrSize, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1, &soundPU_incrSize );
+        break;
+    case EXTRA_LIFE:
+        PUtoSpawn = PowerUp( posToSpawn, widthPU, heightPU, EXTRA_LIFE, 0, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1, &soundPU_incrSize );
+        break;
+    case LASER_GUN:
+        PUtoSpawn = PowerUp( posToSpawn, widthPU, heightPU, LASER_GUN, boostTimeLaserGun, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1, &soundPU_incrSize );
+        break;
+    case MULTI_BALL:
+        PUtoSpawn = PowerUp( posToSpawn, widthPU, heightPU, MULTI_BALL, 0, walls.GetInnerBounds().bottom, nSubImagesInSequence, 1, &soundPU_incrSize );
+        break;
+    case SUPER_BALL:
+        PUtoSpawn = PowerUp( posToSpawn, ( float )PowerUpSequences[ 4 ].GetWidth() / 5.0f, ( float )PowerUpSequences[ 4 ].GetHeight() / 5.0f,
+                             SUPER_BALL, 5, walls.GetInnerBounds().bottom, 5, 5, &soundPU_superBall );
+        break;
+    }
+
+    vPowerUps.push_back( PUtoSpawn );
 }
 
 void KlingKlongManager::ShootLaser()

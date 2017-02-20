@@ -36,6 +36,7 @@ private:
     void ApplyPowerUp( const PowerUp& pu );
     void CreateMultiBalls();
     void CreatePowerUp( const Vec2& pos, const bool enemyKilled );
+    void AddPowerUp( const ePowerUpType& type, const Vec2& posToSpawn );
     void ShootLaser();
     void UpdateBalls( const float dt, Keyboard& kbd );
     void UpdatePaddle( const float dt, Keyboard& kbd );
