@@ -93,6 +93,7 @@ private:
     Surface sur_Medium      = Surface::FromFile( L"Images\\Text\\medium.png" );
     Surface sur_Hard        = Surface::FromFile( L"Images\\Text\\hard.png" );
     Surface sur_GameOver    = Surface::FromFile( L"Images\\Text\\gameover.png" );
+    Surface sur_Victory     = Surface::FromFile( L"Images\\Text\\victory.png" );
     static constexpr int nSubImagesInSequence = 8;  /* first 4 sequences consist of 8 images */
     static constexpr int nPowerUps = 5;
     Surface PowerUpSequences[ nPowerUps ] = { Surface::FromFile( L"Images\\Sequences\\incrSize.png" ),
@@ -100,13 +101,12 @@ private:
                                               Surface::FromFile( L"Images\\Sequences\\laserGun.png" ),
                                               Surface::FromFile( L"Images\\Sequences\\multiBall.png" ),
                                               Surface::FromFile( L"Images\\Sequences\\superBall.png" ) };
-    Surface PadExplosion[ 4 ] ={ Surface::FromFile( L"Images\\padExpl1.png" ),
-                                 Surface::FromFile( L"Images\\padExpl2.png" ),
-                                 Surface::FromFile( L"Images\\padExpl3.png" ),
-                                 Surface::FromFile( L"Images\\padExpl4.png" ) };
+    Surface PadExplosion[ 4 ] = { Surface::FromFile( L"Images\\padExpl1.png" ),
+                                  Surface::FromFile( L"Images\\padExpl2.png" ),
+                                  Surface::FromFile( L"Images\\padExpl3.png" ),
+                                  Surface::FromFile( L"Images\\padExpl4.png" ) };
     int explSeqIdx = 0;
-
-    Surface seqEnemy = Surface::FromFile( L"Images\\Sequences\\funnyEnemy.png" );
+    Surface seqEnemy    = Surface::FromFile( L"Images\\Sequences\\funnyEnemy.png" );
 #if EASY_MODE
     float timeBetweenEnemies = 15;  /* in seconds */
 #else
@@ -118,7 +118,7 @@ private:
     std::chrono::steady_clock::time_point startTime_enemySpawn;
     std::chrono::steady_clock::time_point startTime_shot;
     std::chrono::steady_clock::time_point startTime_explosion;
-    std::chrono::steady_clock::time_point startTime_levelFinished;
+    std::chrono::steady_clock::time_point startTime_victory;
 
     bool startedShooting = false;
     static constexpr float timeBetweenShots = 0.35f;     /* in seconds */

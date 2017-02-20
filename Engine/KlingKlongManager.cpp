@@ -18,6 +18,9 @@ void KlingKlongManager::ResetGame()
     // seed rand()
     std::srand( ( unsigned int )std::time( 0 ) );
 
+    // level
+    level = 0;
+
     // reset paddle
     ResetPaddle();
 
@@ -85,14 +88,14 @@ void KlingKlongManager::Update( const float dt, Keyboard& kbd )
         {
             soundVictory.Play();
             gameState = GameState::VICTORY_SCREEN;
-            startTime_levelFinished = std::chrono::steady_clock::now();
+            startTime_victory = std::chrono::steady_clock::now();
         }
     }
     break;
     case GameState::GAME_OVER:
     {
         const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime_explosion;
-        if( timeElapsed.count() > 0.15 )
+        if( timeElapsed.count() > 0.15f )
         {
             explSeqIdx++;
             startTime_explosion = std::chrono::steady_clock::now();
@@ -106,7 +109,7 @@ void KlingKlongManager::Update( const float dt, Keyboard& kbd )
     case GameState::VICTORY_SCREEN:
     {
         // next level
-        const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime_levelFinished;
+        const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime_victory;
         if( timeElapsed.count() > timeBetweenLevels )
         {
             level++;
@@ -116,7 +119,8 @@ void KlingKlongManager::Update( const float dt, Keyboard& kbd )
             vLaserShots.clear();
             vEnemies.clear();
             CreateNextLevel();
-        }        
+            gameState = GameState::PLAYING;
+        }
     }
     break;
     default:
@@ -126,6 +130,7 @@ void KlingKlongManager::Update( const float dt, Keyboard& kbd )
 
 void KlingKlongManager::UpdateStartScreen( Keyboard& kbd )
 {
+    /* only for the very beginning of the game */
     if( startScreenCnt < 3 )
     {
         if( -1 == startScreenCnt )
@@ -153,6 +158,7 @@ void KlingKlongManager::UpdateStartScreen( Keyboard& kbd )
         }
     }
 
+    /* every time we are in the start menu */
     while( !kbd.KeyIsEmpty() )
     {
         const Keyboard::Event e = kbd.ReadKey();
@@ -779,6 +785,9 @@ void KlingKlongManager::DrawScene()
     break;
     case GameState::PLAYING:
     {
+#if !_DEBUG
+        gfx.DrawSprite( 0, 0, sur_Background );
+#endif
         walls.Draw( gfx );
         for( const Ball& b : vBalls )
         {
@@ -804,9 +813,11 @@ void KlingKlongManager::DrawScene()
         pad.Draw( gfx );
         pad.DrawAsLifesRemaining( gfx, lifes, Vec2( walls.GetInnerBounds().left, 15 ), 0.3f );
 
+#if _DEBUG
         gfx.DrawString( std::to_string( vEnemies.size() ).c_str(), 400, gfx.ScreenHeight - 30, font, fontSurface, Colors::White );
         gfx.DrawString( std::to_string( vLaserShots.size() ).c_str(), 600, gfx.ScreenHeight - 30, font, fontSurface, Colors::White );
         gfx.DrawString( std::to_string( nBricksLeft ).c_str(), 800, gfx.ScreenHeight - 30, font, fontSurface, Colors::White );
+#endif
 
         std::string lvlTxt = "Level " + std::to_string( level + 1 );
         gfx.DrawString( lvlTxt.c_str(), 700, 10, font, fontSurface, Colors::White );
@@ -814,6 +825,9 @@ void KlingKlongManager::DrawScene()
     break;
     case GameState::VICTORY_SCREEN:
     {
+        walls.Draw( gfx );
+        pad.Draw( gfx );
+        gfx.DrawSpriteKey( ( int )walls.GetInnerBounds().GetCenter().x - sur_Victory.GetWidth() / 2, 200, sur_Victory, sur_Victory.GetPixel( 0, 0 ) );
     }
     break;
     case GameState::GAME_OVER:
@@ -890,41 +904,41 @@ void KlingKlongManager::CreateNextLevel()
                 }                
             }
         }
+        nBricksLeft = 1;
     }
-    //else if( 1 == level )
-    //{
-    //    nBricksLeft = 0;
-    //    for( int y = 0; y < nBricksDown; ++y )
-    //    {
-    //        const Color c = brickColors[ 3 - y ];
-    //        for( int x = 0; x < nBricksAcross; ++x )
-    //        {
-    //            if( y % 2 - 1 && x % 2 - 1 )
-    //            {
-    //                // empty space
-    //            }
-    //            else
-    //            {
-    //                if( ( 0 == y || 2 == y ) && x % 2 )
-    //                {
-    //                    bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ),
-    //                                                                    brickWidth, brickHeight ), c, SOLID, 2 );
-    //                    nBricksLeft++;
-    //                }
-    //                else
-    //                {
-    //                    bricks[ y * nBricksAcross + x ] = Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c );
-    //                    nBricksLeft++;
-    //                }
-    //            }
-    //        }
-    //    }
+    else if( 1 == level )
+    {
+        nBricksLeft = 0;
+        for( int y = 0; y < nBricksDown; ++y )
+        {
+            const Color c = brickColors[ 3 - y ];
+            for( int x = 0; x < nBricksAcross; ++x )
+            {
+                if( y % 2 - 1 && x % 2 - 1 )
+                {
+                    // empty space
+                }
+                else
+                {
+                    if( ( 0 == y || 2 == y ) && x % 2 )
+                    {
+                        vBricks.push_back( Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c, SOLID, 2 ) );
+                        nBricksLeft++;
+                    }
+                    else
+                    {
+                        vBricks.push_back( Brick( RectF( topLeft + Vec2( x * brickWidth, y * brickHeight ), brickWidth, brickHeight ), c ) );
+                        nBricksLeft++;
+                    }
+                }
+            }
+        }
 
-    //    bricks[ 0 ] = Brick( RectF( topLeft + Vec2( -brickWidth, ( nBricksDown - 1 ) * brickHeight ),
-    //                                brickWidth, brickHeight ), Colors::LightGray, UNDESTROYABLE );
-    //    bricks[ 2 ] = Brick( RectF( topLeft + Vec2( nBricksAcross * brickWidth, ( nBricksDown - 1 ) * brickHeight ),
-    //                                brickWidth, brickHeight ), Colors::LightGray, UNDESTROYABLE );
-    //}
+        /*vBricks.push_back( Brick( RectF( topLeft + Vec2( -brickWidth, ( nBricksDown - 1 ) * brickHeight ),
+                                    brickWidth, brickHeight ), Colors::LightGray, UNDESTROYABLE ) );
+        vBricks.push_back( Brick( RectF( topLeft + Vec2( nBricksAcross * brickWidth, ( nBricksDown - 1 ) * brickHeight ),
+                                    brickWidth, brickHeight ), Colors::LightGray, UNDESTROYABLE ) );*/
+    }
     //else if( 2 == level )
     //{
     //    nBricksLeft = 0;
