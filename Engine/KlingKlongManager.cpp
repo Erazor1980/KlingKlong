@@ -27,7 +27,7 @@ KlingKlongManager::KlingKlongManager( Graphics& gfx_in, GameState& gameState_in,
     walls( walls_in ),
     pad( pad_in )
 {
-    startScreenCnt = 3;
+    //startScreenCnt = 3;
 
     allLevels = LoadTextFile( "level.txt" );
 
@@ -40,7 +40,7 @@ void KlingKlongManager::ResetGame()
     std::srand( ( unsigned int )std::time( 0 ) );
 
     // level
-    level = 4;
+    level = 0;
 
     // reset paddle
     ResetPaddle();
@@ -79,6 +79,7 @@ void KlingKlongManager::ResetGame()
     //AddPowerUp( MULTI_BALL, Vec2( 450, 100 ) );
     //AddPowerUp( SUPER_BALL, Vec2( 450, 100 ) );
     //vBalls[ 0 ].StickToPaddle( pad.GetRect().GetCenter().x );
+    //nBricksLeft = 1;
 }
 
 void KlingKlongManager::Update( const float dt, Keyboard& kbd )
@@ -848,6 +849,26 @@ void KlingKlongManager::DrawScene()
     {
         walls.Draw( gfx );
         pad.Draw( gfx );
+        for( const Ball& b : vBalls )
+        {
+            b.Draw( gfx, PowerUpSequences[ SUPER_BALL ] );
+        }
+        for( const Brick& b : vBricks )
+        {
+            b.Draw( gfx );
+        }
+        for( const PowerUp& p : vPowerUps )
+        {
+            p.Draw( gfx, PowerUpSequences[ p.GetType() ] );
+        }
+        for( const LaserShot& l : vLaserShots )
+        {
+            l.Draw( gfx );
+        }
+        for( const Enemy& e : vEnemies )
+        {
+            e.Draw( gfx, seqEnemy );
+        }
         gfx.DrawSpriteKey( ( int )walls.GetInnerBounds().GetCenter().x - sur_Victory.GetWidth() / 2, 200, sur_Victory, sur_Victory.GetPixel( 0, 0 ) );
     }
     break;

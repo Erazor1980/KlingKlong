@@ -64,7 +64,7 @@ private:
     void UpdateMultiBalls( int idxBallToDeactivate );
     void SpawnEnemy( const Vec2& pos = Vec2( Graphics::ScreenWidth / 2, Graphics::ScreenHeight / 2 ) );
 	/********************************/
-    GameState state = GameState::PLAYING;
+    GameState state = GameState::START_SCREEN;
 private:
 	MainWindow& wnd;
 	Graphics gfx;
