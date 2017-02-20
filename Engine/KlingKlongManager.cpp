@@ -40,7 +40,7 @@ void KlingKlongManager::ResetGame()
     std::srand( ( unsigned int )std::time( 0 ) );
 
     // level
-    level = 0;
+    level = 4;
 
     // reset paddle
     ResetPaddle();
@@ -888,7 +888,7 @@ void KlingKlongManager::CreateNextLevel()
 
     float fieldWidth    = walls.GetInnerBounds().right - walls.GetInnerBounds().left;
     int nBricksAcross   = 12;
-    int nBricksDown     = 8;
+    int nBricksDown     = 10;
 
     float brickWidth    = fieldWidth / nBricksAcross;
     float brickHeight   = 22.0f;
@@ -942,11 +942,23 @@ void KlingKlongManager::CreateNextLevel()
             break;
             case 'Y':   // solid yellow brick (2 life)
             {
-                vBricks.push_back( Brick( RectF( topLeft + Vec2( c * brickWidth, y * brickHeight ), brickWidth, brickHeight ), { 0, 230, 230 }, SOLID, 2 ) );
+                vBricks.push_back( Brick( RectF( topLeft + Vec2( c * brickWidth, y * brickHeight ), brickWidth, brickHeight ), { 230, 230, 0 }, SOLID, 2 ) );
                 nBricksLeft++;
             }
             break;
             case 'y':   // yellow brick
+            {
+                vBricks.push_back( Brick( RectF( topLeft + Vec2( c * brickWidth, y * brickHeight ), brickWidth, brickHeight ), { 230, 230, 0 } ) );
+                nBricksLeft++;
+            }
+            break;
+            case 'C':   // solid cyan brick (2 life)
+            {
+                vBricks.push_back( Brick( RectF( topLeft + Vec2( c * brickWidth, y * brickHeight ), brickWidth, brickHeight ), { 0, 230, 230 }, SOLID, 2 ) );
+                nBricksLeft++;
+            }
+            break;
+            case 'c':   // cyan brick
             {
                 vBricks.push_back( Brick( RectF( topLeft + Vec2( c * brickWidth, y * brickHeight ), brickWidth, brickHeight ), { 0, 230, 230 } ) );
                 nBricksLeft++;
