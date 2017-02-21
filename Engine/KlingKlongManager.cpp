@@ -140,6 +140,7 @@ void KlingKlongManager::Update( const float dt, Keyboard& kbd )
             vLaserShots.clear();
             vEnemies.clear();
             CreateNextLevel();
+            startTime_enemySpawn = std::chrono::steady_clock::now();
             gameState = GameState::PLAYING;
         }
     }
@@ -208,6 +209,7 @@ void KlingKlongManager::UpdateStartScreen( Keyboard& kbd )
             {
                 if( optionSelected == START_GAME )
                 {
+                    startTime_enemySpawn = std::chrono::steady_clock::now();
                     gameState = GameState::PLAYING;
                 }
                 else if( EXIT == optionSelected )
