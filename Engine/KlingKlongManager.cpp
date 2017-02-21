@@ -921,7 +921,7 @@ void KlingKlongManager::DrawScene()
 
 void KlingKlongManager::CreateNextLevel()
 {
-    if( level > 4 )
+    if( level > 6 )
     {
         level = 0;
     }
@@ -930,7 +930,7 @@ void KlingKlongManager::CreateNextLevel()
 
     float fieldWidth    = walls.GetInnerBounds().right - walls.GetInnerBounds().left;
     int nBricksAcross   = 12;
-    int nBricksDown     = 10;
+    int nBricksDown     = 12;
 
     float brickWidth    = fieldWidth / nBricksAcross;
     float brickHeight   = 22.0f;
@@ -1017,6 +1017,7 @@ void KlingKlongManager::CreateNextLevel()
         }
         y++;
     }
+    nBricksLeft = 1;
 }
 
 void KlingKlongManager::DrawLightning()
