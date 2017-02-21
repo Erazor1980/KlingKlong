@@ -81,6 +81,7 @@ void KlingKlongManager::ResetGame()
     //AddPowerUp( SUPER_BALL, Vec2( 450, 100 ) );
     //vBalls[ 0 ].StickToPaddle( pad.GetRect().GetCenter().x );
     //nBricksLeft = 1;
+    //vBalls[ 0 ].ActivateSuperBall( 5, ( PowerUpSequences[ SUPER_BALL ].GetWidth() / 5 ) / 2.0f ) ;
 }
 
 void KlingKlongManager::Update( const float dt, Keyboard& kbd )

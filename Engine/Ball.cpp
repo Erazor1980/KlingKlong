@@ -201,9 +201,15 @@ void Ball::DeActivateSuperBall()
 {
     superBallActive = false;
     radius = 7;
+    speed = defaultSpeed;
 }
 
 bool Ball::IsSuperBall() const
 {
     return superBallActive;
+}
+
+void Ball::ReduceSpeed()
+{
+    speed *= 0.9f;
 }

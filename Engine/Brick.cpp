@@ -44,6 +44,7 @@ bool Brick::ExecuteBallCollision( Ball& ball )
     if( ball.IsSuperBall() )
     {
         life = 0;
+        ball.ReduceSpeed();
         return destroyed = true;
     }
 

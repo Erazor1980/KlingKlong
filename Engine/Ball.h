@@ -45,6 +45,7 @@ public:
     void ActivateSuperBall( const float duration, float newRadius );
     void DeActivateSuperBall();
     bool IsSuperBall() const;
+    void ReduceSpeed(); /* when SUPER_BALL activated, the ball looses speed, each time it destroys a brick */
 private:
     float radius = 7.0f;
 #if EASY_MODE
@@ -52,6 +53,7 @@ private:
 #else
     float speed  = 550;
 #endif
+    float defaultSpeed = speed;
     eBallState ballState = INACTIVE;
     float offsetToPaddleCenter = 0;     /* for STICKING state, to move with the paddle */
     Vec2 pos;
