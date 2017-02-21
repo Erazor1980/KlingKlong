@@ -50,6 +50,7 @@ private:
     void ResetPaddle();
 
     void CreateNextLevel();
+    void DrawLightning();
 private:
     enum Selection
     {
@@ -107,6 +108,8 @@ private:
                                   Surface::FromFile( L"Images\\padExpl4.png" ) };
     int explSeqIdx = 0;
     Surface seqEnemy    = Surface::FromFile( L"Images\\Sequences\\funnyEnemy.png" );
+    Surface seqLightning   = Surface::FromFile( L"Images\\Sequences\\lightning.png" );
+    int lightningSeqIdx = 0;
 #if EASY_MODE
     float timeBetweenEnemies = 15;  /* in seconds */
 #else
@@ -119,6 +122,7 @@ private:
     std::chrono::steady_clock::time_point startTime_shot;
     std::chrono::steady_clock::time_point startTime_explosion;
     std::chrono::steady_clock::time_point startTime_victory;
+    std::chrono::steady_clock::time_point startTime_lightning;
 
     bool startedShooting = false;
     static constexpr float timeBetweenShots = 0.35f;     /* in seconds */

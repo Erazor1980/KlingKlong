@@ -48,7 +48,7 @@ public:
 private:
     float radius = 7.0f;
 #if EASY_MODE
-    float speed = 200;
+    float speed = 270;
 #else
     float speed  = 550;
 #endif

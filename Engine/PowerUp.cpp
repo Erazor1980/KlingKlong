@@ -28,7 +28,12 @@ bool PowerUp::Update( const RectF& paddleRect, const float dt, bool &paddleHit )
     }
 
     const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime;
-    if( timeElapsed.count() > 0.05 )
+    float ms = 0.05f;
+    if( LASER_GUN == type )
+    {
+        ms = 0.10f;
+    }
+    if( timeElapsed.count() > ms )
     {
         idxSurfSeq++;
         if( idxSurfSeq >= rowImagesSeq * colImagesSeq )

@@ -36,7 +36,11 @@ private:
 	/********************************/
 	/*  User Functions              */
 	/********************************/
+#if _DEBUG
+    GameState state = GameState::PLAYING;
+#else
     GameState state = GameState::START_SCREEN;
+#endif
 private:
 	MainWindow& wnd;
 	Graphics gfx;

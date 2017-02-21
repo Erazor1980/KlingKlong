@@ -2,8 +2,13 @@
 
 #define EASY_MODE   false    /* for Julia */
 
+#if EASY_MODE
+#define MAX_LIFES 5
+#define MAX_ENEMIES 3
+#else
 #define MAX_LIFES 3
 #define MAX_ENEMIES 5
+#endif
 
 
 #define M_PI        3.14159265358979323846

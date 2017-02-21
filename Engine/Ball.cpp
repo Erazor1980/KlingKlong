@@ -114,7 +114,7 @@ Ball::eBallWallColRes Ball::DoWallCollision( const RectF& walls, const RectF& pa
         ReboundY( padBounce );
         collisionResult = WALL_HIT;
     }
-    else if( rect.bottom > walls.bottom )
+    else if( rect.bottom > walls.bottom - 10 )
     {
         pos.y -=  rect.bottom - walls.bottom;
         ReboundY( padBounce );

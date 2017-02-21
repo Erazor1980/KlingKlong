@@ -26,7 +26,9 @@ KlingKlongManager::KlingKlongManager( Graphics& gfx_in, GameState& gameState_in,
     gameState( gameState_in ),
     walls( walls_in )
 {
-    //startScreenCnt = 3;
+#if _DEBUG
+    startScreenCnt = 3;
+#endif
 
     allLevels = LoadTextFile( "level.txt" );
 
@@ -100,7 +102,7 @@ void KlingKlongManager::Update( const float dt, Keyboard& kbd )
         UpdateLaserShots( dt );
         UpdateEnemies( dt );
 
-        if( 0 == lifes )
+        if( lifes <= 0 )
         {
             soundGameOver.Play();
             gameState = GameState::GAME_OVER;
@@ -390,34 +392,40 @@ void KlingKlongManager::CreatePowerUp( const Vec2& pos, const bool enemyKilled )
     {
         int idx = rand() % cntFreePU;
         int typePU = vFreeIndices[ idx ];
+
+#if EASY_MODE
+        int chance = 3;
+#else
+        int chance = 5;
+#endif
         switch( ( ePowerUpType ) typePU )
         {
         case INCR_PADDLE_SIZE:
-            if( rand() % 5 == 1 )
+            if( rand() % chance == 1 )
             {
                 AddPowerUp( INCR_PADDLE_SIZE, posToSpawn );
             }
             break;
         case EXTRA_LIFE:
-            if( rand() % 5 == 1 )
+            if( rand() % chance == 1 )
             {
                 AddPowerUp( EXTRA_LIFE, posToSpawn );
             }
             break;
         case LASER_GUN:
-            if( rand() % 5 == 1 )
+            if( rand() % chance == 1 )
             {
                 AddPowerUp( LASER_GUN, posToSpawn );
             }
             break;
         case MULTI_BALL:
-            if( rand() % 5 == 1 )
+            if( rand() % chance == 1 )
             {
                 AddPowerUp( MULTI_BALL, posToSpawn );
             }
             break;
         case SUPER_BALL:
-            if( rand() % 15 == 1 )
+            if( rand() % ( chance * 3 ) == 1 )
             {
                 AddPowerUp( SUPER_BALL, posToSpawn );
             }
@@ -433,9 +441,11 @@ void KlingKlongManager::AddPowerUp( const ePowerUpType &type, const Vec2& posToS
 
     float boostTimeIncrSize = 5;
     float boostTimeLaserGun = 4;
+    float boostTimeSuperBall = 4;
 #if EASY_MODE
     boostTimeIncrSize *= 2;
     boostTimeLaserGun *= 2;
+    boostTimeSuperBall = 10;
 #endif
 
     PowerUp PUtoSpawn;
@@ -455,7 +465,7 @@ void KlingKlongManager::AddPowerUp( const ePowerUpType &type, const Vec2& posToS
         break;
     case SUPER_BALL:
         PUtoSpawn = PowerUp( posToSpawn, ( float )PowerUpSequences[ 4 ].GetWidth() / 5.0f, ( float )PowerUpSequences[ 4 ].GetHeight() / 5.0f,
-                             SUPER_BALL, 5, walls.GetInnerBounds().bottom, 5, 5, &soundPU_superBall );
+                             SUPER_BALL, boostTimeSuperBall, walls.GetInnerBounds().bottom, 5, 5, &soundPU_superBall );
         break;
     }
 
@@ -759,7 +769,7 @@ void KlingKlongManager::ResetBall()
 
 void KlingKlongManager::ResetPaddle()
 {
-    pad = Paddle( Vec2( gfx.ScreenWidth / 2, gfx.ScreenHeight - 80 ) );
+    pad = Paddle( Vec2( gfx.ScreenWidth / 2, gfx.ScreenHeight - 110 ) );
 }
 
 void KlingKlongManager::DrawScene()
@@ -809,7 +819,7 @@ void KlingKlongManager::DrawScene()
     case GameState::PLAYING:
     {
 #if !_DEBUG
-        gfx.DrawSprite( 0, 0, sur_Background );
+        gfx.DrawSprite( 0, gfx.ScreenHeight - sur_Background.GetHeight(), sur_Background );
 #endif
         walls.Draw( gfx );
         for( const Ball& b : vBalls )
@@ -836,7 +846,9 @@ void KlingKlongManager::DrawScene()
         pad.Draw( gfx );
         pad.DrawAsLifesRemaining( gfx, lifes, Vec2( walls.GetInnerBounds().left, 15 ), 0.3f );
 
-#if _DEBUG
+#if !_DEBUG
+        DrawLightning();
+#else
         gfx.DrawString( std::to_string( vEnemies.size() ).c_str(), 400, gfx.ScreenHeight - 30, font, fontSurface, Colors::White );
         gfx.DrawString( std::to_string( vLaserShots.size() ).c_str(), 600, gfx.ScreenHeight - 30, font, fontSurface, Colors::White );
         gfx.DrawString( std::to_string( nBricksLeft ).c_str(), 800, gfx.ScreenHeight - 30, font, fontSurface, Colors::White );
@@ -848,6 +860,9 @@ void KlingKlongManager::DrawScene()
     break;
     case GameState::VICTORY_SCREEN:
     {
+#if !_DEBUG
+        gfx.DrawSprite( 0, gfx.ScreenHeight - sur_Background.GetHeight(), sur_Background );
+#endif
         walls.Draw( gfx );
         pad.Draw( gfx );
         for( const Ball& b : vBalls )
@@ -875,6 +890,10 @@ void KlingKlongManager::DrawScene()
     break;
     case GameState::GAME_OVER:
     {
+#if !_DEBUG
+        gfx.DrawSprite( 0, gfx.ScreenHeight - sur_Background.GetHeight(), sur_Background );
+        DrawLightning();
+#endif
         for( const Brick& b : vBricks )
         {
             b.Draw( gfx );
@@ -882,7 +901,7 @@ void KlingKlongManager::DrawScene()
         if( explSeqIdx > 3 )
         {
             const int x = ( Graphics::ScreenWidth - sur_GameOver.GetWidth() ) / 2;
-            const int y = ( Graphics::ScreenHeight - sur_GameOver.GetHeight() ) / 2;
+            const int y = ( Graphics::ScreenHeight - sur_GameOver.GetHeight() ) / 3;
             gfx.DrawSpriteKey( x, y, sur_GameOver, sur_GameOver.GetPixel( 0, 0 ) );
         }
         else
@@ -996,5 +1015,27 @@ void KlingKlongManager::CreateNextLevel()
             };
         }
         y++;
+    }
+}
+
+void KlingKlongManager::DrawLightning()
+{
+    const int subWidth      = seqLightning.GetWidth() / nSubImagesInSequence;
+    const int subImgInLevel = ( int )( walls.GetInnerBounds().right - walls.GetInnerBounds().left ) / subWidth;
+    for( int i = 0; i < 19; ++i )
+    {
+        gfx.DrawSpriteKeyFromSequence( ( int )walls.GetInnerBounds().left + 5 + subWidth * ( ( lightningSeqIdx + i ) % 19 ), gfx.ScreenHeight - 80,
+                                       seqLightning, seqLightning.GetPixel( 0, 0 ), i % 8, 8, 1 );
+    }
+
+    const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime_lightning;
+    if( timeElapsed.count() >= 0.1 )
+    {
+        lightningSeqIdx++;
+        if( lightningSeqIdx >= nSubImagesInSequence )
+        {
+            lightningSeqIdx = 0;
+        }
+        startTime_lightning = std::chrono::steady_clock::now();
     }
 }
