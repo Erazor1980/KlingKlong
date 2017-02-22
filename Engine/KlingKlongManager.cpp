@@ -1017,7 +1017,6 @@ void KlingKlongManager::CreateNextLevel()
         }
         y++;
     }
-    nBricksLeft = 1;
 }
 
 void KlingKlongManager::DrawLightning()
