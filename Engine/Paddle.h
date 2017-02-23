@@ -12,7 +12,7 @@ class Paddle
 {
 public:
     Paddle() = default;
-    Paddle( const Vec2& pos_in );
+    Paddle( const Vec2& pos_in, bool easy = false );
     void Draw( Graphics& gfx ) const;
     void DrawAsLifesRemaining( Graphics& gfx, const int lifesRemaining, const Vec2& pos, const float sizeRatio = 0.5f ) const;
     bool DoBallCollision( Ball& ball );
@@ -31,11 +31,9 @@ private:
     static constexpr Color wingColor = { 210, 33, 33 };// Colors::Red;
     static constexpr Color color = Colors::White;
     static constexpr float wingWidth = 18.0f;
-#if EASY_MODE
-    static constexpr float speed = 300.0f;
-#else
-    static constexpr float speed = 550.0f;
-#endif
+    
+    float speed = 550.0f;
+
     // control the paddle rebound behavior here
     static constexpr float fixedZoneWidthRatio = 0.1f;
 public:

@@ -8,7 +8,7 @@ class Enemy
 {
 public:
     Enemy() = default;
-    Enemy( const Vec2& pos_in, const float width_in, const float height_in, const RectF& walls_in, int rowImagesSeq_in, int colImagesSeq_in );
+    Enemy( const Vec2& pos_in, const float width_in, const float height_in, const RectF& walls_in, int rowImagesSeq_in, int colImagesSeq_in, bool easy = false );
     void Draw( Graphics& gfx, const Surface& surfSeq ) const;
     void Update( float dt );
     bool CheckForCollision( const RectF& otherRect );
@@ -21,11 +21,7 @@ private:
     Vec2 dir;
     float width;
     float height;
-#if EASY_MODE
-    float speed = 100;
-#else
     float speed = 200;
-#endif
 
     RectF walls;
 

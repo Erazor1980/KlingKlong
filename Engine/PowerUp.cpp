@@ -1,7 +1,7 @@
 #include "PowerUp.h"
 
 PowerUp::PowerUp( const Vec2& centerPos_in, const float width_in, const float height_in, ePowerUpType type_in, const float boost_time /* boost time in seconds */,
-                  const float level_bottom, int rowImagesSeq_in, int colImagesSeq_in, Sound* const sound_in )
+                  const float level_bottom, int rowImagesSeq_in, int colImagesSeq_in, Sound* const sound_in, bool easy )
     :    
     width( width_in ),
     height( height_in ),
@@ -15,6 +15,11 @@ PowerUp::PowerUp( const Vec2& centerPos_in, const float width_in, const float he
 {
     pos = centerPos_in;
     pos.x = centerPos_in.x - width / 2.0f;
+
+    if( easy )
+    {
+        speed = 150;
+    }
 }
 
 bool PowerUp::Update( const RectF& paddleRect, const float dt, bool &paddleHit )

@@ -52,8 +52,36 @@ void KlingKlongManager::ResetGame()
     // reset bricks
     CreateNextLevel();
 
-    // reset life
-    lifes = MAX_LIFES;
+    // reset life, max enemies & time between enemies
+    switch( difficulty )
+    {
+    case KlingKlongManager::EASY:
+        maxLifes = 5;
+        lifes = 3;
+        maxEnemies = 2;
+        timeBetweenEnemies = 15;
+        break;
+    case KlingKlongManager::MEDIUM:
+        maxLifes = 3;
+        lifes = 3;
+        maxEnemies = 3;
+        timeBetweenEnemies = 10;
+        break;
+    case KlingKlongManager::HARD:
+        maxLifes = 2;
+        lifes = 2;
+        maxEnemies = 5;
+        timeBetweenEnemies = 6;
+        break;
+    case KlingKlongManager::INSANE:
+        maxLifes = 1;
+        lifes = 1;
+        maxEnemies = 10;
+        timeBetweenEnemies = 2;
+        break;
+    default:
+        break;
+    }
 
     // reset power ups
     vPowerUps.clear();
@@ -213,16 +241,47 @@ void KlingKlongManager::UpdateStartScreen( Keyboard& kbd )
                 if( optionSelected == START_GAME )
                 {
                     startTime_enemySpawn = std::chrono::steady_clock::now();
+                    gameStarted = true;
                     gameState = GameState::PLAYING;
                 }
                 else if( EXIT == optionSelected )
                 {
                     gameState = GameState::EXIT_GAME;
                 }
+                else if( DIFFICULTY == optionSelected )
+                {
+                    int diff = difficulty;
+                    diff++;
+                    diff = diff % NUM_DIFFICULTIES;
+                    difficulty = ( Difficulty )diff;
+                    gameStarted = false;
+                    ResetGame();
+                }
             }
             else if( e.GetCode() == VK_ESCAPE )
             {
                 gameState = GameState::EXIT_GAME;             
+            }
+            else if( e.GetCode() == VK_LEFT && DIFFICULTY == optionSelected )
+            {
+                int diff = difficulty;
+                diff--;
+                if( diff < 0 )
+                {
+                    diff = NUM_DIFFICULTIES - 1;
+                }
+                difficulty = ( Difficulty )diff;
+                gameStarted = false;
+                ResetGame();
+            }
+            else if( e.GetCode() == VK_RIGHT && DIFFICULTY == optionSelected )
+            {
+                int diff = difficulty;
+                diff++;
+                diff = diff % NUM_DIFFICULTIES;
+                difficulty = ( Difficulty )diff;
+                gameStarted = false;
+                ResetGame();
             }
         }
     }
@@ -240,6 +299,7 @@ void KlingKlongManager::KeyHandling( Keyboard& kbd )
                 if( GameState::GAME_OVER == gameState )
                 {
                     ResetGame();
+                    gameStarted = false;
                 }
                 gameState = GameState::START_SCREEN;
             }
@@ -269,7 +329,7 @@ void KlingKlongManager::ApplyPowerUp( const PowerUp & pu )
         pad.IncreaseSize( pu.GetBoostTime() );
         break;
     case EXTRA_LIFE:
-        if( lifes < MAX_LIFES )
+        if( lifes < maxLifes )
         {
             lifes++;
         }
@@ -296,10 +356,27 @@ void KlingKlongManager::CreateMultiBalls()
         //TODO maybe add possibility to get more then 3 balls later
         return;
     }
-
+    float speed;
+    switch( difficulty )
+    {
+    case KlingKlongManager::EASY:
+        speed = 275;
+        break;
+    case KlingKlongManager::MEDIUM:
+        speed = 500;
+        break;
+    case KlingKlongManager::HARD:
+        speed = 625;
+        break;
+    case KlingKlongManager::INSANE:
+        speed = 750;
+        break;
+    default:
+        break;
+    }
     while( vBalls.size() < 3 )
     {
-        Ball newBall = Ball( vBalls[ 0 ].GetPosition(), Vec2(), 5, 5 );
+        Ball newBall = Ball( vBalls[ 0 ].GetPosition(), Vec2(), speed, 5, 5 );
         float xDir;
         float yDir;
         do
@@ -331,7 +408,7 @@ void KlingKlongManager::CreatePowerUp( const Vec2& pos, const bool enemyKilled )
         if( freePUs[ i ] )
         {
             /* check, if activation makes sense (e.g. if lifes == MAX_LIFES -> no extra life PU!) */
-            if( ( vBalls.size() >= 3 && i == MULTI_BALL ) || ( i == EXTRA_LIFE && lifes == MAX_LIFES ) )
+            if( ( vBalls.size() >= 3 && i == MULTI_BALL ) || ( i == EXTRA_LIFE && lifes == maxLifes ) )
             {
                 continue;
             }
@@ -364,8 +441,15 @@ void KlingKlongManager::CreatePowerUp( const Vec2& pos, const bool enemyKilled )
         }
     }
 
-    if( enemyKilled )   /* guaranteed drop */
+    if( enemyKilled )   /* guaranteed drop, in INSANE mode only 20% */
     {
+        if( INSANE == difficulty )
+        {
+            if( rand() % 6 < 5 )
+            {
+                return;
+            }
+        }
         int idx = rand() % cntFreePU;
         int typePU = vFreeIndices[ idx ];
         if( typePU == SUPER_BALL )
@@ -394,11 +478,25 @@ void KlingKlongManager::CreatePowerUp( const Vec2& pos, const bool enemyKilled )
         int idx = rand() % cntFreePU;
         int typePU = vFreeIndices[ idx ];
 
-#if EASY_MODE
-        int chance = 3;
-#else
-        int chance = 5;
-#endif
+        int chance = 0;     /* the higher this value the LESS power ups will drop */
+        switch( difficulty )
+        {
+        case KlingKlongManager::EASY:
+            chance = 3;
+            break;
+        case KlingKlongManager::MEDIUM:
+            chance = 5;
+            break;
+        case KlingKlongManager::HARD:
+            chance = 7;
+            break;
+        case KlingKlongManager::INSANE:
+            chance = 10;
+            break;
+        default:
+            break;
+        }
+
         switch( ( ePowerUpType ) typePU )
         {
         case INCR_PADDLE_SIZE:
@@ -440,14 +538,35 @@ void KlingKlongManager::AddPowerUp( const ePowerUpType &type, const Vec2& posToS
     const float widthPU     = ( float )PowerUpSequences[ 0 ].GetWidth() / nSubImagesInSequence;
     const float heightPU    = ( float )PowerUpSequences[ 0 ].GetHeight();
 
-    float boostTimeIncrSize = 5;
-    float boostTimeLaserGun = 4;
+    float boostTimeIncrSize = 6;
+    float boostTimeLaserGun = 6;
     float boostTimeSuperBall = 4;
-#if EASY_MODE
-    boostTimeIncrSize *= 2;
-    boostTimeLaserGun *= 2;
-    boostTimeSuperBall = 10;
-#endif
+
+    switch( difficulty )
+    {
+    case KlingKlongManager::EASY:
+        boostTimeIncrSize *= 2;
+        boostTimeLaserGun *= 2;
+        boostTimeSuperBall *= 2;
+        break;
+    case KlingKlongManager::MEDIUM:
+        boostTimeIncrSize *= 1.1f;
+        boostTimeLaserGun *= 1.1f;
+        boostTimeSuperBall *= 1.1f;
+        break;
+    case KlingKlongManager::HARD:
+        boostTimeIncrSize *= 0.7f;
+        boostTimeLaserGun *= 0.7f;
+        boostTimeSuperBall *= 0.7f;
+        break;
+    case KlingKlongManager::INSANE:
+        boostTimeIncrSize *= 0.5f;
+        boostTimeLaserGun *= 0.5f;
+        boostTimeSuperBall *= 0.5f;
+        break;
+    default:
+        break;
+    }
 
     PowerUp PUtoSpawn;
     switch( type )
@@ -495,12 +614,12 @@ void KlingKlongManager::ShootLaser()
 
 void KlingKlongManager::SpawnEnemy( const Vec2& pos )
 {
-    if( vEnemies.size() >= MAX_ENEMIES )
+    if( vEnemies.size() >= maxEnemies )
     {
         return;
     }
 
-    vEnemies.push_back( Enemy( pos, seqEnemy.GetWidth() / 5.0f, seqEnemy.GetHeight() / 5.0f, walls.GetInnerBounds(), 5, 5 ) );
+    vEnemies.push_back( Enemy( pos, seqEnemy.GetWidth() / 5.0f, seqEnemy.GetHeight() / 5.0f, walls.GetInnerBounds(), 5, 5, EASY == difficulty ) );    
 }
 
 void KlingKlongManager::UpdateBalls( const float dt, Keyboard& kbd )
@@ -765,12 +884,30 @@ void KlingKlongManager::UpdateEnemies( const float dt )
 void KlingKlongManager::ResetBall()
 {
     vBalls.clear();
-    vBalls.push_back( Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ), Vec2( -0.2f, -1 ), 5, 5 ) );
+    float speed;
+    switch( difficulty )
+    {
+    case KlingKlongManager::EASY:
+        speed = 275;
+        break;
+    case KlingKlongManager::MEDIUM:
+        speed = 500;
+        break;
+    case KlingKlongManager::HARD:
+        speed = 625;
+        break;
+    case KlingKlongManager::INSANE:
+        speed = 750;
+        break;
+    default:
+        break;
+    }
+    vBalls.push_back( Ball( Vec2( pad.GetRect().GetCenter().x, pad.GetRect().top - 7 ), Vec2( -0.2f, -1 ), speed, 5, 5 ) );
 }
 
 void KlingKlongManager::ResetPaddle()
 {
-    pad = Paddle( Vec2( gfx.ScreenWidth / 2, gfx.ScreenHeight - 110 ) );
+    pad = Paddle( Vec2( gfx.ScreenWidth / 2, gfx.ScreenHeight - 110 ), EASY == difficulty );
 }
 
 void KlingKlongManager::DrawScene()
@@ -793,18 +930,80 @@ void KlingKlongManager::DrawScene()
             gfx.DrawSpriteKey( x, y, sur_KlingKlong, sur_KlingKlong.GetPixel( 0, 0 ) );
             if( 3 == startScreenCnt )
             {
-                x = gfx.ScreenWidth / 2 - sur_StartGame.GetWidth() / 2;
                 y = gfx.ScreenHeight / 2 + 30;
-                gfx.DrawSpriteKey( x, y, sur_StartGame, sur_StartGame.GetPixel( 0, 0 ) );
+                if( gameStarted )
+                {
+                    x = gfx.ScreenWidth / 2 - sur_Continue.GetWidth() / 2;
+                    gfx.DrawSpriteKey( x, y, sur_Continue, sur_Continue.GetPixel( 0, 0 ) );
+                }
+                else
+                {
+                    x = gfx.ScreenWidth / 2 - sur_StartGame.GetWidth() / 2;
+                    gfx.DrawSpriteKey( x, y, sur_StartGame, sur_StartGame.GetPixel( 0, 0 ) );
+                }
                 if( Selection::START_GAME == optionSelected )
                 {
-                    gfx.DrawRectBorder( RectF( Vec2( ( float )x, ( float )y ),
-                        ( float )sur_StartGame.GetWidth(), ( float )sur_StartGame.GetHeight() ), 1, Colors::LightGray );
+                    if( gameStarted )
+                    {
+                        gfx.DrawRectBorder( RectF( Vec2( ( float )x, ( float )y ),
+                            ( float )sur_Continue.GetWidth(), ( float )sur_Continue.GetHeight() ), 1, Colors::LightGray );
+                    }
+                    else
+                    {
+                        gfx.DrawRectBorder( RectF( Vec2( ( float )x, ( float )y ),
+                            ( float )sur_StartGame.GetWidth(), ( float )sur_StartGame.GetHeight() ), 1, Colors::LightGray );
+                    }
                 }
-                //TODO difficulties not implemented yet
-                /*x = gfx.ScreenWidth / 2 - sur_Difficulty.GetWidth() / 2;
                 y += 50;
-                gfx.DrawSpriteKey( x, y, sur_Difficulty, sur_Difficulty.GetPixel( 0, 0 ) );*/
+                if( EASY == difficulty )
+                {
+                    x = gfx.ScreenWidth / 2 - sur_Difficulty.GetWidth() / 2 - sur_Easy.GetWidth() / 2;
+                    gfx.DrawSpriteKey( x, y, sur_Difficulty, sur_Difficulty.GetPixel( 0, 0 ) );
+                    if( Selection::DIFFICULTY == optionSelected )
+                    {
+                        gfx.DrawRectBorder( RectF( Vec2( ( float )x, ( float )y ),
+                            ( float )sur_Difficulty.GetWidth() + sur_Easy.GetWidth(), ( float )sur_Difficulty.GetHeight() - 6 ), 1, Colors::Green );
+                    }
+                    x += sur_Difficulty.GetWidth();
+                    gfx.DrawSpriteKey( x, y + 6, sur_Easy, sur_Easy.GetPixel( 0, 0 ) );
+                }
+                else if( MEDIUM == difficulty )
+                {
+                    x = gfx.ScreenWidth / 2 - sur_Difficulty.GetWidth() / 2 - sur_Medium.GetWidth() / 2;
+                    gfx.DrawSpriteKey( x, y, sur_Difficulty, sur_Difficulty.GetPixel( 0, 0 ) );
+                    if( Selection::DIFFICULTY == optionSelected )
+                    {
+                        gfx.DrawRectBorder( RectF( Vec2( ( float )x, ( float )y ),
+                            ( float )sur_Difficulty.GetWidth() + sur_Medium.GetWidth(), ( float )sur_Difficulty.GetHeight() - 6 ), 1, Colors::Yellow );
+                    }
+                    x += sur_Difficulty.GetWidth();
+                    gfx.DrawSpriteKey( x, y, sur_Medium, sur_Medium.GetPixel( 0, 0 ) );
+                }
+                else if( HARD == difficulty )
+                {
+                    x = gfx.ScreenWidth / 2 - sur_Difficulty.GetWidth() / 2 - sur_Hard.GetWidth() / 2;
+                    gfx.DrawSpriteKey( x, y, sur_Difficulty, sur_Difficulty.GetPixel( 0, 0 ) );
+                    if( Selection::DIFFICULTY == optionSelected )
+                    {
+                        gfx.DrawRectBorder( RectF( Vec2( ( float )x, ( float )y ),
+                            ( float )sur_Difficulty.GetWidth() + sur_Hard.GetWidth(), ( float )sur_Difficulty.GetHeight() - 6 ), 1, Colors::Red );
+                    }
+                    x += sur_Difficulty.GetWidth();
+                    gfx.DrawSpriteKey( x, y, sur_Hard, sur_Hard.GetPixel( 0, 0 ) );
+                }
+                else if( INSANE == difficulty )
+                {
+                    x = gfx.ScreenWidth / 2 - sur_Difficulty.GetWidth() / 2 - sur_Insane.GetWidth() / 2;
+                    gfx.DrawSpriteKey( x, y, sur_Difficulty, sur_Difficulty.GetPixel( 0, 0 ) );
+                    if( Selection::DIFFICULTY == optionSelected )
+                    {
+                        gfx.DrawRectBorder( RectF( Vec2( ( float )x, ( float )y ),
+                            ( float )sur_Difficulty.GetWidth() + sur_Insane.GetWidth(), ( float )sur_Difficulty.GetHeight() - 6 ), 3, Colors::Magenta );
+                    }
+                    x += sur_Difficulty.GetWidth();
+                    gfx.DrawSpriteKey( x, y, sur_Insane, sur_Insane.GetPixel( 0, 0 ) );
+                }
+
                 x = gfx.ScreenWidth / 2 - sur_Exit.GetWidth() / 2;
                 y += 50;
                 gfx.DrawSpriteKey( x, y, sur_Exit, sur_Exit.GetPixel( 0, 0 ) );
@@ -857,6 +1056,23 @@ void KlingKlongManager::DrawScene()
 
         std::string lvlTxt = "Level " + std::to_string( level + 1 );
         gfx.DrawString( lvlTxt.c_str(), 700, 10, font, fontSurface, Colors::White );
+        switch( difficulty )
+        {
+        case KlingKlongManager::EASY:
+            gfx.DrawString( "Easy", gfx.ScreenWidth / 2 - 30, 10, font, fontSurface, Colors::Green );
+            break;
+        case KlingKlongManager::MEDIUM:
+            gfx.DrawString( "Medium", gfx.ScreenWidth / 2 - 30, 10, font, fontSurface, Colors::Yellow );
+            break;
+        case KlingKlongManager::HARD:
+            gfx.DrawString( "Hard", gfx.ScreenWidth / 2 - 30, 10, font, fontSurface, Colors::Red );
+            break;
+        case KlingKlongManager::INSANE:
+            gfx.DrawString( "INSANE", gfx.ScreenWidth / 2 - 30, 10, font, fontSurface, Colors::Magenta );
+            break;
+        default:
+            break;
+        }
     }
     break;
     case GameState::VICTORY_SCREEN:

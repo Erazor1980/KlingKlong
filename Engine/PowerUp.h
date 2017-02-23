@@ -21,17 +21,13 @@ class PowerUp
 public:
     PowerUp() = default;
     PowerUp( const Vec2& centerPos_in, const float width_in, const float height_in, ePowerUpType type_in, const float boost_time /* boost time in seconds */,
-             const float level_bottom, int rowImagesSeq_in, int colImagesSeq_in, Sound* const sound_in );
+             const float level_bottom, int rowImagesSeq_in, int colImagesSeq_in, Sound* const sound_in, bool easy = false );
     bool Update( const RectF& paddleRect, const float dt, bool &paddleHit );         /* returns true, when hit paddle or the ground */
     void Draw( Graphics& gfx, const Surface& surfSeq ) const;
     ePowerUpType GetType() const;
     float GetBoostTime() const;
 private:
-#if EASY_MODE
-    static constexpr float speed = 150;
-#else
-    static constexpr float speed = 250;
-#endif
+    float speed = 250;
     Vec2 pos;
     float width;
     float height;

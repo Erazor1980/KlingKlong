@@ -1,6 +1,6 @@
 #include "Enemy.h"
 
-Enemy::Enemy( const Vec2& pos_in, const float width_in, const float height_in, const RectF& walls_in, int rowImagesSeq_in, int colImagesSeq_in )
+Enemy::Enemy( const Vec2& pos_in, const float width_in, const float height_in, const RectF& walls_in, int rowImagesSeq_in, int colImagesSeq_in, bool easy )
     :
     walls( walls_in ),
     rowImagesSeq( rowImagesSeq_in ),
@@ -13,6 +13,11 @@ Enemy::Enemy( const Vec2& pos_in, const float width_in, const float height_in, c
     {
         dir = Vec2( rand() % 100 - 50 + 10.0f, rand() % 100 - 50 + 10.0f );
     } while( abs( dir.x ) < 10 && abs( dir.y ) < 10 );
+
+    if( easy )
+    {
+        speed = 100;
+    }
 }
 
 void Enemy::Draw( Graphics& gfx, const Surface& surfSeq ) const

@@ -30,6 +30,21 @@ public:
     void Update( const float dt, Keyboard& kbd );
     void DrawScene();
 private:
+    enum Selection
+    {
+        START_GAME = 0, /* if game already started, this will be "continue game" */
+        DIFFICULTY,
+        EXIT,
+        NUM_SELECTIONS
+    };
+    enum Difficulty
+    {
+        EASY = 0,
+        MEDIUM,
+        HARD,
+        INSANE,
+        NUM_DIFFICULTIES
+    };
     void UpdateStartScreen( Keyboard& kbd );
     void KeyHandling( Keyboard& kbd );
     void ApplyPowerUp( const PowerUp& pu );
@@ -48,23 +63,13 @@ private:
     void ResetGame();
     void ResetBall();
     void ResetPaddle();
-
     void CreateNextLevel();
     void DrawLightning();
 private:
-    enum Selection
-    {
-        START_GAME = 0,
-        /*DIFFICULTY,*/
-        //CONTINUE_GAME,
-        //RESTART_GAME,
-        EXIT,
-        NUM_SELECTIONS
-    };
 
     /* START_SCREEN */
     std::chrono::steady_clock::time_point startTime_startScreen;
-    int startScreenCnt = -1;    /* for drawing/playing title screen: 0 -> "welcome to", 1 -> "kling", 2 -> "klong", 3 -> "press key" */
+    int startScreenCnt = -1;    /* for drawing/playing title screen: 0 -> "welcome to", 1 -> "kling", 2 -> "klong", 3 -> "start menu" */
     Selection optionSelected = Selection::START_GAME;
         
     /* ALL SOUNDS */
@@ -88,11 +93,13 @@ private:
     Surface sur_KlingKlong  = Surface::FromFile( L"Images\\Text\\KlingKlong.png" );
     Surface sur_WelcomeTo   = Surface::FromFile( L"Images\\Text\\welcome.png" );
     Surface sur_StartGame   = Surface::FromFile( L"Images\\Text\\startGame.png" );
+    Surface sur_Continue    = Surface::FromFile( L"Images\\Text\\continue.png" );
     Surface sur_Exit        = Surface::FromFile( L"Images\\Text\\exit.png" );
     Surface sur_Difficulty  = Surface::FromFile( L"Images\\Text\\difficulty.png" );
     Surface sur_Easy        = Surface::FromFile( L"Images\\Text\\easy.png" );
     Surface sur_Medium      = Surface::FromFile( L"Images\\Text\\medium.png" );
     Surface sur_Hard        = Surface::FromFile( L"Images\\Text\\hard.png" );
+    Surface sur_Insane       = Surface::FromFile( L"Images\\Text\\insane.png" );
     Surface sur_GameOver    = Surface::FromFile( L"Images\\Text\\gameover.png" );
     Surface sur_Victory     = Surface::FromFile( L"Images\\Text\\victory.png" );
     static constexpr int nSubImagesInSequence = 8;  /* first 4 sequences consist of 8 images */
@@ -110,12 +117,8 @@ private:
     Surface seqEnemy    = Surface::FromFile( L"Images\\Sequences\\funnyEnemy.png" );
     Surface seqLightning   = Surface::FromFile( L"Images\\Sequences\\lightning.png" );
     int lightningSeqIdx = 0;
-#if EASY_MODE
-    float timeBetweenEnemies = 15;  /* in seconds */
-#else
-    float timeBetweenEnemies = 10;  /* in seconds */
-#endif
 
+    float timeBetweenEnemies = 10;  /* in seconds */
     float timeBetweenLevels = 3;    /* in seconds */
     /* TIMER */
     std::chrono::steady_clock::time_point startTime_enemySpawn;
@@ -134,7 +137,11 @@ private:
     std::vector< Enemy > vEnemies;
     std::vector< LaserShot > vLaserShots;
 
-    int lifes = MAX_LIFES;
+    bool gameStarted = false;
+    Difficulty difficulty = MEDIUM;
+    int maxEnemies = 3;
+    int maxLifes = 3;
+    int lifes = maxLifes;
     int level = 0;
     std::vector< std::string > allLevels;
     int nBricksLeft = 0;

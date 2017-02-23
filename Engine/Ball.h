@@ -25,8 +25,8 @@ public:
     };
 public:
     Ball() = default;
-    Ball( const Vec2& pos_in, const Vec2& dir_in, int rowImagesSeq_in, int colImagesSeq_in );   /* sequence parameter for the super ball sequence! */
-    void Draw( Graphics& gfx, const Surface& surfSeq ) const;
+    Ball( const Vec2& pos_in, const Vec2& dir_in, float speed_in, int rowImagesSeq_in, int colImagesSeq_in );   /* sequence parameter for the super ball sequence! */
+    void Draw( Graphics& gfx, const Surface& surfSeq, bool easy = false ) const;
     void Update( float dt, const float paddleCenterX, const Keyboard& kbd );
     /* return 0 = nothing, 1 = hit wall, 2 = hit bottom */
    
@@ -48,11 +48,7 @@ public:
     void ReduceSpeed(); /* when SUPER_BALL activated, the ball looses speed, each time it destroys a brick */
 private:
     float radius = 7.0f;
-#if EASY_MODE
-    float speed = 270;
-#else
     float speed  = 550;
-#endif
     float defaultSpeed = speed;
     eBallState ballState = INACTIVE;
     float offsetToPaddleCenter = 0;     /* for STICKING state, to move with the paddle */

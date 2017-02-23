@@ -1,6 +1,6 @@
 #include "Paddle.h"
 
-Paddle::Paddle( const Vec2& pos_in )
+Paddle::Paddle( const Vec2& pos_in, bool easy )
     :
     pos( pos_in ),
     exitXFactor( maximumExitRatio / halfWidth ),
@@ -10,6 +10,10 @@ Paddle::Paddle( const Vec2& pos_in )
     sizeIncreased( false )
 {
     CalcLaserPositions();
+    if( easy )
+    {
+        speed = 300;
+    }
 }
 
 void Paddle::Draw( Graphics& gfx ) const

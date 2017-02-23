@@ -1,30 +1,32 @@
 #include "Ball.h"
 #include "SpriteCodex.h"
 
-Ball::Ball( const Vec2& pos_in, const Vec2& dir_in, int rowImagesSeq_in, int colImagesSeq_in )
+Ball::Ball( const Vec2& pos_in, const Vec2& dir_in, float speed_in, int rowImagesSeq_in, int colImagesSeq_in )
     :
     pos( pos_in ),
     ballState( WAITING ),
     rowImagesSeq( rowImagesSeq_in ),
-    colImagesSeq( colImagesSeq_in )
+    colImagesSeq( colImagesSeq_in ),
+    speed( speed_in )
 {
     SetDirection( dir_in );
 }
 
-void Ball::Draw( Graphics& gfx, const Surface& surfSeq ) const
+void Ball::Draw( Graphics& gfx, const Surface& surfSeq, bool easy ) const
 {
     // draw ball direction line when stopped
     if( ballState != MOVING )
     {
         Vec2 dirLine = pos + dir.GetNormalized();
-#if EASY_MODE
-        for( int i = 1; i <= 55; ++i )
-#else
-        for( int i = 1; i <= 15; ++i )
-#endif
+
+        int numDots = 15;
+        if( easy )
+        {
+            numDots = 55;
+        }
+        for( int i = 1; i <= numDots; ++i )
         {
             gfx.PutPixel( ( int )dirLine.x, ( int )dirLine.y, Colors::Gray );
-            //gfx.DrawCircle( ( int )dirLine.x, ( int )dirLine.y, 2, Colors::Blue );
             dirLine += dir.GetNormalized() * 9;
         }
     }

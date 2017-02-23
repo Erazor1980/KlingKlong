@@ -37,7 +37,7 @@ private:
 	/*  User Functions              */
 	/********************************/
 #if _DEBUG
-    GameState state = GameState::PLAYING;
+    GameState state = GameState::START_SCREEN;
 #else
     GameState state = GameState::START_SCREEN;
 #endif
