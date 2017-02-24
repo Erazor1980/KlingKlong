@@ -133,7 +133,7 @@ void KlingKlongManager::Update( const float dt, Keyboard& kbd )
 
         if( lifes <= 0 )
         {
-            soundGameOver.Play();
+            soundGameOver.Play( 1, 0.5f );
             gameState = GameState::GAME_OVER;
         }
         else if( 0 == nBricksLeft )
