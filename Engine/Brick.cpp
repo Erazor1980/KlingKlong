@@ -77,11 +77,16 @@ bool Brick::ExecuteBallCollision( Ball& ball )
     return destroyed;
 }
 
-bool Brick::CheckLaserCollision( LaserShot& laser )
+bool Brick::CheckLaserCollision( LaserShot& laser, bool& laserHit )
 {
     if( destroyed || !rect.IsOverlappingWith( laser.GetRect() ) )
     {
+        laserHit = false;
         return false;
+    }
+    else
+    {
+        laserHit = true;
     }
 
     //laser.DeActivate();

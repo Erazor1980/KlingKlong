@@ -104,7 +104,7 @@ void KlingKlongManager::ResetGame()
     /////////////////
     //AddPowerUp( INCR_PADDLE_SIZE, Vec2( 450, 100 ) );
     //AddPowerUp( EXTRA_LIFE, Vec2( 450, 100 ) );
-    //AddPowerUp( LASER_GUN, Vec2( 450, 500 ) );
+    AddPowerUp( LASER_GUN, Vec2( 450, 500 ) );
     //AddPowerUp( MULTI_BALL, Vec2( 450, 100 ) );
     //AddPowerUp( SUPER_BALL, Vec2( 450, 100 ) );
     //vBalls[ 0 ].StickToPaddle( pad.GetRect().GetCenter().x );
@@ -826,24 +826,29 @@ void KlingKlongManager::UpdateLaserShots( const float dt )
     while( it != vLaserShots.end() )
     {
         auto b = vBricks.begin();
-        bool brickHit = false;
+        bool brickDestroyed = false;
         while( b != vBricks.end() && it != vLaserShots.end() )
         {
-            if( ( *b ).CheckLaserCollision( ( *it ) ) )
+            bool laserHit = false;
+            if( ( *b ).CheckLaserCollision( ( *it ), laserHit ) )
             {
                 nBricksLeft--;
                 CreatePowerUp( ( *b ).GetCenter(), false );
                 
                 b = vBricks.erase( b );
                 it = vLaserShots.erase( it );
-                brickHit = true;
+                brickDestroyed = true;
             }
             else
             {
+                if( laserHit )
+                {
+                    it = vLaserShots.erase( it );
+                }
                 b++;
             }
         }
-        if( !brickHit )
+        if( !brickDestroyed )
         {
             it++;
         }
@@ -1024,7 +1029,7 @@ void KlingKlongManager::DrawScene()
         walls.Draw( gfx );
         for( const Ball& b : vBalls )
         {
-            b.Draw( gfx, PowerUpSequences[ SUPER_BALL ] );
+            b.Draw( gfx, PowerUpSequences[ SUPER_BALL ], EASY == difficulty );
         }
         for( const Brick& b : vBricks )
         {
