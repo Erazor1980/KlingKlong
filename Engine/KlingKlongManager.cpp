@@ -41,7 +41,7 @@ void KlingKlongManager::ResetGame()
     std::srand( ( unsigned int )std::time( 0 ) );
 
     // level
-    level = 3;
+    level = 0;
 
     // reset paddle
     ResetPaddle();
