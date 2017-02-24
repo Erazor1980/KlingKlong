@@ -41,7 +41,7 @@ void KlingKlongManager::ResetGame()
     std::srand( ( unsigned int )std::time( 0 ) );
 
     // level
-    level = 0;
+    level = 3;
 
     // reset paddle
     ResetPaddle();
@@ -104,7 +104,7 @@ void KlingKlongManager::ResetGame()
     /////////////////
     //AddPowerUp( INCR_PADDLE_SIZE, Vec2( 450, 100 ) );
     //AddPowerUp( EXTRA_LIFE, Vec2( 450, 100 ) );
-    //AddPowerUp( LASER_GUN, Vec2( 450, 500 ) );
+    AddPowerUp( LASER_GUN, Vec2( 450, 500 ) );
     //AddPowerUp( MULTI_BALL, Vec2( 450, 100 ) );
     //AddPowerUp( SUPER_BALL, Vec2( 450, 100 ) );
     //vBalls[ 0 ].StickToPaddle( pad.GetRect().GetCenter().x );
@@ -826,7 +826,7 @@ void KlingKlongManager::UpdateLaserShots( const float dt )
     while( it != vLaserShots.end() )
     {
         auto b = vBricks.begin();
-        bool brickDestroyed = false;
+        bool laserDeleted = false;
         while( b != vBricks.end() && it != vLaserShots.end() )
         {
             bool laserHit = false;
@@ -837,18 +837,19 @@ void KlingKlongManager::UpdateLaserShots( const float dt )
                 
                 b = vBricks.erase( b );
                 it = vLaserShots.erase( it );
-                brickDestroyed = true;
+                laserDeleted = true;
             }
             else
             {
                 if( laserHit )
                 {
                     it = vLaserShots.erase( it );
+                    laserDeleted = true;
                 }
                 b++;
             }
         }
-        if( !brickDestroyed )
+        if( !laserDeleted )
         {
             it++;
         }
