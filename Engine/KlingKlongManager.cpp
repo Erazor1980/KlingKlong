@@ -661,10 +661,13 @@ void KlingKlongManager::UpdateBalls( const float dt, Keyboard& kbd )
     if( vBalls.size() == 0 )
     {
         lifes--;
-        ResetPaddle();
         vPowerUps.clear();
         vLaserShots.clear();
-        soundLifeLoss.Play();
+        if( lifes > 0 )
+        {
+            soundLifeLoss.Play();
+            ResetPaddle();
+        }
 
         ResetBall();
     }
