@@ -14,11 +14,33 @@
 enum class GameState
 {
     START_SCREEN,
-    /*MAIN_MENU,*/
     PLAYING,
     GAME_OVER,
     VICTORY_SCREEN,
+    STATISTICS_SCREEN,
     EXIT_GAME
+};
+
+struct Statistics
+{
+    void reset()
+    {
+        enemiesKilled = 0;
+        laserGunCollected = 0;
+        extraLifeCollected = 0;
+        superBallCollected = 0;
+        multiBallCollected = 0;
+        incrSizeCollected = 0;
+        bricksDestroyed = 0;
+    }
+
+    int enemiesKilled = 0;
+    int laserGunCollected = 0;
+    int extraLifeCollected = 0;
+    int superBallCollected = 0;
+    int multiBallCollected = 0;
+    int incrSizeCollected = 0;
+    int bricksDestroyed = 0;
 };
 
 
@@ -65,6 +87,7 @@ private:
     void ResetPaddle();
     void CreateNextLevel();
     void DrawLightning();
+    void DrawStatisticsScreen();
 private:
 
     /* START_SCREEN */
@@ -99,9 +122,10 @@ private:
     Surface sur_Easy        = Surface::FromFile( L"Images\\Text\\easy.png" );
     Surface sur_Medium      = Surface::FromFile( L"Images\\Text\\medium.png" );
     Surface sur_Hard        = Surface::FromFile( L"Images\\Text\\hard.png" );
-    Surface sur_Insane       = Surface::FromFile( L"Images\\Text\\insane.png" );
+    Surface sur_Insane      = Surface::FromFile( L"Images\\Text\\insane.png" );
     Surface sur_GameOver    = Surface::FromFile( L"Images\\Text\\gameover.png" );
     Surface sur_Victory     = Surface::FromFile( L"Images\\Text\\victory.png" );
+    Surface sur_Statistics  = Surface::FromFile( L"Images\\Text\\statistics.png" );
     static constexpr int nSubImagesInSequence = 8;  /* first 4 sequences consist of 8 images */
     static constexpr int nPowerUps = 5;
     Surface PowerUpSequences[ nPowerUps ] = { Surface::FromFile( L"Images\\Sequences\\incrSize.png" ),
@@ -145,6 +169,7 @@ private:
     int level = 0;
     std::vector< std::string > allLevels;
     int nBricksLeft = 0;
+    Statistics stats;
 
     //Font font;
     Paddle pad;

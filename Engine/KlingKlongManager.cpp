@@ -62,7 +62,7 @@ void KlingKlongManager::ResetGame()
         timeBetweenEnemies = 15;
         break;
     case KlingKlongManager::MEDIUM:
-        maxLifes = 3;
+        maxLifes = 4;
         lifes = 3;
         maxEnemies = 3;
         timeBetweenEnemies = 10;
@@ -95,10 +95,13 @@ void KlingKlongManager::ResetGame()
     // explosion sequence
     explSeqIdx = 0;
 
+    // reset statistics
+    stats.reset();
+
     // reset timer
     startTime_shot          = std::chrono::steady_clock::now();
     startTime_enemySpawn    = std::chrono::steady_clock::now();
-
+    
     /////////////////
     //// TESTING ////
     /////////////////
@@ -134,6 +137,7 @@ void KlingKlongManager::Update( const float dt, Keyboard& kbd )
         if( lifes <= 0 )
         {
             soundGameOver.Play( 1, 0.5f );
+            startTime_explosion = std::chrono::steady_clock::now();
             gameState = GameState::GAME_OVER;
         }
         else if( 0 == nBricksLeft )
@@ -146,8 +150,9 @@ void KlingKlongManager::Update( const float dt, Keyboard& kbd )
     break;
     case GameState::GAME_OVER:
     {
+        gameStarted = false;
         const std::chrono::duration<float> timeElapsed = std::chrono::steady_clock::now() - startTime_explosion;
-        if( timeElapsed.count() > 0.15f )
+        if( explSeqIdx < 4 && timeElapsed.count() > 0.15f )
         {
             explSeqIdx++;
             startTime_explosion = std::chrono::steady_clock::now();
@@ -155,6 +160,10 @@ void KlingKlongManager::Update( const float dt, Keyboard& kbd )
         if( explSeqIdx >= 4 )
         {
             KeyHandling( kbd );
+        }
+        if( timeElapsed.count() > 2.5f )
+        {
+            gameState = GameState::STATISTICS_SCREEN;
         }
     }
     break;
@@ -174,6 +183,11 @@ void KlingKlongManager::Update( const float dt, Keyboard& kbd )
             startTime_enemySpawn = std::chrono::steady_clock::now();
             gameState = GameState::PLAYING;
         }
+    }
+    break;
+    case GameState::STATISTICS_SCREEN:
+    {
+        KeyHandling( kbd );
     }
     break;
     default:
@@ -241,8 +255,12 @@ void KlingKlongManager::UpdateStartScreen( Keyboard& kbd )
                 if( optionSelected == START_GAME )
                 {
                     startTime_enemySpawn = std::chrono::steady_clock::now();
-                    gameStarted = true;
                     gameState = GameState::PLAYING;
+                    if( !gameStarted )
+                    {
+                        gameStarted = true;
+                        ResetGame();
+                    }
                 }
                 else if( EXIT == optionSelected )
                 {
@@ -303,6 +321,17 @@ void KlingKlongManager::KeyHandling( Keyboard& kbd )
                 }
                 gameState = GameState::START_SCREEN;
             }
+            else if( e.GetCode() == 'S' )
+            {
+                if( GameState::STATISTICS_SCREEN == gameState && gameStarted )
+                {
+                    gameState = GameState::PLAYING;
+                }
+                else if( GameState::PLAYING == gameState )
+                {
+                    gameState = GameState::STATISTICS_SCREEN;
+                }
+            }
         }
     }
 
@@ -327,21 +356,26 @@ void KlingKlongManager::ApplyPowerUp( const PowerUp & pu )
     {
     case INCR_PADDLE_SIZE:
         pad.IncreaseSize( pu.GetBoostTime() );
+        stats.incrSizeCollected++;
         break;
     case EXTRA_LIFE:
+        stats.extraLifeCollected++;
         if( lifes < maxLifes )
         {
             lifes++;
-        }
+        } 
         break;
     case LASER_GUN:
+        stats.laserGunCollected++;
         pad.AddLaserGun( pu.GetBoostTime() );
         startTime_shot = std::chrono::steady_clock::now();
         break;
     case MULTI_BALL:
+        stats.multiBallCollected++;
         CreateMultiBalls();
         break;
     case SUPER_BALL:
+        stats.superBallCollected++;
         vBalls[ 0 ].ActivateSuperBall( pu.GetBoostTime(), ( PowerUpSequences[ SUPER_BALL ].GetWidth() / 5 ) / 2.0f );
         break;
     default:
@@ -618,8 +652,9 @@ void KlingKlongManager::SpawnEnemy( const Vec2& pos )
     {
         return;
     }
-
-    vEnemies.push_back( Enemy( pos, seqEnemy.GetWidth() / 5.0f, seqEnemy.GetHeight() / 5.0f, walls.GetInnerBounds(), 5, 5, EASY == difficulty ) );    
+    
+    vEnemies.push_back( Enemy( pos, seqEnemy.GetWidth() / 5.0f, seqEnemy.GetHeight() / 5.0f, walls.GetInnerBounds(),
+                               5, 5, EASY == difficulty || MEDIUM == difficulty ) );    
 }
 
 void KlingKlongManager::UpdateBalls( const float dt, Keyboard& kbd )
@@ -638,6 +673,7 @@ void KlingKlongManager::UpdateBalls( const float dt, Keyboard& kbd )
                 CreatePowerUp( ( *e ).GetPos(), true );
 
                 e = vEnemies.erase( e );
+                stats.enemiesKilled++;
             }
             else
             {
@@ -661,6 +697,7 @@ void KlingKlongManager::UpdateBalls( const float dt, Keyboard& kbd )
     if( vBalls.size() == 0 )
     {
         lifes--;
+        startTime_enemySpawn = std::chrono::steady_clock::now();
         vPowerUps.clear();
         vLaserShots.clear();
         if( lifes > 0 )
@@ -743,6 +780,7 @@ void KlingKlongManager::UpdateBricks( const float dt )
             if( vBricks[ bestCollisionIdx ].GetType() != UNDESTROYABLE )
             {
                 nBricksLeft--;
+                stats.bricksDestroyed++;
                 CreatePowerUp( vBricks[ bestCollisionIdx ].GetCenter(), false );
             }
             vBricks.erase( vBricks.begin() + bestCollisionIdx );
@@ -812,6 +850,7 @@ void KlingKlongManager::UpdateLaserShots( const float dt )
                 e = vEnemies.erase( e );
                 it = vLaserShots.erase( it );
                 enemyKilled = true;
+                stats.enemiesKilled++;
             }
             else
             {
@@ -836,6 +875,7 @@ void KlingKlongManager::UpdateLaserShots( const float dt )
             if( ( *b ).CheckLaserCollision( ( *it ), laserHit ) )
             {
                 nBricksLeft--;
+                stats.bricksDestroyed++;
                 CreatePowerUp( ( *b ).GetCenter(), false );
                 
                 b = vBricks.erase( b );
@@ -900,10 +940,10 @@ void KlingKlongManager::ResetBall()
         speed = 275;
         break;
     case KlingKlongManager::MEDIUM:
-        speed = 500;
+        speed = 400;
         break;
     case KlingKlongManager::HARD:
-        speed = 625;
+        speed = 600;
         break;
     case KlingKlongManager::INSANE:
         speed = 750;
@@ -1058,9 +1098,9 @@ void KlingKlongManager::DrawScene()
 #if !_DEBUG
         DrawLightning();
 #else
-        gfx.DrawString( std::to_string( vEnemies.size() ).c_str(), 400, gfx.ScreenHeight - 30, font, fontSurface, Colors::White );
-        gfx.DrawString( std::to_string( vLaserShots.size() ).c_str(), 600, gfx.ScreenHeight - 30, font, fontSurface, Colors::White );
-        gfx.DrawString( std::to_string( nBricksLeft ).c_str(), 800, gfx.ScreenHeight - 30, font, fontSurface, Colors::White );
+        gfx.DrawString( std::string( "Enemies: " + std::to_string( vEnemies.size() ) ).c_str(), 400, gfx.ScreenHeight - 30, font, fontSurface, Colors::White );
+        //gfx.DrawString( std::to_string( vLaserShots.size() ).c_str(), 600, gfx.ScreenHeight - 30, font, fontSurface, Colors::White );
+        gfx.DrawString( std::string( "Bricks left: " + std::to_string( nBricksLeft ) ).c_str(), 600, gfx.ScreenHeight - 30, font, fontSurface, Colors::White );
 #endif
 
         std::string lvlTxt = "Level " + std::to_string( level + 1 );
@@ -1112,6 +1152,11 @@ void KlingKlongManager::DrawScene()
             e.Draw( gfx, seqEnemy );
         }
         gfx.DrawSpriteKey( ( int )walls.GetInnerBounds().GetCenter().x - sur_Victory.GetWidth() / 2, 200, sur_Victory, sur_Victory.GetPixel( 0, 0 ) );
+    }
+    break;
+    case GameState::STATISTICS_SCREEN:
+    {
+        DrawStatisticsScreen();
     }
     break;
     case GameState::GAME_OVER:
@@ -1264,4 +1309,38 @@ void KlingKlongManager::DrawLightning()
         }
         startTime_lightning = std::chrono::steady_clock::now();
     }
+}
+
+void KlingKlongManager::DrawStatisticsScreen()
+{
+#if _DEBUG
+    gfx.DrawSprite( 0, gfx.ScreenHeight - sur_Background.GetHeight(), sur_Background );
+#endif
+    gfx.DrawSprite( gfx.ScreenWidth / 2 - sur_Statistics.GetWidth() / 2, 100, sur_Statistics );
+
+    int x = 350;
+    int y = 330;
+    gfx.DrawSpriteKeyFromSequence( x, y, seqEnemy, seqEnemy.GetPixel( 0, 0 ), 0, 5, 5 );
+    gfx.DrawString( std::string( "x" + std::to_string( stats.enemiesKilled ) ).c_str(), x + 150, y, font, fontSurface, Colors::Green );
+    y += 50;
+    gfx.DrawSpriteKeyFromSequence( x, y + 5, PowerUpSequences[ INCR_PADDLE_SIZE ], PowerUpSequences[ INCR_PADDLE_SIZE ].GetPixel( 0, 0 ), 0, nSubImagesInSequence, 1 );
+    gfx.DrawString( std::string( "x" + std::to_string( stats.incrSizeCollected ) ).c_str(), x + 150, y, font, fontSurface, Colors::Green );
+    y += 50;
+    gfx.DrawSpriteKeyFromSequence( x, y, PowerUpSequences[ EXTRA_LIFE ], PowerUpSequences[ EXTRA_LIFE ].GetPixel( 0, 0 ), 0, nSubImagesInSequence, 1 );
+    gfx.DrawString( std::string( "x" + std::to_string( stats.extraLifeCollected ) ).c_str(), x + 150, y, font, fontSurface, Colors::Green );
+    y += 50;
+    gfx.DrawSpriteKeyFromSequence( x, y - 15, PowerUpSequences[ LASER_GUN ], PowerUpSequences[ LASER_GUN ].GetPixel( 0, 0 ), 0, nSubImagesInSequence, 1 );
+    gfx.DrawString( std::string( "x" + std::to_string( stats.laserGunCollected ) ).c_str(), x + 150, y, font, fontSurface, Colors::Green );
+    y += 50;
+    gfx.DrawSpriteKeyFromSequence( x, y, PowerUpSequences[ MULTI_BALL ], PowerUpSequences[ MULTI_BALL ].GetPixel( 0, 0 ), 0, nSubImagesInSequence, 1 );
+    gfx.DrawString( std::string( "x" + std::to_string( stats.multiBallCollected ) ).c_str(), x + 150, y, font, fontSurface, Colors::Green );
+    y += 50;
+    gfx.DrawSpriteKeyFromSequence( x, y - 5, PowerUpSequences[ SUPER_BALL ], PowerUpSequences[ SUPER_BALL ].GetPixel( 0, 0 ), 0, 5, 5 );
+    gfx.DrawString( std::string( "x" + std::to_string( stats.superBallCollected ) ).c_str(), x + 150, y, font, fontSurface, Colors::Green );
+    y += 50;
+
+    Beveler bev( { 225, 10, 5 } );
+    RectF rect( Vec2( ( float )x, ( float )y ), 70, 30 );
+    bev.DrawBeveledBrick( rect.GetExpanded( -2.5 ), 5, gfx );
+    gfx.DrawString( std::string( "x" + std::to_string( stats.bricksDestroyed ) ).c_str(), x + 150, y, font, fontSurface, Colors::Green );
 }
